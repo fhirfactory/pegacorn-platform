@@ -20,6 +20,9 @@
     </properties>
     
     <modules>
-        <module>../pegacorn-communicate-iris</module>
+        <module>../pegacorn-petasos-common</module>
+        <module>../pegacorn-petasos-resilience</module>
+        <module>../pegacorn-petasos-interchange</module>
+        <module>../pegacorn-petasos-workunitprocessor</module>
     </modules>
 </project>
