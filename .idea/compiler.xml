@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="pegacorn-petasos-interchange" />
+        <module name="pegacorn-petasos-common" />
+        <module name="pegacorn-petasos-resilience" />
+        <module name="pegacorn-petasos-workunitprocessor" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="pegacorn-petasos" target="1.8" />
+      <module name="pegacorn-petasos-common" target="1.8" />
+      <module name="pegacorn-petasos-interchange" target="1.8" />
+      <module name="pegacorn-petasos-resilience" target="1.8" />
+      <module name="pegacorn-petasos-workunitprocessor" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

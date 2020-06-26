@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/pegacorn-petasos.iml" filepath="$PROJECT_DIR$/pegacorn-petasos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pegacorn-petasos-common/pegacorn-petasos-common.iml" filepath="$PROJECT_DIR$/../pegacorn-petasos-common/pegacorn-petasos-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pegacorn-petasos-interchange/pegacorn-petasos-interchange.iml" filepath="$PROJECT_DIR$/../pegacorn-petasos-interchange/pegacorn-petasos-interchange.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pegacorn-petasos-resilience/pegacorn-petasos-resilience.iml" filepath="$PROJECT_DIR$/../pegacorn-petasos-resilience/pegacorn-petasos-resilience.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pegacorn-petasos-workunitprocessor/pegacorn-petasos-workunitprocessor.iml" filepath="$PROJECT_DIR$/../pegacorn-petasos-workunitprocessor/pegacorn-petasos-workunitprocessor.iml" />
+    </modules>
+  </component>
+</project>
