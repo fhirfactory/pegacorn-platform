@@ -9,17 +9,19 @@
         <relativePath>../pegacorn</relativePath>
     </parent>
         
-    <artifactId>pegacorn-petasos</artifactId>
+    <artifactId>pegacorn-platform</artifactId>
     <packaging>pom</packaging>
     
-    <name>Pegacorn :: Petasos</name>
-    <description>The resilience and reliability framework for the Pegacorn solution</description>
+    <name>Pegacorn :: Platform</name>
+    <description>The core (common) platform services on which Pegacorn is built</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
     <modules>
-        <module>../pegacorn-petasos-system</module>
+        <module>../pegacorn-platform-commoncode</module>
+        <module>../pegacorn-platform-petasos</module>
+        <module>../pegacorn-platform-edge</module>
     </modules>
 </project>
