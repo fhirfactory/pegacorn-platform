@@ -21,6 +21,7 @@
     
     <modules>
         <module>../pegacorn-platform-commoncode</module>
+        <module>../pegacorn-platform-enablers</module>
         <module>../pegacorn-platform-petasos</module>
         <module>../pegacorn-platform-samples</module>
     </modules>
