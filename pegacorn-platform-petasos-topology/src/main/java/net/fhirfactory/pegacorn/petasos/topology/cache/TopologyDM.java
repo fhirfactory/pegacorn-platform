@@ -499,7 +499,7 @@ public class TopologyDM {
                 return(endpointNode);
             }
         }
-        LOG.debug(".getEndpoint(): no endpoints found!");
+        LOG.warn(".getEndpoint(): no endpoint found for node --> {}, endpointName --> {}, endpointVersion --> {}", node, endpointName, endpointVersion);
         return(null);
     }
 
