@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.uow;
 
+import net.fhirfactory.pegacorn.common.model.FDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +41,21 @@ public class UoWPayload {
     }
 
     public UoWPayload(UoWPayload originalUoWPayload) {
-        payload = originalUoWPayload.getPayload();
-        payloadTopicID = originalUoWPayload.getPayloadTopicID();
+        payload = new String(originalUoWPayload.getPayload());
+        TopicToken newToken = new TopicToken();
+        FDN newTokenFDN = new FDN(originalUoWPayload.getPayloadTopicID().getIdentifier());
+        newToken.setIdentifier(newTokenFDN.getToken());
+        newToken.setVersion(new String(originalUoWPayload.getPayloadTopicID().getVersion()));
+        payloadTopicID = newToken;
     }
 
     public UoWPayload(TopicToken payloadType, String payloadContent){
-        this.payloadTopicID = payloadType;
-        this.payload = payloadContent;
+        TopicToken newToken = new TopicToken();
+        FDN newTokenFDN = new FDN(payloadType.getIdentifier());
+        newToken.setIdentifier(newTokenFDN.getToken());
+        newToken.setVersion(new String(payloadType.getVersion()));
+        payloadTopicID = newToken;
+        this.payload = new String(payloadContent);
     }
 
     public String getPayload() {
@@ -57,7 +66,7 @@ public class UoWPayload {
 
     public void setPayload(String payload) {
         LOG.debug(".setPayload(): Entry, payload (String) --> {}", payload);
-        this.payload = payload;
+        this.payload = new String(payload);
     }
 
     public TopicToken getPayloadTopicID() {
@@ -68,7 +77,11 @@ public class UoWPayload {
 
     public void setPayloadTopicID(TopicToken payloadTopicID) {
         LOG.debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadTopicID);
-        this.payloadTopicID = payloadTopicID;
+        TopicToken newToken = new TopicToken();
+        FDN newTokenFDN = new FDN(payloadTopicID.getIdentifier());
+        newToken.setIdentifier(newTokenFDN.getToken());
+        newToken.setVersion(new String(payloadTopicID.getVersion()));
+        this.payloadTopicID = newToken;
     }
 
     @Override

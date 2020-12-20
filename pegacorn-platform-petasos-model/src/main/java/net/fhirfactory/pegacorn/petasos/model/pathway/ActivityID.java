@@ -27,6 +27,7 @@ import java.util.Date;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
 /**
@@ -154,28 +155,28 @@ public class ActivityID {
             this.creationDate = originalRecord.getCreationDate();
         }
         if (originalRecord.hasPresentParcelIdentifier()) {
-            this.presentParcelIdentifier = originalRecord.getPresentParcelIdentifier();
+            this.presentParcelIdentifier = new ResilienceParcelIdentifier(originalRecord.getPresentParcelIdentifier());
         }
         if (originalRecord.hasPresentEpisodeIdentifier()) {
-            this.presentEpisodeIdentifier = originalRecord.getPresentEpisodeIdentifier();
+            this.presentEpisodeIdentifier = new EpisodeIdentifier(originalRecord.getPresentEpisodeIdentifier());
         }
         if (originalRecord.hasPresentWUPIdentifier()) {
-            this.presentWUPIdentifier = originalRecord.getPresentWUPIdentifier();
+            this.presentWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
         }
         if (originalRecord.hasPresentWUPFunctionToken()) {
-            this.presentWUPFunctionToken = originalRecord.getPresentWUPFunctionToken();
+            this.presentWUPFunctionToken = new NodeElementFunctionToken(originalRecord.getPresentWUPFunctionToken());
         }
         if (originalRecord.hasPreviousParcelIdentifier()) {
-            this.previousParcelIdenifier = originalRecord.getPreviousParcelIdentifier();
+            this.previousParcelIdenifier = new ResilienceParcelIdentifier(originalRecord.getPreviousParcelIdentifier());
         }
         if (originalRecord.hasPreviousEpisodeIdentifier()) {
-            this.previousEpisodeIdentifier = originalRecord.getPreviousEpisodeIdentifier();
+            this.previousEpisodeIdentifier = new EpisodeIdentifier(originalRecord.getPreviousEpisodeIdentifier());
         }
         if (originalRecord.hasPreviousWUPIdentifier()) {
-            this.previousWUPIdentifier = originalRecord.getPresentWUPIdentifier();
+            this.previousWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
         }
         if (originalRecord.hasPreviousWUPFunctionToken()) {
-            this.previousWUPFunctionToken = originalRecord.getPresentWUPFunctionToken();
+            this.previousWUPFunctionToken = new WUPFunctionToken(originalRecord.getPresentWUPFunctionToken());
         }
     }
 

@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.model.pathway;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
@@ -287,5 +288,43 @@ public class WorkUnitTransportPacket {
     @Override
     public int hashCode() {
         return Objects.hash(getPacketID(), getSenderSendDate(), isARetry, getCurrentJobCard(), getCurrentParcelStatus(), getPayload());
+    }
+
+    public WorkUnitTransportPacket deepClone(){
+        WorkUnitTransportPacket newPacket = new WorkUnitTransportPacket();
+        ObjectMapper objectMapper = new ObjectMapper();
+        if(hasSenderSendDate()) {
+            newPacket.setSenderSendDate(getSenderSendDate());
+        }
+        if(hasPayload()){
+            newPacket.setPayload(new UoW(getPayload()));
+        }
+        if(hasPacketID()) {
+            newPacket.setPacketID(new ActivityID(getPacketID()));
+        }
+        newPacket.setRetryCount(getIsARetry());
+        if(hasCurrentJobCard()) {
+            newPacket.setCurrentJobCard(new WUPJobCard(getCurrentJobCard()));
+        }
+        newPacket.setCurrentParcelStatus(getCurrentParcelStatus());
+        newPacket.generateString();
+        return(newPacket);
+    }
+
+    private WorkUnitTransportPacket(){
+        this.senderSendDate = null;
+        this.payload = null;
+        this.packetID = null;
+        this.isARetry = false;
+        this.currentJobCard = null;
+        this.currentParcelStatus = null;
+        this.generatedString = null;
+        this.senderSendDateLock = new Object();
+        this.payloadLock = new Object();
+        this.isARetryLock = new Object();
+        this.currentJobCardLock = new Object();
+        this.currentParcelStatusLock = new Object();
+        this.generatedStringLock = new Object();
+        this.packetIDLock = new Object();
     }
 }

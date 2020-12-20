@@ -33,6 +33,8 @@ import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import org.apache.camel.Exchange;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,9 @@ public class InterchangeTargetWUPTypeRouter {
     @Inject
     DeploymentTopologyIM topologyProxy;
 
+    @Produce
+    private ProducerTemplate template;
+
     @Inject
     ProcessingPlantResilienceActivityServicesController activityServicesController;
 
@@ -81,43 +86,45 @@ public class InterchangeTargetWUPTypeRouter {
 
         // Get my Petasos Context
         NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
-        if(LOG.isTraceEnabled()) {
+        if (LOG.isTraceEnabled()) {
             LOG.trace(".forwardUoW2WUPs{}: Retrieved node from TopologyProxy");
             Iterator<String> listIterator = node.debugPrint(".forwardUoW2WUPs{}: node").iterator();
-            while(listIterator.hasNext()) {
+            while (listIterator.hasNext()) {
                 LOG.trace(listIterator.next());
             }
         }
         TopicToken uowTopicID = null;
-        if(ingresPacket.getPayload().hasIngresContent()){
+        if (ingresPacket.getPayload().hasIngresContent()) {
             uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadTopicID();
             LOG.trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
         } else {
             LOG.debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
-            return(new ArrayList<String>());
+            return (new ArrayList<String>());
         }
         Set<NodeElementIdentifier> nodeSet = topicServer.getSubscriberSet(uowTopicID);
-        List<String> targetSubscriberSet = new ArrayList<String>();
-        if( nodeSet == null ){
-            LOG.debug(".forwardUoW2WUPs(): Exiting, nothing subscribed to that topic, returning empty set");
-            return(targetSubscriberSet);
-        } else {
-            if (LOG.isTraceEnabled()) {tracePrintSubscribedWUPSet(nodeSet);}
+        if (nodeSet != null) {
+            if (LOG.isTraceEnabled()) {
+                tracePrintSubscribedWUPSet(nodeSet);
+            }
             Iterator<NodeElementIdentifier> nodeIterator = nodeSet.iterator();
-            while(nodeIterator.hasNext()){
+            while (nodeIterator.hasNext()) {
                 NodeElementIdentifier currentNodeIdentifier = nodeIterator.next();
                 LOG.trace(".forwardUoW2WUPs(): Subscriber --> {}", currentNodeIdentifier);
                 NodeElement currentNodeElement = topologyProxy.getNode(currentNodeIdentifier);
                 NodeElementFunctionToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionToken();
                 RouteElementNames routeName = new RouteElementNames(currentNodeFunctionToken);
-                targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
+                // Clone and Inject Message into Target Route
+                WorkUnitTransportPacket clonedPacket = ingresPacket.deepClone();
+                template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), clonedPacket);
+                // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
                 // Now add the downstream WUPFunction to the Parcel Finalisation Registry
                 WUPFunctionToken functionToken = new WUPFunctionToken(currentNodeFunctionToken);
                 activityServicesController.registerWUAEpisodeDownstreamWUPInterest(ingresPacket.getPacketID().getPresentEpisodeIdentifier(), functionToken);
             }
-            LOG.debug(".forwardUoW2WUPs(): Exiting, returning registered/interested endpoints: endpointList -->{}", targetSubscriberSet);
-            return (targetSubscriberSet);
         }
+        LOG.debug(".forwardUoW2WUPs(): Exiting");
+        List<String> targetSubscriberSet = new ArrayList<String>();
+        return (targetSubscriberSet);
     }
 
     private void tracePrintSubscribedWUPSet(Set<NodeElementIdentifier> wupSet) {
