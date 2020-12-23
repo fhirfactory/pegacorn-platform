@@ -103,7 +103,9 @@ public class UoW {
         this.instanceID = new UoWIdentifier(originalUoW.getInstanceID());
         this.ingresContent = new UoWPayload(originalUoW.getIngresContent());
         this.egressContent = new UoWPayloadSet();
-        this.egressContent.getPayloadElements().addAll(originalUoW.getEgressContent().getPayloadElements());
+        for(UoWPayload currentPayload: originalUoW.egressContent.getPayloadElements()) {
+            this.egressContent.getPayloadElements().add(new UoWPayload(currentPayload));
+        }
         this.processingOutcome = originalUoW.getProcessingOutcome();
         this.typeID = new FDNToken(originalUoW.getTypeID());
     }
