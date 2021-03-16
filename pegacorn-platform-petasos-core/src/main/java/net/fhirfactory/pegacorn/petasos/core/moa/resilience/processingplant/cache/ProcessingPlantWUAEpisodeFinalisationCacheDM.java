@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.WUAEpisodeFinalisationRegistrationStatus;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.WUAEpisodeFinalisationRegistrationStatusEnum;

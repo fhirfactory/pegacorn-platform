@@ -21,15 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.topics;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.FDNTokenSet;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNTokenSet;
 
 import java.util.Objects;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 
 /**
  * @author Mark A. Hunter

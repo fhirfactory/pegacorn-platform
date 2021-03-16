@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.ipc.model;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMOAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 
 @ApplicationScoped
 public class IPCPacketFramingConstants {
@@ -31,7 +31,7 @@ public class IPCPacketFramingConstants {
     private static final String IPC_PACKET_FRAME_START = "<|><STX><|>";
 
     public static Integer getIpcPacketMaximumFrameSize() {
-        return GenericMOAWUPTemplate.IPC_PACKET_MAXIMUM_FRAME_SIZE;
+        return GenericMessageBasedWUPTemplate.IPC_PACKET_MAXIMUM_FRAME_SIZE;
     }
 
     public static String getIpcPacketFrameEnd() {

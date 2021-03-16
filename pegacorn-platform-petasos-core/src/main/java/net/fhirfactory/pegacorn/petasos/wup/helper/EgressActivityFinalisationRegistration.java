@@ -25,14 +25,9 @@ package net.fhirfactory.pegacorn.petasos.wup.helper;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -40,8 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.Instant;
-import java.util.Date;
 
 /**
  * This class (bean) is to be injected into the flow of an Egress Only WUP Implementation

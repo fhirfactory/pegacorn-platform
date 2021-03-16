@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.ipc.model;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 
 import java.time.LocalDateTime;

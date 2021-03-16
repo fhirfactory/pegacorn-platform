@@ -24,8 +24,6 @@ package net.fhirfactory.pegacorn.petasos.ipc.beans.sender;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverResponsePacket;
-import net.fhirfactory.pegacorn.petasos.model.processingplant.ProcessingPlantServicesInterface;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -38,7 +36,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.sql.Date;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @ApplicationScoped
 public class InterProcessingPlantHandoverPacketGenerationBean {

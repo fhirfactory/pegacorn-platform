@@ -22,9 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.RDN;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class RouteElementNames {
     private static final Logger LOG = LoggerFactory.getLogger(RouteElementNames.class);
 
-    private NodeElementFunctionToken nodeFunctionToken;
+    private TopologyNodeFunctionFDNToken nodeFunctionToken;
     private boolean mustBeDirect;
     private String wupTypeName;
     private String wupVersion;
@@ -46,13 +49,13 @@ public class RouteElementNames {
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
 
-    public RouteElementNames(NodeElementFunctionToken functionToken, boolean mustBeDirect){
+    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect){
         this.nodeFunctionToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
     }
 
-    public RouteElementNames(NodeElementFunctionToken functionToken){
+    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken){
         this.nodeFunctionToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
@@ -60,15 +63,17 @@ public class RouteElementNames {
 
     public String simplifyName(){
         LOG.debug(".simplifyName(): this.nodeFunctionToken --> {}", this.nodeFunctionToken);
-        FDN wupFunctionFDN = new FDN(this.nodeFunctionToken.getFunctionID());
+        TopologyNodeFunctionFDN wupFunctionFDN = new TopologyNodeFunctionFDN(this.nodeFunctionToken);
         LOG.trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
-        RDN processingPlantRDN = wupFunctionFDN.extractRDNViaQualifier(NodeElementTypeEnum.PROCESSING_PLANT.getNodeElementType());
+        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
         LOG.trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
-        RDN wupFunctionRDN = wupFunctionFDN.getUnqualifiedRDN();
+        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
+        LOG.trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
+        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WUP);
         LOG.trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
-        String nodeVersion = nodeFunctionToken.getVersion();
+        String nodeVersion = wupFunctionRDN.getNodeVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");
-        String wupName = processingPlantRDN.getValue()+"."+wupFunctionRDN.getValue()+"."+nodeVersionSimplified;
+        String wupName = processingPlantRDN.getNodeName()+"."+workshopRDN.getNodeName()+"."+wupFunctionRDN.getNodeName()+"."+nodeVersionSimplified;
         LOG.debug(".simplifyName(): wupName (String) --> {}", wupName);
         return(wupName);
     }

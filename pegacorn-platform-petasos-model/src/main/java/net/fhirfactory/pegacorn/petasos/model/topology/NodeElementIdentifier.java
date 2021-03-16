@@ -22,11 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.model.topology;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.common.model.RDN;
-
-import java.util.ArrayList;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
 /**
  * @author Mark A. Hunter

@@ -22,8 +22,8 @@
 
 package net.fhirfactory.pegacorn.petasos.model.topology;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +42,10 @@ public class EndpointElement {
     private Object containingNodeIDLock;
     private String friendlyName;
     private Object friendlyNameLock;
-    private String hostname;
-    private Object hostnameLock;
+    private String internalHostname;
+    private Object internalHostnameLock;
+    private String exposedHostname;
+    private Object exposedHostnameLock;
     private String internalPort;
     private Object internalPortLock;
     private String exposedPort;
@@ -66,7 +68,8 @@ public class EndpointElement {
         this.endpointInstanceID = null;
         this.endpointType = null;
         this.friendlyName = null;
-        this.hostname = null;
+        this.internalHostname = null;
+        this.exposedHostname = null;
         this.isServer = false;
         this.internalPort = null;
         this.topologyElementStatus = null;
@@ -80,7 +83,8 @@ public class EndpointElement {
         this.endpointInstanceIDLock = new Object();
         this.containingNodeIDLock = new Object();
         this.friendlyNameLock = new Object();
-        this.hostnameLock = new Object();
+        this.internalHostnameLock = new Object();
+        this.exposedHostnameLock = new Object();
         this.internalPortLock = new Object();
         this.isServerLock = new Object();
         this.toStringStringLock = new Object();
@@ -158,13 +162,24 @@ public class EndpointElement {
         }
     }
 
-    public String getHostname() {
-        return hostname;
+    public String getInternalHostname() {
+        return internalHostname;
     }
 
-    public void setHostname(String hostname) {
-        synchronized (hostnameLock) {
-            this.hostname = hostname;
+    public void setInternalHostname(String internalHostname) {
+        synchronized (internalHostnameLock) {
+            this.internalHostname = internalHostname;
+            generateToString();
+        }
+    }
+
+    public String getExposedHostname() {
+        return exposedHostname;
+    }
+
+    public void setExposedHostname(String hostname) {
+        synchronized (exposedHostnameLock) {
+            this.exposedHostname = hostname;
             generateToString();
         }
     }
@@ -217,7 +232,7 @@ public class EndpointElement {
                     "(endpointFunctionID=" + endpointFunctionID + ")," +
                     "(containingNodeID=" + containingNodeID + ")," +
                     "(friendlyName=" + friendlyName + ")," +
-                    "(hostname=" + hostname + ")," +
+                    "(hostname=" + internalHostname + ")," +
                     "(internalPort=" + internalPort + ")," +
                     "(exposedPort=" + exposedPort + ")," +
                     "(isServer=" + isServer + ")" +

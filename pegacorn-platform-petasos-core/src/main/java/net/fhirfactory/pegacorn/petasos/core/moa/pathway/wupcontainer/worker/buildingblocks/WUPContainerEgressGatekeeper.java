@@ -33,13 +33,12 @@ import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 
 /**
  * @author Mark A. Hunter
@@ -77,7 +76,7 @@ public class WUPContainerEgressGatekeeper {
         // Get my Petasos Context
         NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
         LOG.trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
-        NodeElementFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
         LOG.trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames(wupFunctionToken);

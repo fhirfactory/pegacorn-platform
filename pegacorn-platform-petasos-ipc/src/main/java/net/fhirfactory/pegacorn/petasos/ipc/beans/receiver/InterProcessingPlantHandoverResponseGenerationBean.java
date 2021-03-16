@@ -25,10 +25,8 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacketStatusEnum;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverResponsePacket;
-import net.fhirfactory.pegacorn.petasos.model.processingplant.ProcessingPlantServicesInterface;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -38,7 +36,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.sql.Date;
 import java.time.Instant;
-import java.time.LocalDateTime;
+
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
 
 @ApplicationScoped

@@ -23,19 +23,14 @@
 package net.fhirfactory.pegacorn.petasos.audit.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 
 public class PetasosParcelSimpleAuditDisplayEntry {
     @JsonSerialize(using = JsonDateSerializer.class)

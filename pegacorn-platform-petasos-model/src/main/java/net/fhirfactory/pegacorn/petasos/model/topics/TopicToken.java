@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.topics;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -36,6 +36,9 @@ import java.util.Objects;
 public class TopicToken {
     private FDNToken identifier;
     private String version;
+
+    public static final String WILDCARD_QUALIFIER = "Wildcard";
+    public static final String WILDCARD_VALUE = "*";
 
     public TopicToken(FDNToken datasetToken, String datasetVersion) {
         this.identifier = datasetToken;
@@ -133,5 +136,42 @@ public class TopicToken {
     @Override
     public int hashCode() {
         return Objects.hash(getIdentifier(), getVersion());
+    }
+
+    public boolean wildcardMatch(TopicToken otherTopicToken){
+        boolean versionMatches = false;
+        if((otherTopicToken.getVersion() == null) || (otherTopicToken.getVersion().contentEquals("*")) || (otherTopicToken.getVersion().contentEquals(getVersion()))){
+            versionMatches = true;
+        }
+        if(getIdentifier().equals(otherTopicToken.getIdentifier()) && versionMatches){
+            return(true);
+        }
+        FDN thisFDN = new FDN(getIdentifier());
+        FDN thatFDN = new FDN(otherTopicToken.getIdentifier());
+        int fdnSize = thisFDN.getRDNCount();
+        if(fdnSize > thatFDN.getRDNCount()){
+            fdnSize = thatFDN.getRDNCount();
+        }
+        ArrayList<RDN> thisRDNArray = thisFDN.getRDNSet();
+        ArrayList<RDN> thatRDNArray = thatFDN.getRDNSet();
+        for(int counter = 0; counter < fdnSize; counter ++){
+            boolean contentSame = thisRDNArray.get(counter).getQualifier().contentEquals(thatRDNArray.get(counter).getQualifier());
+            boolean hasWildcard = thatRDNArray.get(counter).getQualifier().contentEquals(getWildcardQualifier())
+                    || thatRDNArray.get(counter).getValue().equals(getWildcardValue())
+                    || thisRDNArray.get(counter).getQualifier().contentEquals(getWildcardQualifier())
+                    || thisRDNArray.get(counter).getValue().contentEquals(getWildcardValue());
+            if(!contentSame && !hasWildcard){
+                return(false);
+            }
+        }
+        return(true);
+    }
+
+    public static String getWildcardQualifier() {
+        return WILDCARD_QUALIFIER;
+    }
+
+    public static String getWildcardValue() {
+        return WILDCARD_VALUE;
     }
 }

@@ -34,7 +34,7 @@ public enum NodeElementTypeEnum {
     WORKSHOP("workshop"),
     PROCESSING_PLANT("processing_plant"),
     PLATFORM("platform_service"),
-    SERVICE("service"),
+    CLUSTER_SERVICE("cluster_service"),
     SITE("site"),
     EXTERNALISED_SERVICE("externalised_service"),
     SUBSYSTEM("subsystem"),

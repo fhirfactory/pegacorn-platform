@@ -1,31 +1,25 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.wup;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.audit.model.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.core.sta.brokers.PetasosSTAServicesAuditOnlyBroker;
-import net.fhirfactory.pegacorn.petasos.core.sta.brokers.PetasosSTAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.model.processingplant.ProcessingPlantServicesInterface;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 public abstract class GenericSTAClientWUPTemplate {
-    private NodeElementFunctionToken apiClientNodeFunction;
+    private TopologyNodeFunctionToken apiClientNodeFunction;
     private WUPIdentifier apiClientWUP;
     private String apiClientName;
     private WUPJobCard apiClientJobCard;
@@ -121,7 +115,7 @@ public abstract class GenericSTAClientWUPTemplate {
         return (staClientNode);
     }
 
-    public NodeElementFunctionToken getApiClientNodeFunction() {
+    public TopologyNodeFunctionToken getApiClientNodeFunction() {
         return apiClientNodeFunction;
     }
 

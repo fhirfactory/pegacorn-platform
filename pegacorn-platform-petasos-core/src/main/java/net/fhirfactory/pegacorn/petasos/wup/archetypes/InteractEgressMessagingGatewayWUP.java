@@ -22,12 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMOAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class InteractEgressMessagingGatewayWUP extends GenericMOAWUPTemplate {
+public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractEgressMessagingGatewayWUP.class);
 
 
@@ -49,7 +49,7 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMOAWUPTem
         ingresEndPoint = ingresEndPoint + ":";
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocol();
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocolLeadIn();
-        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getHostname();
+        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getInternalHostname();
         ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getExposedPort();
         ingresEndPoint = ingresEndPoint + specifyEndpointProtocolLeadout();
         LOG.debug(".specifyIngresEndpoint(): Exit, ingresEndPoint --> {}", ingresEndPoint);
@@ -57,7 +57,7 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMOAWUPTem
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedIngresEndpoint(){
+    protected boolean getUsesWUPFrameworkGeneratedIngresEndpoint(){
         return(true);
     }
 
@@ -80,7 +80,7 @@ public abstract class InteractEgressMessagingGatewayWUP extends GenericMOAWUPTem
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedEgressEndpoint() {
+    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint() {
         return(false);
     }
 

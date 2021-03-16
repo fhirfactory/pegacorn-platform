@@ -26,7 +26,6 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class WUPContainerIngresGatekeeper {
         // Get my Petasos Context
         NodeElement node = topologyProxy.getNodeByKey(nodeKey);
         LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
-        NodeElementFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames(wupFunctionToken);

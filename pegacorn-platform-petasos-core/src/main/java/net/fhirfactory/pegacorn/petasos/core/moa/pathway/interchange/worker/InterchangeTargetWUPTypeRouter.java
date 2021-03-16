@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
@@ -29,13 +29,9 @@ import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
-import org.apache.camel.Exchange;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.RecipientList;
+import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,11 +107,11 @@ public class InterchangeTargetWUPTypeRouter {
                 NodeElementIdentifier currentNodeIdentifier = nodeIterator.next();
                 LOG.trace(".forwardUoW2WUPs(): Subscriber --> {}", currentNodeIdentifier);
                 NodeElement currentNodeElement = topologyProxy.getNode(currentNodeIdentifier);
-                NodeElementFunctionToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionToken();
+                TopologyNodeFunctionToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionToken();
                 RouteElementNames routeName = new RouteElementNames(currentNodeFunctionToken);
                 // Clone and Inject Message into Target Route
                 WorkUnitTransportPacket clonedPacket = ingresPacket.deepClone();
-                template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), clonedPacket);
+                template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
                 // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
                 // Now add the downstream WUPFunction to the Parcel Finalisation Registry
                 WUPFunctionToken functionToken = new WUPFunctionToken(currentNodeFunctionToken);

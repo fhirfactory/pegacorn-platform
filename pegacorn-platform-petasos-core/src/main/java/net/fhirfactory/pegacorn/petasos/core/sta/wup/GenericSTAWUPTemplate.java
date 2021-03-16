@@ -3,7 +3,6 @@ package net.fhirfactory.pegacorn.petasos.core.sta.wup;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.sta.brokers.PetasosSTAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
@@ -92,7 +91,7 @@ public abstract class GenericSTAWUPTemplate {
         LOG.info(".registerTopologyElementInstantiation(): Exit");
     }
 
-    public NodeElementFunctionToken getWUPFunctionToken() {
+    public TopologyNodeFunctionToken getWUPFunctionToken() {
         return (this.wupFunctionToken);
     }
 
@@ -116,11 +115,11 @@ public abstract class GenericSTAWUPTemplate {
         this.wupNode = wupNode;
     }
 
-    public NodeElementFunctionToken getWupFunctionToken() {
+    public TopologyNodeFunctionToken getWupFunctionToken() {
         return wupFunctionToken;
     }
 
-    public void setWupFunctionToken(NodeElementFunctionToken nodeFunctionToken) {
+    public void setWupFunctionToken(TopologyNodeFunctionToken nodeFunctionToken) {
         this.wupFunctionToken = new WUPFunctionToken(nodeFunctionToken);
     }
 

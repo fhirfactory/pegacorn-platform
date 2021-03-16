@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.sta.brokers;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.STAResilienceParcelServicesIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;

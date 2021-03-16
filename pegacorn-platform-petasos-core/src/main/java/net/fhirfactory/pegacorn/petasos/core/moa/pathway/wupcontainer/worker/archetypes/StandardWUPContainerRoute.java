@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,21 +45,21 @@ import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 public class StandardWUPContainerRoute extends BaseRouteBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(StandardWUPContainerRoute.class);
 
-	private NodeElement wupNode;
+	private WorkUnitProcessorTopologyNode wupNode;
 	private RouteElementNames nameSet;
 
-	public StandardWUPContainerRoute( CamelContext camelCTX, NodeElement wupNode) {
+	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode) {
 		super(camelCTX);
 		LOG.debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFunctionToken());
+		nameSet = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken());
 	}
 
-	public StandardWUPContainerRoute( CamelContext camelCTX, NodeElement wupNode, boolean requiresDirect) {
+	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, boolean requiresDirect) {
 		super(camelCTX);
 		LOG.debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFunctionToken(), requiresDirect);
+		nameSet = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken(), requiresDirect);
 	}
 
 	@Override

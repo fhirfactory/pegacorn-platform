@@ -28,12 +28,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.common.model.FDNToken;
 
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 
@@ -41,10 +39,10 @@ import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 public class TopicSubscriptionMapDM {
 	private static final Logger LOG = LoggerFactory.getLogger(TopicSubscriptionMapDM.class);
 	
-	ConcurrentHashMap<TopicToken, Set<NodeElementIdentifier>> distributionList;
+	ConcurrentHashMap<TopicToken, Set<TopologyNodeFDNToken>> distributionList;
 	
     public TopicSubscriptionMapDM(){
-        distributionList = new ConcurrentHashMap<TopicToken, Set<NodeElementIdentifier>>();
+        distributionList = new ConcurrentHashMap<TopicToken, Set<TopologyNodeFDNToken>>();
     }
 
     /**
@@ -54,7 +52,7 @@ public class TopicSubscriptionMapDM {
      * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-     public Set<NodeElementIdentifier> getSubscriberSet(TopicToken topicID){
+     public Set<TopologyNodeFDNToken> getSubscriberSet(TopicToken topicID){
     	LOG.debug(".getSubscriberSet(): Entry");
     	if(LOG.isDebugEnabled()){
     		if(topicID != null){
@@ -64,17 +62,17 @@ public class TopicSubscriptionMapDM {
 		}
     	if(distributionList.isEmpty()) {
     		LOG.debug("getSubscriberSet(): Exit, empty list so can't match");
-    		return(new HashSet<NodeElementIdentifier>());
+    		return(new HashSet<TopologyNodeFDNToken>());
     	}
-   		Set<NodeElementIdentifier> interestedWUPSet = this.distributionList.get(topicID);
+   		Set<TopologyNodeFDNToken> interestedWUPSet = this.distributionList.get(topicID);
     	if(interestedWUPSet == null ){
 			LOG.debug(".getSubscriberSet(): Couldn't find any associated FDNTokenSet elements (i.e. couldn't find any interested WUPs), returning an empty set");
-			return(new HashSet<NodeElementIdentifier>());
+			return(new HashSet<TopologyNodeFDNToken>());
     	} else {
     		if(LOG.isDebugEnabled()) {
 				LOG.debug(".getSubscriberSet(): Exit, returning associated FDNSet of the WUPs interested:");
 				int count = 0;
-				Iterator<NodeElementIdentifier> nodeIterator = interestedWUPSet.iterator();
+				Iterator<TopologyNodeFDNToken> nodeIterator = interestedWUPSet.iterator();
 				while(nodeIterator.hasNext()){
 					LOG.debug(".getSubscriberSet(): Interested Node [{}] Identifier --> {}", count, nodeIterator.next());
 					count++;
@@ -92,7 +90,7 @@ public class TopicSubscriptionMapDM {
      * @param subscriberNode The NodeElement of the WUP that is interested in the payload type.
      */
     @Transaction
-    public void addSubscriber(TopicToken topic, NodeElementIdentifier subscriberNode) {
+    public void addSubscriber(TopicToken topic, TopologyNodeFDNToken subscriberNode) {
     	if(LOG.isDebugEnabled()){
     		LOG.debug(".addSubscriber(): Entry");
 			if(topic != null){
@@ -106,20 +104,20 @@ public class TopicSubscriptionMapDM {
     	if((topic==null) || (subscriberNode==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): topic or subscriberInstanceID is null"));
     	}
-		Set<NodeElementIdentifier> interestedWUPSet = this.distributionList.get(topic);
+		Set<TopologyNodeFDNToken> interestedWUPSet = this.distributionList.get(topic);
 		if(interestedWUPSet != null) {
     		LOG.trace(".addSubscriber(): Adding subscriber to existing map for topic --> {}", topic);
 			interestedWUPSet.add(subscriberNode);
     	} else {
 			LOG.trace(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
-			interestedWUPSet = new LinkedHashSet<NodeElementIdentifier> ();
+			interestedWUPSet = new LinkedHashSet<TopologyNodeFDNToken> ();
 			interestedWUPSet.add(subscriberNode);
     		this.distributionList.put(topic, interestedWUPSet);
     	}
 		if(LOG.isDebugEnabled()) {
 			LOG.debug(".addSubscriber(): Exit, here is the Subscription list for the Topic:");
 			int count = 0;
-			Iterator<NodeElementIdentifier> nodeIterator = interestedWUPSet.iterator();
+			Iterator<TopologyNodeFDNToken> nodeIterator = interestedWUPSet.iterator();
 			while(nodeIterator.hasNext()){
 				LOG.debug(".addSubscriber(): Interested Node [{}] Identifier --> {}", count, nodeIterator.next());
 				count++;
@@ -134,7 +132,7 @@ public class TopicSubscriptionMapDM {
      * @param subscriberInstanceID  The subscriber we are removing from the subscription list.
      */
     @Transaction
-    public void removeSubscriber(TopicToken topic, NodeElementIdentifier subscriberInstanceID) {
+    public void removeSubscriber(TopicToken topic, TopologyNodeFDNToken subscriberInstanceID) {
     	LOG.debug(".removeSubscriber(): Entry, topic --> {}, subscriberInstanceID --> {}", topic, subscriberInstanceID);
     	if((topic==null) || (subscriberInstanceID==null)) {
     		throw(new IllegalArgumentException(".removeSubscriber(): topic or subscriberInstanceID is null"));
@@ -152,10 +150,10 @@ public class TopicSubscriptionMapDM {
 		}
 		if(found) {
     		LOG.trace(".removeSubscriber(): Removing Subscriber from topic --> {}", topic);
-			Set<NodeElementIdentifier> payloadDistributionList = this.distributionList.get(currentToken);
-			Iterator<NodeElementIdentifier> nodeIterator = payloadDistributionList.iterator();
+			Set<TopologyNodeFDNToken> payloadDistributionList = this.distributionList.get(currentToken);
+			Iterator<TopologyNodeFDNToken> nodeIterator = payloadDistributionList.iterator();
 			while(nodeIterator.hasNext()){
-				NodeElementIdentifier currentNode = nodeIterator.next();
+				TopologyNodeFDNToken currentNode = nodeIterator.next();
 				if(currentNode.equals(subscriberInstanceID)){
 					LOG.trace(".removeSubscriber(): Found Subscriber in Subscription List, removing");
 					payloadDistributionList.remove(currentNode);
@@ -180,9 +178,9 @@ public class TopicSubscriptionMapDM {
     	while(topicEnumerator.hasMoreElements()){
     		TopicToken currentToken = topicEnumerator.nextElement();
     		LOG.debug(".printAllSubscriptionSets(): Topic (TopicToken) --> {}", currentToken);
-			Set<NodeElementIdentifier> subscribers = getSubscriberSet(currentToken);
+			Set<TopologyNodeFDNToken> subscribers = getSubscriberSet(currentToken);
 			if(subscribers != null){
-				Iterator<NodeElementIdentifier> currentNodeIdentifierIterator = subscribers.iterator();
+				Iterator<TopologyNodeFDNToken> currentNodeIdentifierIterator = subscribers.iterator();
 				while(currentNodeIdentifierIterator.hasNext()){
 					LOG.debug(".printAllSubscriptionSets(): Subscriber --> {}", currentNodeIdentifierIterator.next());
 				}

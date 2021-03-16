@@ -21,11 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.topology;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.common.model.RDN;
-import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.components.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.components.mode.ConcurrencyModeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

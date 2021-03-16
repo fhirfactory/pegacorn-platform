@@ -23,9 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.sta.brokers;
 
 import java.time.Instant;
 import java.util.Date;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.STATransaction;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
+
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import org.slf4j.Logger;
@@ -33,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.petasos.audit.api.PetasosAuditWriter;
 import net.fhirfactory.pegacorn.petasos.audit.model.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;

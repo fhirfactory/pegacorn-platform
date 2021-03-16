@@ -43,7 +43,7 @@ public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAW
      public void registerActivityStart(UoW unitOfWork, WUPClusterModeEnum clusterMode, WUPSystemModeEnum systemMode){
         LOG.debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
         ActivityID newActivityID = new ActivityID();
-        newActivityID.setPresentWUPFunctionToken(this.getWUPFunctionToken());
+        newActivityID.setPresentWUPFunctionToken(this.getWupNode().getNodeFunctionToken());
         newActivityID.setPresentWUPIdentifier(this.getWupIdentifier());
      }
 

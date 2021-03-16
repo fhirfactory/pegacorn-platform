@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.topology.cache;
 
 import java.util.*;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElement;
 import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 
 

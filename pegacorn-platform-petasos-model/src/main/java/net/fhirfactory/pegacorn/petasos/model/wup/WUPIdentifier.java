@@ -22,9 +22,13 @@
 
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
 import java.util.ArrayList;
 
@@ -32,22 +36,22 @@ import java.util.ArrayList;
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class WUPIdentifier extends FDNToken {
+public class WUPIdentifier extends TopologyNodeFDNToken {
 	
-    public WUPIdentifier(FDNToken originalToken) {
-        this.setContent(new String(originalToken.getContent()));
+    public WUPIdentifier(TopologyNodeFDNToken originalToken) {
+        this.setToken(new String(originalToken.getToken()));
     }
     public WUPIdentifier(){super();}
 	
 	@Override
 	public String toString() {
-	        FDN tempFDN = new FDN(this);
+	        TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getToken());
 	        String simpleString = "WUPIdentifier{";
-	        ArrayList<RDN> rdnSet = tempFDN.getRDNSet();
+	        ArrayList<TopologyNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
 	        int setSize = rdnSet.size();
 	        for (int counter = 0; counter < setSize; counter++) {
-	            RDN currentRDN = rdnSet.get(counter);
-	            String currentNameValue = currentRDN.getValue();
+	            TopologyNodeRDN currentRDN = rdnSet.get(counter);
+	            String currentNameValue = currentRDN.getNodeName();
 	            if(currentNameValue.contains(".")){
 	                String outputString = currentNameValue.replace(".", "_");
 	                simpleString = simpleString + outputString;

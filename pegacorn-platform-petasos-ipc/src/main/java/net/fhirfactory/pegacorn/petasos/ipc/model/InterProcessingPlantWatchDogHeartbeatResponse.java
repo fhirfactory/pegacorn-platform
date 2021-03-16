@@ -21,9 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.ipc.model;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class InterProcessingPlantWatchDogHeartbeatResponse {

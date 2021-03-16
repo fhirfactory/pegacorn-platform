@@ -29,9 +29,9 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

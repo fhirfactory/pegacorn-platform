@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.Tree;
-import net.fhirfactory.pegacorn.common.model.TreeNode;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.Tree;
+import net.fhirfactory.pegacorn.common.model.generalid.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

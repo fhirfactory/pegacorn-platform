@@ -35,7 +35,7 @@ import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
 /**
  * This class acts as the Data Manager for the Parcel Cache within the local

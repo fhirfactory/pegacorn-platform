@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.properties;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
 public class EgressProcessingProperty {
     private boolean hasBeenProcessed;

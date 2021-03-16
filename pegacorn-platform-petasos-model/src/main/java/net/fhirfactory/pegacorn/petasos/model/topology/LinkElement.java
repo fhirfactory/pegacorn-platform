@@ -22,8 +22,6 @@
 
 package net.fhirfactory.pegacorn.petasos.model.topology;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-
 import java.util.Objects;
 
 public class LinkElement {

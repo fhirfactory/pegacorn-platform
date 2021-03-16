@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 
 /**

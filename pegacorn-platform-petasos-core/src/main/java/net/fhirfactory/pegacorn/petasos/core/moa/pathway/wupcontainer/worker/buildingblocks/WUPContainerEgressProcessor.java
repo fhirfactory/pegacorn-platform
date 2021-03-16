@@ -38,7 +38,6 @@ import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 
@@ -69,7 +68,7 @@ public class WUPContainerEgressProcessor {
         		LOG.trace(listIterator.next());
         	}
         }
-        NodeElementFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
         // Now, continue with business logic
         WorkUnitTransportPacket egressPacket = null;

@@ -28,7 +28,6 @@ import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPa
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
@@ -61,7 +60,7 @@ public class InterProcessingPlantHandoverRegistrationBean {
         LOG.trace(".ipcReceiverActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
         NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
         LOG.trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
-        NodeElementFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         LOG.trace(".ipcReceiverActivityStart(): Building the ActivityID for this activity");
         NodeElementIdentifier wupNodeID = node.getNodeInstanceID();

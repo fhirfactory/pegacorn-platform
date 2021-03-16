@@ -31,9 +31,9 @@ import net.fhirfactory.pegacorn.petasos.model.topology.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.components.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.components.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.topology.cache.TopologyDM;
 
 /**
@@ -137,7 +137,7 @@ public class TopologyIM {
     public EndpointElement getEndpoint(EndpointElementIdentifier endpointID) {
         LOG.debug(".getEndpoint(): Entry, endpointID --> {}", endpointID);
         EndpointElement element = topologyDataManager.getEndpoint(endpointID);
-        LOG.info(".getEndpoint(): Exit, EndpointElement --> {}", element);
+        LOG.debug(".getEndpoint(): Exit, EndpointElement --> {}", element);
         return (topologyDataManager.getEndpoint(endpointID));
     }
 

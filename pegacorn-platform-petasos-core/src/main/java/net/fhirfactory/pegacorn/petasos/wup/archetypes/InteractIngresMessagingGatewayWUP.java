@@ -23,21 +23,16 @@
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElementIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMOAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 
-public abstract class InteractIngresMessagingGatewayWUP extends GenericMOAWUPTemplate {
+public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractIngresMessagingGatewayWUP.class);
     
 
@@ -62,7 +57,7 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMOAWUPTem
         ingresEndPoint = ingresEndPoint + ":";
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocol();
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocolLeadIn();
-        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getHostname();
+        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getInternalHostname();
         ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getExposedPort();
         ingresEndPoint = ingresEndPoint + specifyEndpointProtocolLeadout();
         LOG.debug(".specifyIngresEndpoint(): Exit, ingresEndPoint --> {}", ingresEndPoint);
@@ -70,7 +65,7 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMOAWUPTem
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedEgressEndpoint(){
+    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint(){
         return(true);
     }
 
@@ -93,7 +88,7 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMOAWUPTem
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedIngresEndpoint() {
+    protected boolean getUsesWUPFrameworkGeneratedIngresEndpoint() {
         return(false);
     }
 

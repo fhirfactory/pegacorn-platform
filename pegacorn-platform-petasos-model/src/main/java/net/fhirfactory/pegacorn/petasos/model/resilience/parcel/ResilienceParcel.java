@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 import java.time.Instant;
 import java.util.*;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;

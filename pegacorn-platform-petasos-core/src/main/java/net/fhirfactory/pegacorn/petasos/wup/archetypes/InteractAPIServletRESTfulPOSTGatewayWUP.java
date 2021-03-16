@@ -25,14 +25,14 @@ package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElement;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMOAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMOAWUPTemplate {
+public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractAPIServletRESTfulPOSTGatewayWUP.class);
 
     private EndpointElement ingresEndpointElement;
@@ -83,7 +83,7 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMOA
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedEgressEndpoint() {
+    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint() {
         return (true);
     }
 }

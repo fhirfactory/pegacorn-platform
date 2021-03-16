@@ -22,10 +22,10 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMOAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
-public abstract class EdgeEgressMessagingGatewayWUP extends GenericMOAWUPTemplate {
+public abstract class EdgeEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 
     protected static final String IPC_FRAME_DECODER = "ipcFrameDecoder";
     protected static final String IPC_STRING_DECODER = "ipcStringDecoder";
@@ -54,7 +54,7 @@ public abstract class EdgeEgressMessagingGatewayWUP extends GenericMOAWUPTemplat
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedIngresEndpoint(){
+    protected boolean getUsesWUPFrameworkGeneratedIngresEndpoint(){
         return(true);
     }
 
@@ -77,7 +77,7 @@ public abstract class EdgeEgressMessagingGatewayWUP extends GenericMOAWUPTemplat
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedEgressEndpoint() {
+    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint() {
         return(false);
     }
 

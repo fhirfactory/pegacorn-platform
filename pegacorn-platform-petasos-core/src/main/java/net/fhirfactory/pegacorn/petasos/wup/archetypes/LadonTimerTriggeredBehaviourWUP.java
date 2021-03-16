@@ -22,16 +22,14 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMOAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMOAWUPTemplate {
+public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBasedWUPTemplate {
     
     public LadonTimerTriggeredBehaviourWUP() {
         super();
@@ -54,7 +52,7 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMOAWUPTempl
         ingresEndPoint = ingresEndPoint + ":";
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocol();
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocolLeadIn();
-        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getHostname();
+        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getInternalHostname();
         ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getExposedPort();
         ingresEndPoint = ingresEndPoint + specifyEndpointProtocolLeadout();
         getLogger().debug(".specifyIngresEndpoint(): Exit, ingresEndPoint --> {}", ingresEndPoint);
@@ -62,7 +60,7 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMOAWUPTempl
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedEgressEndpoint(){
+    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint(){
         return(true);
     }
 
@@ -85,7 +83,7 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMOAWUPTempl
     }
 
     @Override
-    protected boolean specifyUsesWUPFrameworkGeneratedIngresEndpoint() {
+    protected boolean getUsesWUPFrameworkGeneratedIngresEndpoint() {
         return(false);
     }
 

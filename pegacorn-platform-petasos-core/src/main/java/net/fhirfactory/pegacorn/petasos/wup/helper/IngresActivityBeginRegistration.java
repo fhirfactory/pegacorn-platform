@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
@@ -74,7 +73,7 @@ public class IngresActivityBeginRegistration {
         LOG.trace(".registerActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
         NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
         LOG.trace(".registerActivityStart(): Node Element retrieved --> {}", node);
-        NodeElementFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
         LOG.trace(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);        
         LOG.trace(".registerActivityStart(): Building the ActivityID for this activity");
         NodeElementIdentifier wupNodeID = node.getNodeInstanceID();

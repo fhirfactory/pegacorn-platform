@@ -29,8 +29,9 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.api.PetasosAuditWriter;
 import net.fhirfactory.pegacorn.petasos.audit.model.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;
@@ -45,7 +46,7 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -174,7 +175,7 @@ public class PetasosMOAServicesBroker {
         return (null);
     }
 
-    public void registerWorkUnitProcessor(NodeElement newElement, Set<TopicToken> payloadTopicSet,
+    public void registerWorkUnitProcessor(WorkUnitProcessorTopologyNode newElement, Set<TopicToken> payloadTopicSet,
                                           WUPArchetypeEnum wupNature) {
         LOG.debug(".registerWorkUnitProcessor(): Entry, newElement --> {}, payloadTopicSet --> {}", newElement,
                 payloadTopicSet);
