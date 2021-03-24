@@ -21,15 +21,16 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import org.apache.camel.*;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class InterchangeTargetWUPTypeRouter {
     TopicIM topicServer;
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
 
     @Produce
     private ProducerTemplate template;
@@ -81,14 +82,8 @@ public class InterchangeTargetWUPTypeRouter {
         LOG.debug(".forwardUoW2WUPs(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupInstanceKey (String) --> {}", ingresPacket, wupInstanceKey);
 
         // Get my Petasos Context
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace(".forwardUoW2WUPs{}: Retrieved node from TopologyProxy");
-            Iterator<String> listIterator = node.debugPrint(".forwardUoW2WUPs{}: node").iterator();
-            while (listIterator.hasNext()) {
-                LOG.trace(listIterator.next());
-            }
-        }
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
+        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(nodeFDNToken);
         TopicToken uowTopicID = null;
         if (ingresPacket.getPayload().hasIngresContent()) {
             uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadTopicID();
@@ -97,17 +92,14 @@ public class InterchangeTargetWUPTypeRouter {
             LOG.debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
             return (new ArrayList<String>());
         }
-        Set<NodeElementIdentifier> nodeSet = topicServer.getSubscriberSet(uowTopicID);
+        Set<TopologyNodeFDNToken> nodeSet = topicServer.getSubscriberSet(uowTopicID);
         if (nodeSet != null) {
-            if (LOG.isTraceEnabled()) {
-                tracePrintSubscribedWUPSet(nodeSet);
-            }
-            Iterator<NodeElementIdentifier> nodeIterator = nodeSet.iterator();
+            Iterator<TopologyNodeFDNToken> nodeIterator = nodeSet.iterator();
             while (nodeIterator.hasNext()) {
-                NodeElementIdentifier currentNodeIdentifier = nodeIterator.next();
+                TopologyNodeFDNToken currentNodeIdentifier = nodeIterator.next();
                 LOG.trace(".forwardUoW2WUPs(): Subscriber --> {}", currentNodeIdentifier);
-                NodeElement currentNodeElement = topologyProxy.getNode(currentNodeIdentifier);
-                TopologyNodeFunctionToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionToken();
+                WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(currentNodeIdentifier);
+                TopologyNodeFunctionFDNToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
                 RouteElementNames routeName = new RouteElementNames(currentNodeFunctionToken);
                 // Clone and Inject Message into Target Route
                 WorkUnitTransportPacket clonedPacket = ingresPacket.deepClone();
@@ -123,9 +115,9 @@ public class InterchangeTargetWUPTypeRouter {
         return (targetSubscriberSet);
     }
 
-    private void tracePrintSubscribedWUPSet(Set<NodeElementIdentifier> wupSet) {
+    private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorTopologyNode> wupSet) {
         LOG.trace(".tracePrintSubscribedWUPSet(): Subscribed WUP Set --> {}", wupSet.size());
-        Iterator<NodeElementIdentifier> tokenIterator = wupSet.iterator();
+        Iterator<WorkUnitProcessorTopologyNode> tokenIterator = wupSet.iterator();
         while (tokenIterator.hasNext()) {
             LOG.trace(".forwardUoW2WUPs(): Subscribed WUP Ingres Point --> {}", tokenIterator.next());
         }

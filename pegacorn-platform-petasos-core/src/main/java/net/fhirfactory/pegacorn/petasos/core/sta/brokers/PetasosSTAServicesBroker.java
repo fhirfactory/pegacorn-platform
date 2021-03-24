@@ -23,6 +23,8 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.brokers;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.STAResilienceParcelServicesIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
@@ -31,8 +33,6 @@ import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.STAT
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
@@ -118,7 +118,7 @@ public class PetasosSTAServicesBroker {
         return(null);
     }
     
-    public void registerWorkUnitProcessor( NodeElement newElement, Set<TopicToken> payloadTopicSet, WUPArchetypeEnum wupNature){
+    public void registerWorkUnitProcessor(WorkUnitProcessorTopologyNode newElement, Set<TopicToken> payloadTopicSet, WUPArchetypeEnum wupNature){
         LOG.debug(".registerWorkUnitProcessor(): Entry, newElement --> {}, payloadTopicSet --> {}", newElement, payloadTopicSet);
         // wupFrameworkManager.buildWUPFramework(newElement, payloadTopicSet, wupNature);
         // wupInterchangeManager.buildWUPInterchangeRoutes(newElement);

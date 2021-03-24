@@ -82,7 +82,7 @@ public class STAResilienceParcelServicesIM {
         LOG.trace(".registerParcel(): Checking and/or Creating a SOAWUAEpisde ID");
 
         if(!activityID.hasPresentEpisodeIdentifier()) {
-        	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().getAsSingleFDNToken());
+        	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().toVersionBasedFDNToken());
         	FDN uowTypeFDN = new FDN(unitOfWork.getTypeID());
         	newWUAFDN.appendFDN(uowTypeFDN);
         	EpisodeIdentifier wuaEpisodeToken = new EpisodeIdentifier(newWUAFDN.getToken());

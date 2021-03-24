@@ -25,8 +25,8 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.TopicCacheDM;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.TopicSubscriptionMapDM;
-import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.Topic;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

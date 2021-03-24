@@ -21,18 +21,20 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
-import java.time.Instant;
-import java.util.*;
-
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Mark A. Hunter
@@ -599,7 +601,8 @@ public class ResilienceParcel {
         }
         FDN newEpisodeID;
         if (activityID.hasPresentWUPFunctionToken()) {
-            newEpisodeID = new FDN(activityID.getPresentWUPFunctionToken().getAsSingleFDNToken());
+            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            newEpisodeID = nodeFunctionFDN.toVersionBasedFDN();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
@@ -623,7 +626,8 @@ public class ResilienceParcel {
         }
         FDN newTypeID;
         if (activityID.hasPresentWUPFunctionToken()) {
-            newTypeID = new FDN(activityID.getPresentWUPFunctionToken().getAsSingleFDNToken());
+            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            newTypeID = nodeFunctionFDN.toVersionBasedFDN();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
@@ -646,7 +650,7 @@ public class ResilienceParcel {
         }
         FDN newInstanceID;
         if (activityID.hasPresentWUPIdentifier()) {
-            newInstanceID = new FDN(activityID.getPresentWUPIdentifier());
+            newInstanceID = new FDN(activityID.getPresentWUPIdentifier().toVersionBasedFDNToken());
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPInstanceID value, bad parameter"));
         }

@@ -23,8 +23,8 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
 
 import java.util.Date;
 
-import net.fhirfactory.pegacorn.components.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.components.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

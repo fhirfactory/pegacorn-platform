@@ -19,11 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package net.fhirfactory.pegacorn.common.model.topicid;
 
-package net.fhirfactory.pegacorn.petasos.model.topology;
+public enum TopicTypeEnum {
+    DATASET_DEFINER("owner"),
+    DATASET_CATEGORY("category"),
+    DATASET_SUBCATEGORY("subcategory"),
+    DATASET_RESOURCE("resource"),
+    DATASET_DISCRIMINATOR_TYPE("discriminator_type"),
+    DATASET_DISCRIMINATOR_VALUE("discriminator_value");
+   
+    private String topicType;
 
-public enum LinkElementTypeEnum {
-    ROUTE_TYPE_CAMEL,
-    ROUTE_TYPE_LOGICAL,
-    ROUTE_TYPE_INTER_MODULE
+    private TopicTypeEnum(String mapElementType){
+        this.topicType = mapElementType;
+    }
+
+    public String getTopicType(){
+        return(this.topicType);
+    }
 }

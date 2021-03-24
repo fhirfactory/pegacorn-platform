@@ -22,17 +22,15 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker.InterchangeExtractAndRouteTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker.InterchangeExtractAndRouteTemplate;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 @ApplicationScoped
 public class PathwayInterchangeManager {

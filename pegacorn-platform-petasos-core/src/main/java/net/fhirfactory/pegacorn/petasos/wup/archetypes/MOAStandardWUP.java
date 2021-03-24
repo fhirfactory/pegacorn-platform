@@ -21,8 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
 public abstract class MOAStandardWUP extends GenericMessageBasedWUPTemplate {
 
@@ -34,46 +35,24 @@ public abstract class MOAStandardWUP extends GenericMessageBasedWUPTemplate {
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_WORKER);
     }
-    
-    @Override
-    protected String specifyEgressEndpoint(){
-        return(this.getNameSet().getEndPointWUPEgress());
-    }
-    
-    @Override
-    protected String specifyIngresEndpoint(){
-        return(this.getNameSet().getEndPointWUPIngres());
-    }
 
     @Override
-    protected String specifyIngresTopologyEndpointName() {
-        return null;
+    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+        getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint ingressEndpoint = new GenericMessageBasedWUPEndpoint();
+        ingressEndpoint.setFrameworkEnabled(true);
+        ingressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPIngres());
+        getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");
+        return(ingressEndpoint);
     }
 
     @Override
-    protected String specifyIngresEndpointVersion() {
-        return null;
+    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        egressEndpoint.setFrameworkEnabled(true);
+        egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
+        return(egressEndpoint);
     }
-
-    @Override
-    protected boolean getUsesWUPFrameworkGeneratedIngresEndpoint() {
-        return (true);
-    }
-
-    @Override
-    protected String specifyEgressTopologyEndpointName() {
-        return null;
-    }
-
-    @Override
-    protected String specifyEgressEndpointVersion() {
-        return null;
-    }
-
-    @Override
-    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint() {
-        return (true);
-    }
-
-
 }

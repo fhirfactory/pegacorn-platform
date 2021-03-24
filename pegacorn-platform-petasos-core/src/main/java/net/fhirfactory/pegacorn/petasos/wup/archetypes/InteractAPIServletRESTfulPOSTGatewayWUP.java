@@ -22,10 +22,11 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.EndpointElement;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,27 +36,32 @@ import java.util.Set;
 public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMessageBasedWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractAPIServletRESTfulPOSTGatewayWUP.class);
 
-    private EndpointElement ingresEndpointElement;
+    private IPCEndpoint ingresEndpointElement;
 
     @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_API_PUSH);
     }
-    
+
     @Override
-    public String specifyIngresEndpoint(){
-        LOG.debug(".specifyIngresEndpoint(): Entry");
-        LOG.trace(".specifyIngresEndpoint(): Retrieved EndpointElement --> {}", this.ingresEndpointElement);
+    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+        getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint ingresEndpoint = new GenericMessageBasedWUPEndpoint();
+        ingresEndpoint.setFrameworkEnabled(false);
         String ingresEndPoint = "direct:" + this.getWupInstanceName() + "-" + this.specifyIngresEndpointPath();
-        return(ingresEndPoint);
-    } 
-    
+        ingresEndpoint.setEndpointSpecification(ingresEndPoint);
+        getLogger().debug(".specifyIngresTopologyEndpoint(): Exit");
+        return(ingresEndpoint);
+    }
+
     @Override
-    protected String specifyEgressEndpoint(){
-        LOG.debug(".specifyEgressEndpoint(): Entry");
-        String endpointName = this.getNameSet().getEndPointWUPEgress();
-        LOG.debug(".specifyEgressEndpoint(): Exit, egressEndPoint --> {}", endpointName);
-        return(endpointName);
+    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        egressEndpoint.setFrameworkEnabled(true);
+        egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
+        return(egressEndpoint);
     }
  
     /**
@@ -72,18 +78,4 @@ public abstract class InteractAPIServletRESTfulPOSTGatewayWUP extends GenericMes
     
     abstract protected String specifyIngresEndpointPath();
 
-    @Override
-    protected String specifyEgressTopologyEndpointName() {
-        return null;
-    }
-
-    @Override
-    protected String specifyEgressEndpointVersion() {
-        return null;
-    }
-
-    @Override
-    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint() {
-        return (true);
-    }
 }

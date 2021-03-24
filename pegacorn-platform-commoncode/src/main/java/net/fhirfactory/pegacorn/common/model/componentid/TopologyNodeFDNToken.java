@@ -1,25 +1,42 @@
 package net.fhirfactory.pegacorn.common.model.componentid;
 
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+
 public class TopologyNodeFDNToken {
-    public String token;
+    private String tokenValue;
 
     public TopologyNodeFDNToken(){
-        token = new String();
+        tokenValue = new String();
     }
 
     public TopologyNodeFDNToken(TopologyNodeFDNToken ori){
-        this.token = new String(ori.getToken());
+        this.tokenValue = new String(ori.getTokenValue());
     }
 
     public TopologyNodeFDNToken(String token){
-        this.token = token;
+        this.tokenValue = token;
     }
 
-    public String getToken() {
-        return token;
+    public String getTokenValue() {
+        return tokenValue;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setTokenValue(String tokenValue) {
+        this.tokenValue = tokenValue;
+    }
+
+    public FDNToken toTypeBasedFDNToken(){
+        TopologyNodeFDN topologyFDN = new TopologyNodeFDN(this);
+        FDN genericFDN = topologyFDN.toTypeBasedFDN();
+        FDNToken genericFDNToken = genericFDN.getToken();
+        return(genericFDNToken);
+    }
+
+    public FDNToken toVersionBasedFDNToken(){
+        TopologyNodeFDN topologyFDN = new TopologyNodeFDN(this);
+        FDN genericFDN = topologyFDN.toVersionBasedFDN();
+        FDNToken genericFDNToken = genericFDN.getToken();
+        return(genericFDNToken);
     }
 }

@@ -24,9 +24,9 @@ package net.fhirfactory.pegacorn.petasos.model.pathway;
 import java.time.Instant;
 import java.util.Date;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
@@ -46,11 +46,11 @@ public class ActivityID {
     private Object presentEpisodeIdentifierLock;
     private WUPIdentifier previousWUPIdentifier;
     private Object previousWUPIdentifierLock;
-    private NodeElementFunctionToken previousWUPFunctionToken;
+    private TopologyNodeFunctionFDNToken previousWUPFunctionToken;
     private Object previousWUPFunctionTokenLock;
     private WUPIdentifier presentWUPIdentifier;
     private Object presentWUPIdentifierLock;
-    private NodeElementFunctionToken presentWUPFunctionToken;
+    private TopologyNodeFunctionFDNToken presentWUPFunctionToken;
     private Object presentWUPFunctionTokenLock;
     private Date creationDate;
     private Object creationDateLock;
@@ -164,7 +164,7 @@ public class ActivityID {
             this.presentWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
         }
         if (originalRecord.hasPresentWUPFunctionToken()) {
-            this.presentWUPFunctionToken = new NodeElementFunctionToken(originalRecord.getPresentWUPFunctionToken());
+            this.presentWUPFunctionToken = new TopologyNodeFunctionFDNToken(originalRecord.getPresentWUPFunctionToken());
         }
         if (originalRecord.hasPreviousParcelIdentifier()) {
             this.previousParcelIdenifier = new ResilienceParcelIdentifier(originalRecord.getPreviousParcelIdentifier());
@@ -176,7 +176,7 @@ public class ActivityID {
             this.previousWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
         }
         if (originalRecord.hasPreviousWUPFunctionToken()) {
-            this.previousWUPFunctionToken = new WUPFunctionToken(originalRecord.getPresentWUPFunctionToken());
+            this.previousWUPFunctionToken = new TopologyNodeFunctionFDNToken(originalRecord.getPresentWUPFunctionToken());
         }
     }
 
@@ -314,11 +314,11 @@ public class ActivityID {
         }
     }
 
-    public NodeElementFunctionToken getPreviousWUPFunctionToken() {
+    public TopologyNodeFunctionFDNToken getPreviousWUPFunctionToken() {
         return previousWUPFunctionToken;
     }
 
-    public void setPreviousWUPFunctionToken(NodeElementFunctionToken previousWUPFunctionToken) {
+    public void setPreviousWUPFunctionToken(TopologyNodeFunctionFDNToken previousWUPFunctionToken) {
         synchronized (previousWUPFunctionTokenLock) {
             this.previousWUPFunctionToken = previousWUPFunctionToken;
         }
@@ -332,11 +332,11 @@ public class ActivityID {
         }
     }
 
-    public NodeElementFunctionToken getPresentWUPFunctionToken() {
+    public TopologyNodeFunctionFDNToken getPresentWUPFunctionToken() {
         return presentWUPFunctionToken;
     }
 
-    public void setPresentWUPFunctionToken(NodeElementFunctionToken presentWUPFunctionToken) {
+    public void setPresentWUPFunctionToken(TopologyNodeFunctionFDNToken presentWUPFunctionToken) {
         synchronized (presentWUPFunctionTokenLock) {
             this.presentWUPFunctionToken = presentWUPFunctionToken;
         }

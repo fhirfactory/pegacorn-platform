@@ -22,10 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
@@ -46,7 +48,7 @@ public class WUPContainerIngresGatekeeper {
     private static final String INGRES_GATEKEEPER_PROCESSED_PROPERTY = "IngresGatekeeperSemaphore";
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
 
     /**
      * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
@@ -56,16 +58,17 @@ public class WUPContainerIngresGatekeeper {
      *
      * @param ingresPacket     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @param nodeKey    The Work Unit Processor Instance: only to be used for instance debugging (not used at the moment)
+     * @param nodeFDNTokenValue    The Work Unit Processor Instance: only to be used for instance debugging (not used at the moment)
      * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String nodeKey) {
-        LOG.debug(".ingresGatekeeper(): Enter, ingresPacket --> {}, nodeKey --> {}", ingresPacket, nodeKey);
+    public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String nodeFDNTokenValue) {
+        LOG.debug(".ingresGatekeeper(): Enter, ingresPacket --> {}, nodeFDNTokenValue --> {}", ingresPacket, nodeFDNTokenValue);
         // Get my Petasos Context
-        NodeElement node = topologyProxy.getNodeByKey(nodeKey);
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(nodeFDNTokenValue);
+        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
         LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames(wupFunctionToken);

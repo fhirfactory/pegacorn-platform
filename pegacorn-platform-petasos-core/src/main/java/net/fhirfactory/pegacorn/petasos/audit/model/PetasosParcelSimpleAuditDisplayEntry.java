@@ -140,7 +140,7 @@ public class PetasosParcelSimpleAuditDisplayEntry {
             this.parcelFinalsationStatus = theParcel.getParcelFinalsationStatus();
         }
         if(theParcel.getPrimaryWUPIdentifier() != null){
-            this.primaryWUPIdentifier = theParcel.getPrimaryWUPIdentifier().getUnqualifiedToken();
+            this.primaryWUPIdentifier = theParcel.getPrimaryWUPIdentifier().getTokenValue();
         }
     }
 

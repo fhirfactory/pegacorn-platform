@@ -32,7 +32,7 @@ import java.util.UUID;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

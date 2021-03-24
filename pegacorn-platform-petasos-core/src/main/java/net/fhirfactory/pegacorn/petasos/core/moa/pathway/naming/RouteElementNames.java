@@ -26,9 +26,6 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

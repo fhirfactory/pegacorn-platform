@@ -21,12 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.ipc.beans.receiver;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacketStatusEnum;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverResponsePacket;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -37,26 +40,22 @@ import javax.inject.Inject;
 import java.sql.Date;
 import java.time.Instant;
 
-import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
-
 @ApplicationScoped
 public class InterProcessingPlantHandoverResponseGenerationBean {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverResponseGenerationBean.class);
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyIM;
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
-    @Inject
-    ProcessingPlantServicesInterface processingPlantServices;
-
     public InterProcessingPlantHandoverResponsePacket generateInterProcessingPlantHandoverResponse(InterProcessingPlantHandoverPacket incomingPacket, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".generateInterProcessingPlantHandoverResponse(): Entry, incomingPacket (InterProcessingPlantHandoverPacket) --> {}, wupInstanceKey (String) --> {}", incomingPacket, wupInstanceKey);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): reconstituted token, now attempting to retrieve NodeElement");
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
-        LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
+        WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode) topologyIM.getNode(nodeFDNToken);
+        LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", wup);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Extracting Job Card and Status Element from Exchange");
         String jobcardPropertyKey = exchangePropertyNames.getExchangeJobCardPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java/WUPEgressConduit.java
         String parcelStatusPropertyKey = exchangePropertyNames.getExchangeStatusElementPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java/WUPEgressConduit.java
@@ -65,7 +64,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean {
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message");
         InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
         response.setActivityID(jobCard.getActivityID());
-        String processingPlantName = processingPlantServices.getProcessingPlantNodeElement().extractNodeKey();
+        String processingPlantName = wup.getNodeFDN().toTag();
         response.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
         response.setSendDate(Date.from(Instant.now()));
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): We are at this point, so it is all good - so assign appropriate status");

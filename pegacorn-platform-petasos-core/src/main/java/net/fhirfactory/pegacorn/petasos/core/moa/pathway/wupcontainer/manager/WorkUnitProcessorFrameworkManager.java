@@ -27,8 +27,6 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
@@ -38,10 +36,8 @@ import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
 /**
@@ -149,7 +145,7 @@ public class WorkUnitProcessorFrameworkManager {
         while (topicIterator.hasNext()) {
             TopicToken currentTopicID = topicIterator.next();
             LOG.trace(".uowTopicSubscribe(): wupNode --> {} is subscribing to UoW Content Topic --> {}", wupNode, currentTopicID);
-            topicServer.addTopicSubscriber(currentTopicID, wupNode.getNodeFunctionFDN().getFunctionToken().);
+            topicServer.addTopicSubscriber(currentTopicID, wupNode.getNodeFDN().getToken());
         }
         LOG.debug(".uowTopicSubscribe(): Exit");
     }

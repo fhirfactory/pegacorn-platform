@@ -83,7 +83,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         }
         LOG.trace(".registerParcel(): Checking and/or Creating a WUAEpisde ID");
         if(!activityID.hasPresentEpisodeIdentifier()) {
-        	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().getAsSingleFDNToken());
+        	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().toVersionBasedFDNToken());
         	FDN uowTypeFDN = new FDN(unitOfWork.getTypeID());
         	newWUAFDN.appendFDN(uowTypeFDN);
         	EpisodeIdentifier wuaEpisodeToken = new EpisodeIdentifier(newWUAFDN.getToken());

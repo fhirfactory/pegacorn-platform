@@ -27,7 +27,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverContextualResponse;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverResponsePacket;
@@ -46,13 +47,10 @@ public class InterProcessingPlantHandoverPacketResponseDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverPacketGenerationBean.class);
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyIM;
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
-
-    @Inject
-    ProcessingPlantServicesInterface processingPlantServices;
 
     public InterProcessingPlantHandoverContextualResponse contextualiseInterProcessingPlantHandoverResponsePacket(String responseMessage, Exchange camelExchange, String wupInstanceKey) {
         LOG.debug(".contextualiseInterProcessingPlantHandoverResponsePacket(): Entry, responseMessage (String) --> {}, wupInstanceKey (String) --> {}", responseMessage, wupInstanceKey);

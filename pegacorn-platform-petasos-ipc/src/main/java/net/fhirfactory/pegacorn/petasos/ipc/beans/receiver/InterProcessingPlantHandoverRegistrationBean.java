@@ -21,14 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.ipc.beans.receiver;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
@@ -47,7 +48,7 @@ public class InterProcessingPlantHandoverRegistrationBean {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverRegistrationBean.class);
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyIM;
 
     @Inject
     PetasosMOAServicesBroker servicesBroker;
@@ -58,21 +59,22 @@ public class InterProcessingPlantHandoverRegistrationBean {
     public InterProcessingPlantHandoverPacket ipcReceiverActivityStart(InterProcessingPlantHandoverPacket thePacket, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".ipcReceiverActivityStart(): Entry, thePacket --> {}, wupInstanceKey --> {}", thePacket, wupInstanceKey);
         LOG.trace(".ipcReceiverActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
+        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyIM.getNode(nodeFDNToken);
         LOG.trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         LOG.trace(".ipcReceiverActivityStart(): Building the ActivityID for this activity");
-        NodeElementIdentifier wupNodeID = node.getNodeInstanceID();
+        WUPIdentifier wupNodeID = new WUPIdentifier(node.getNodeFDN().getToken());
         ActivityID newActivityID = new ActivityID();
         newActivityID.setPresentWUPFunctionToken(wupFunctionToken);
-        newActivityID.setPresentWUPIdentifier(new WUPIdentifier(node.getNodeInstanceID()));
+        newActivityID.setPresentWUPIdentifier(wupNodeID);
         newActivityID.setPreviousEpisodeIdentifier(thePacket.getActivityID().getPresentEpisodeIdentifier());
         newActivityID.setPreviousParcelIdentifier(thePacket.getActivityID().getPresentParcelIdentifier());
         LOG.trace(".ipcReceiverActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
         UoW theUoW = thePacket.getPayloadPacket();
         LOG.trace(".ipcReceiverActivityStart(): Creating new JobCard");
-        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, topologyProxy.getConcurrencyMode(wupNodeID), topologyProxy.getDeploymentResilienceMode(wupNodeID),  Date.from(Instant.now()));
+        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, node.getConcurrencyMode(), node.getResilienceMode(),  Date.from(Instant.now()));
         LOG.trace(".ipcReceiverActivityStart(): Registering the Work Unit Activity using the activityJobCard --> {} and UoW --> {}", activityJobCard, theUoW);
         ParcelStatusElement statusElement = servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         LOG.trace(".ipcReceiverActivityStart(): Registration aftermath: statusElement --> {}", statusElement);

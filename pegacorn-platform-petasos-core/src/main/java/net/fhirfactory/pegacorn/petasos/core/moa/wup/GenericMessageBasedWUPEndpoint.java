@@ -1,17 +1,17 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PegacornStandardEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCEndpoint;
 
 public class GenericMessageBasedWUPEndpoint {
-    private PegacornStandardEndpoint endpointTopologyNode;
+    private IPCEndpoint endpointTopologyNode;
     private String endpointSpecification;
     private boolean frameworkEnabled;
 
-    public PegacornStandardEndpoint getEndpointTopologyNode() {
+    public IPCEndpoint getEndpointTopologyNode() {
         return endpointTopologyNode;
     }
 
-    public void setEndpointTopologyNode(PegacornStandardEndpoint endpointTopologyNode) {
+    public void setEndpointTopologyNode(IPCEndpoint endpointTopologyNode) {
         this.endpointTopologyNode = endpointTopologyNode;
     }
 

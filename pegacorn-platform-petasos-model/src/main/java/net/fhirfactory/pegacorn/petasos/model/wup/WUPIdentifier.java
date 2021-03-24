@@ -24,11 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
 import java.util.ArrayList;
 
@@ -39,13 +35,13 @@ import java.util.ArrayList;
 public class WUPIdentifier extends TopologyNodeFDNToken {
 	
     public WUPIdentifier(TopologyNodeFDNToken originalToken) {
-        this.setToken(new String(originalToken.getToken()));
+        this.setTokenValue(new String(originalToken.getTokenValue()));
     }
     public WUPIdentifier(){super();}
 	
 	@Override
 	public String toString() {
-	        TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getToken());
+	        TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getTokenValue());
 	        String simpleString = "WUPIdentifier{";
 	        ArrayList<TopologyNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
 	        int setSize = rdnSet.size();

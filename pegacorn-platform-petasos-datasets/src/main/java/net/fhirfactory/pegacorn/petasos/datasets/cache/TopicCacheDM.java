@@ -34,8 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.Topic;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 
 /**
  *

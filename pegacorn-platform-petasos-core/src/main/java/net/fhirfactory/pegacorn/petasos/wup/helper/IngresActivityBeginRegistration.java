@@ -22,27 +22,26 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
-import java.time.Instant;
-import java.util.Date;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import org.apache.camel.Exchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
+import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * This class (bean) is to be injected into the flow of an Ingres Only WUP Implementation
@@ -60,7 +59,7 @@ public class IngresActivityBeginRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(IngresActivityBeginRegistration.class);
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
 
     @Inject
     PetasosMOAServicesBroker servicesBroker;
@@ -71,18 +70,19 @@ public class IngresActivityBeginRegistration {
     public UoW registerActivityStart(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".registerActivityStart(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
         LOG.trace(".registerActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
-        LOG.trace(".registerActivityStart(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
+        WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
+        LOG.trace(".registerActivityStart(): Node Element retrieved --> {}", wup);
+        TopologyNodeFunctionFDNToken wupFunctionToken = wup.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);        
         LOG.trace(".registerActivityStart(): Building the ActivityID for this activity");
-        NodeElementIdentifier wupNodeID = node.getNodeInstanceID();
+        WUPIdentifier wupID = new WUPIdentifier(wup.getNodeFDN().getToken());
         ActivityID newActivityID = new ActivityID();
         newActivityID.setPresentWUPFunctionToken(wupFunctionToken);
-        newActivityID.setPresentWUPIdentifier(new WUPIdentifier(node.getNodeInstanceID()));
+        newActivityID.setPresentWUPIdentifier(wupID);
         LOG.trace(".registerActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
         LOG.trace(".registerActivityStart(): Creating new JobCard");
-        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, topologyProxy.getConcurrencyMode(wupNodeID), topologyProxy.getDeploymentResilienceMode(wupNodeID),  Date.from(Instant.now()));
+        WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, wup.getConcurrencyMode(), wup.getResilienceMode(),  Date.from(Instant.now()));
         LOG.trace(".registerActivityStart(): Registering the Work Unit Activity using the activityJobCard --> {} and UoW --> {}", activityJobCard, theUoW);
         ParcelStatusElement statusElement = servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         LOG.trace(".registerActivityStart(): Registration aftermath: statusElement --> {}", statusElement);

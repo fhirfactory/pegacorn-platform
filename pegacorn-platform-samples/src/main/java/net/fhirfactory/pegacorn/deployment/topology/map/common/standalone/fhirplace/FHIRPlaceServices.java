@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.fhirfactory.pegacorn.components.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.components.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.map.common.model.DeploymentMapNodeElement;
 

@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
-import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAServerWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPClusterModeEnum;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAWUPTemplate {
+public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAServerWUPTemplate {
     private static final Logger LOG = LoggerFactory.getLogger(InteractAPIServletRESTfulGETGatewayWUP.class);
 
     public InteractAPIServletRESTfulGETGatewayWUP(){
@@ -43,8 +43,8 @@ public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAW
      public void registerActivityStart(UoW unitOfWork, WUPClusterModeEnum clusterMode, WUPSystemModeEnum systemMode){
         LOG.debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
         ActivityID newActivityID = new ActivityID();
-        newActivityID.setPresentWUPFunctionToken(this.getWupNode().getNodeFunctionToken());
-        newActivityID.setPresentWUPIdentifier(this.getWupIdentifier());
+        newActivityID.setPresentWUPFunctionToken(this.getWUP().getNodeFunctionFDN().getFunctionToken());
+        newActivityID.setPresentWUPIdentifier(this.getWUPIdentifier());
      }
 
     public void registerActivityFinish(UoW unitOfWork){

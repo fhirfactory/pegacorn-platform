@@ -22,8 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
 import java.util.HashSet;
@@ -43,43 +44,34 @@ public abstract class LadonTimerTriggeredBehaviourWUP extends GenericMessageBase
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR);
     }
-    
+
     @Override
-    protected String specifyIngresEndpoint(){
-        getLogger().debug(".specifyIngresEndpoint(): Entry");
+    protected GenericMessageBasedWUPEndpoint specifyIngresTopologyEndpoint(){
+        getLogger().debug(".specifyIngresTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint ingresEndpoint = new GenericMessageBasedWUPEndpoint();
+        ingresEndpoint.setFrameworkEnabled(false);
+        // Get Port
         String ingresEndPoint;
         ingresEndPoint = specifyEndpointComponentDefinition();
         ingresEndPoint = ingresEndPoint + ":";
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocol();
         ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocolLeadIn();
-        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getInternalHostname();
-        ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getExposedPort();
+//        ingresEndPoint = ingresEndPoint + this.getWUPTopologyNode().getContainingComponent().getContainingComponent();
+//        ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getExposedPort();
         ingresEndPoint = ingresEndPoint + specifyEndpointProtocolLeadout();
+        ingresEndpoint.setEndpointSpecification(ingresEndPoint);
         getLogger().debug(".specifyIngresEndpoint(): Exit, ingresEndPoint --> {}", ingresEndPoint);
-        return(ingresEndPoint);
+        return(ingresEndpoint);
     }
 
     @Override
-    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint(){
-        return(true);
-    }
-
-    @Override
-    protected String specifyEgressEndpointVersion() {
-        return null;
-    }
-
-    @Override
-    protected String specifyEgressTopologyEndpointName() {
-        return null;
-    }
-    
-    @Override
-    protected String specifyEgressEndpoint(){
-        getLogger().debug(".specifyEgressEndpoint(): Entry");
-        String endpoint = this.getNameSet().getEndPointWUPEgress();
-        getLogger().debug(".specifyEgressEndpoint(): Exit, egressEndPoint --> {}", endpoint);
-        return(endpoint);
+    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        egressEndpoint.setFrameworkEnabled(true);
+        egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
+        return(egressEndpoint);
     }
 
     @Override

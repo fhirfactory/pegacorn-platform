@@ -22,6 +22,8 @@
 package net.fhirfactory.pegacorn.common.model.componentid;
 
 public enum TopologyNodeTypeEnum {
+    OAM_WORKSHOP("operations_administration_and_maintenance_workshop"),
+    OAM_WORK_UNIT_PROCESSOR("operations_administration_and_maintenance_wup"),
     WUP("wup"),
     WUP_CORE("wup_core"),
     WUP_INTERCHANGE_PAYLOAD_TRANSFORMER("interchange_payload_transfomer"),

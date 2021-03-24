@@ -24,6 +24,9 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
 import java.util.ArrayList;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
@@ -36,6 +39,16 @@ public class ResilienceParcelIdentifier extends FDNToken {
 
     public ResilienceParcelIdentifier(){
     	super();
+	}
+
+	public ResilienceParcelIdentifier(TopologyNodeFunctionFDNToken nodeFunctionToken){
+    	super();
+		TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(nodeFunctionToken);
+		FDN newFDN = new FDN();
+		for(TopologyNodeRDN currentRDN: nodeFunctionFDN.getHierarchicalNameSet()) {
+			newFDN.appendRDN(new RDN(currentRDN.getNodeName(), currentRDN.getNodeVersion()));
+		}
+		setContent(newFDN.getToken().getContent());
 	}
     
 

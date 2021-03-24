@@ -25,10 +25,11 @@ package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
 
@@ -48,50 +49,16 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
     }
-    
-    @Override
-    protected String specifyIngresEndpoint(){
-        LOG.debug(".specifyIngresEndpoint(): Entry");
-        String ingresEndPoint;
-        ingresEndPoint = specifyEndpointComponentDefinition();
-        ingresEndPoint = ingresEndPoint + ":";
-        ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocol();
-        ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocolLeadIn();
-        ingresEndPoint = ingresEndPoint + this.getIngresTopologyEndpointElement().getInternalHostname();
-        ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getExposedPort();
-        ingresEndPoint = ingresEndPoint + specifyEndpointProtocolLeadout();
-        LOG.debug(".specifyIngresEndpoint(): Exit, ingresEndPoint --> {}", ingresEndPoint);
-        return(ingresEndPoint);
-    }
 
     @Override
-    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint(){
-        return(true);
+    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        egressEndpoint.setFrameworkEnabled(true);
+        egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
+        return(egressEndpoint);
     }
-
-    @Override
-    protected String specifyEgressEndpointVersion() {
-        return null;
-    }
-
-    @Override
-    protected String specifyEgressTopologyEndpointName() {
-        return null;
-    }
-    
-    @Override
-    protected String specifyEgressEndpoint(){
-        LOG.debug(".specifyEgressEndpoint(): Entry");
-        String endpoint = this.getNameSet().getEndPointWUPEgress();
-        LOG.debug(".specifyEgressEndpoint(): Exit, egressEndPoint --> {}", endpoint);
-        return(endpoint);
-    }
-
-    @Override
-    protected boolean getUsesWUPFrameworkGeneratedIngresEndpoint() {
-        return(false);
-    }
-
 
     /**
      * The Ingres Message Gateway doesn't subscribe to ANY topics as it receives it's 
@@ -104,9 +71,4 @@ public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBa
         HashSet<TopicToken> subTopics = new HashSet<TopicToken>();
         return(subTopics);
     }
-    
-    abstract protected String specifyEndpointComponentDefinition();
-    abstract protected String specifyEndpointProtocol();
-    abstract protected String specifyEndpointProtocolLeadIn();
-    abstract protected String specifyEndpointProtocolLeadout();
 }

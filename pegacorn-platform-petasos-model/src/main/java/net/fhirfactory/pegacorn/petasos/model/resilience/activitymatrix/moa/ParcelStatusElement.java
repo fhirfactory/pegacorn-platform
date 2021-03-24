@@ -22,13 +22,15 @@
 
 package net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 
 import java.time.Instant;
 import java.util.Date;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
 
 public class ParcelStatusElement {
 
@@ -63,15 +65,15 @@ public class ParcelStatusElement {
         this.requiresRetryLock = new Object();
     }
 
-    public FDNToken getParcelInstanceID() {
+    public ResilienceParcelIdentifier getParcelInstanceID() {
         return (this.activityID.getPresentParcelIdentifier());
     }
 
-    public FDNToken getWupInstanceID() {
+    public TopologyNodeFDNToken getWupInstanceID() {
         return (this.activityID.getPresentWUPIdentifier());
     }
 
-    public NodeElementFunctionToken getWUPFunctionToken() {
+    public TopologyNodeFunctionFDNToken getWUPFunctionToken() {
         return (this.activityID.getPresentWUPFunctionToken());
     }
 

@@ -22,13 +22,15 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
@@ -50,7 +52,7 @@ public class WUPEgressConduit {
     private static final Logger LOG = LoggerFactory.getLogger(WUPEgressConduit.class);
     
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
@@ -61,24 +63,25 @@ public class WUPEgressConduit {
      *
      * @param incomingUoW   The Unit of Work (UoW) received as output from the actual Work Unit Processor (Business Logic)
      * @param camelExchange The Apache Camel Exchange object, for extracting the WUPJobCard & ParcelStatusElement from
-     * @param wupInstanceKey The NodeElement Key Instance - an absolutely unique identifier for the instance of WUP within the entiry deployment.
+     * @param wupFDNTokenValue The NodeElement Key Instance - an absolutely unique identifier for the instance of WUP within the entiry deployment.
      * @return A WorkUnitTransportPacket object for relay to the other
      */
-    public WorkUnitTransportPacket receiveFromWUP(UoW incomingUoW, Exchange camelExchange, String wupInstanceKey) {
-        LOG.debug(".receiveFromWUP(): Entry, incomingUoW (UoW) --> {}, wupInstanceKey (String) --> {}", incomingUoW, wupInstanceKey);
+    public WorkUnitTransportPacket receiveFromWUP(UoW incomingUoW, Exchange camelExchange, String wupFDNTokenValue) {
+        LOG.debug(".receiveFromWUP(): Entry, incomingUoW (UoW) --> {}, wupFDNTokenValue (String) --> {}", incomingUoW, wupFDNTokenValue);
         // Get my Petasos Context
         if( topologyProxy == null ) {
         	LOG.error(".receiveFromWUP(): Guru Software Meditation Error: topologyProxy is null");
         }
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupFDNTokenValue);
+        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
         LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
         // Now, continue with business logic
         RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
         // Retrieve the information from the CamelExchange
-        String jobcardPropertyKey = exchangePropertyNames.getExchangeJobCardPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java
-        String parcelStatusPropertyKey = exchangePropertyNames.getExchangeStatusElementPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java
+        String jobcardPropertyKey = exchangePropertyNames.getExchangeJobCardPropertyName(wupFDNTokenValue); // this value should match the one in WUPIngresConduit.java
+        String parcelStatusPropertyKey = exchangePropertyNames.getExchangeStatusElementPropertyName(wupFDNTokenValue); // this value should match the one in WUPIngresConduit.java
         WUPJobCard jobCard = camelExchange.getProperty(jobcardPropertyKey, WUPJobCard.class);
         ParcelStatusElement statusElement = camelExchange.getProperty(parcelStatusPropertyKey, ParcelStatusElement.class);
         // Now process incoming content

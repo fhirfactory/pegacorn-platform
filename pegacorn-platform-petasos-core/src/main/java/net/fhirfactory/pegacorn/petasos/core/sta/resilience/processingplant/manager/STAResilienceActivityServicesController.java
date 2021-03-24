@@ -22,13 +22,13 @@
 
 package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager;
 
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.tasks.FinaliseSOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.tasks.RegisterNewSOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
-import net.fhirfactory.pegacorn.petasos.topology.manager.TopologyIM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.model.topics;
+package net.fhirfactory.pegacorn.common.model.topicid;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import org.slf4j.Logger;

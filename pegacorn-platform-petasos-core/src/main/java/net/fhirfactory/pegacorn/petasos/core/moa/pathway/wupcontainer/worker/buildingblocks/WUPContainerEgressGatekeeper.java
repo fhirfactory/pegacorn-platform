@@ -22,23 +22,23 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Mark A. Hunter
@@ -50,7 +50,7 @@ public class WUPContainerEgressGatekeeper {
     private static final String EGRESS_GATEKEEPER_PROCESSED_PROPERTY = "EgressGatekeeperSemaphore";
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
 
     private String getGatekeeperProperty(FDNToken wupIdentifier) {
         FDN workingFDN = new FDN(wupIdentifier);
@@ -67,19 +67,20 @@ public class WUPContainerEgressGatekeeper {
      *
      * @param transportPacket The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange   The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @param wupInstanceKey  The Work Unit Processor Instance Key, used to retrieve the associated NodeElement for the WUP
+     * @param wupFDNTokenValue  The Work Unit Processor Instance Key, used to retrieve the associated NodeElement for the WUP
      * @return Should either return the ingres point into the associated Interchange Payload Transformer or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange, String wupInstanceKey) {
-        LOG.debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupInstanceKey (String) --> {}", transportPacket,wupInstanceKey );
+    public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange, String wupFDNTokenValue) {
+        LOG.debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket,wupFDNTokenValue );
         // Get my Petasos Context
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupFDNTokenValue);
+        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
         LOG.trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionToken wupFunctionToken = node.getNodeFunctionToken();
+        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
-        RouteElementNames nameSet = new RouteElementNames(wupFunctionToken);
+        RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);
         ArrayList<String> targetList = new ArrayList<String>();
         if(!transportPacket.hasCurrentJobCard()) {
             LOG.error(".egressGatekeeper(): CurrentJobCard is null!");

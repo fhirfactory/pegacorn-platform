@@ -24,6 +24,9 @@ package net.fhirfactory.pegacorn.common.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -138,7 +141,7 @@ class FDNTest {
 
 	/**
 	 * Test method for
-	 * {@link net.fhirfactory.pegacorn.common.model.FDN#appendRDN(net.fhirfactory.pegacorn.common.model.RDN)}.
+	 * {@link FDN#appendRDN(RDN)}.
 	 */
 	@Test
 	void testAppendRDN() {
@@ -161,7 +164,7 @@ class FDNTest {
 
 	/**
 	 * Test method for
-	 * {@link net.fhirfactory.pegacorn.common.model.FDN#getParentFDN()}.
+	 * {@link FDN#getParentFDN()}.
 	 */
 	@Test
 	void testGetParentFDN() {
@@ -190,7 +193,7 @@ class FDNTest {
 
 	/**
 	 * Test method for
-	 * {@link net.fhirfactory.pegacorn.common.model.FDN#equals(net.fhirfactory.pegacorn.common.model.FDN)}.
+	 * {@link FDN#equals(FDN)}.
 	 */
 	@Test
 	void testEqualsFDN() {

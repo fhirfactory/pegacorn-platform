@@ -21,11 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.ipc.beans.sender;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
@@ -42,18 +43,16 @@ public class InterProcessingPlantHandoverPacketGenerationBean {
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverPacketGenerationBean.class);
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyIM;
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
-    @Inject
-    ProcessingPlantServicesInterface processingPlantServices;
-
     public InterProcessingPlantHandoverPacket constructInterProcessingPlantHandoverPacket(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".constructInterProcessingPlantHandoverPacket(): Entry, theUoW (UoW) --> {}, wupInstanceKey (String) --> {}", theUoW, wupInstanceKey);
         LOG.trace(".constructInterProcessingPlantHandoverPacket(): Attempting to retrieve NodeElement");
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
+        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
+        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyIM.getNode(nodeFDNToken);
         LOG.trace(".constructInterProcessingPlantHandoverPacket(): Node Element retrieved --> {}", node);
         LOG.trace(".constructInterProcessingPlantHandoverPacket(): Extracting Job Card and Status Element from Exchange");
         String jobcardPropertyKey = exchangePropertyNames.getExchangeJobCardPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java/WUPEgressConduit.java
@@ -63,7 +62,7 @@ public class InterProcessingPlantHandoverPacketGenerationBean {
         LOG.trace(".constructInterProcessingPlantHandoverPacket(): Creating the Response message");
         InterProcessingPlantHandoverPacket forwardingPacket = new InterProcessingPlantHandoverPacket();
         forwardingPacket.setActivityID(jobCard.getActivityID());
-        String processingPlantName = processingPlantServices.getProcessingPlantNodeElement().extractNodeKey();
+        String processingPlantName = node.getNodeFDN().toTag();
         forwardingPacket.setMessageIdentifier(processingPlantName + "-" + Date.from(Instant.now()).toString());
         forwardingPacket.setSendDate(Date.from(Instant.now()));
         forwardingPacket.setPayloadPacket(theUoW);

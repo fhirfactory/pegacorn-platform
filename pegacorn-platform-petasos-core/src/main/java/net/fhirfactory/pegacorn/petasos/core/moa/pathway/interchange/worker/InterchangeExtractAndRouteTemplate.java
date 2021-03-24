@@ -21,26 +21,25 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
+import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 
 public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeExtractAndRouteTemplate.class);
 
-    private NodeElement wupNodeElement;
+    private WorkUnitProcessorTopologyNode wupNodeElement;
     private RouteElementNames nameSet;
 
-    public InterchangeExtractAndRouteTemplate(CamelContext context, NodeElement nodeElement) {
+    public InterchangeExtractAndRouteTemplate(CamelContext context, WorkUnitProcessorTopologyNode nodeElement) {
         super(context);
         LOG.debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
         this.wupNodeElement = nodeElement;
-        nameSet = new RouteElementNames(wupNodeElement.getNodeFunctionToken());
+        nameSet = new RouteElementNames(wupNodeElement.getNodeFunctionFDN().getFunctionToken());
     }
 
     @Override
@@ -51,7 +50,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerIngres())
                 .routeId(nameSet.getRouteInterchangePayloadTransformer())
-                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange," + this.wupNodeElement.extractNodeKey() + ")")
+                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange," + this.wupNodeElement.getNodeFDN().getToken().getTokenValue() + ")")
                 .to(nameSet.getEndPointInterchangePayloadTransformerEgress());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerEgress())
@@ -60,6 +59,6 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangeRouterIngres())
                 .routeId(nameSet.getRouteInterchangeRouter())
-                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange," +  this.wupNodeElement.extractNodeKey() + ")");
+                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange," +  this.wupNodeElement.getNodeFDN().getToken().getTokenValue() + ")");
     }
 }

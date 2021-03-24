@@ -22,12 +22,13 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
+import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
 public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
     
@@ -39,51 +40,18 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
     }
 
     @Override
-    protected abstract String specifyIngresTopologyEndpointName();
-    @Override
-    protected abstract String specifyIngresEndpointVersion();
-
-    @Override
     protected WUPArchetypeEnum specifyWUPArchetype(){
         return(WUPArchetypeEnum.WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT);
     }
-    
-    @Override
-    protected String specifyIngresEndpoint(){
-        getLogger().debug(".specifyIngresEndpoint(): Entry");
-        String ingresEndPoint;
-        ingresEndPoint = specifyEndpointComponentDefinition();
-        ingresEndPoint = ingresEndPoint + ":";
-        ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocol();
-        ingresEndPoint = ingresEndPoint + this.specifyEndpointProtocolLeadIn();
-        ingresEndPoint = ingresEndPoint + "0.0.0.0"; // TODO need to look into why Wildfly wont bind....
-        ingresEndPoint = ingresEndPoint + ":" + this.getIngresTopologyEndpointElement().getInternalPort();
-        ingresEndPoint = ingresEndPoint + specifyEndpointProtocolLeadout();
-        getLogger().debug(".specifyIngresEndpoint(): Exit, ingresEndPoint --> {}", ingresEndPoint);
-        return(ingresEndPoint);
-    }
 
     @Override
-    protected boolean getUsesWUPFrameworkGeneratedEgressEndpoint(){
-        return(true);
-    }
-
-    @Override
-    protected String specifyEgressEndpointVersion() {
-        return null;
-    }
-
-    @Override
-    protected String specifyEgressTopologyEndpointName() {
-        return null;
-    }
-    
-    @Override
-    protected String specifyEgressEndpoint(){
-        getLogger().debug(".specifyEgressEndpoint(): Entry");
-        String endpoint = this.getNameSet().getEndPointWUPEgress();
-        getLogger().debug(".specifyEgressEndpoint(): Exit, egressEndPoint --> {}", endpoint);
-        return(endpoint);
+    protected GenericMessageBasedWUPEndpoint specifyEgressTopologyEndpoint(){
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Entry");
+        GenericMessageBasedWUPEndpoint egressEndpoint = new GenericMessageBasedWUPEndpoint();
+        egressEndpoint.setFrameworkEnabled(true);
+        egressEndpoint.setEndpointSpecification(this.getNameSet().getEndPointWUPEgress());
+        getLogger().debug(".specifyEgressTopologyEndpoint(): Exit");
+        return(egressEndpoint);
     }
 
     @Override
@@ -103,26 +71,4 @@ public abstract class EdgeIngresMessagingGatewayWUP extends GenericMessageBasedW
         HashSet<TopicToken> subTopics = new HashSet<TopicToken>();
         return(subTopics);
     }
-    
-    protected String specifyEndpointComponentDefinition() {
-        return ("netty");
-    }
-
-    protected String specifyEndpointProtocol() {
-        return ("tcp");
-    }
-
-    protected String specifyEndpointProtocolLeadIn() {
-        return ("://");
-    }
-
-    protected String specifyEndpointProtocolLeadout() {
-        return specifyEndpointProtocolLeadout(specifyServerInitializerFactoryName());
-    }
-
-    public static String specifyEndpointProtocolLeadout(String serverInitializerFactoryName) {
-        return "?serverInitializerFactory=#" + serverInitializerFactoryName + DEFAULT_NETTY_PARAMS_POSTFIX;
-    }
-    
-    abstract protected String specifyServerInitializerFactoryName();
 }

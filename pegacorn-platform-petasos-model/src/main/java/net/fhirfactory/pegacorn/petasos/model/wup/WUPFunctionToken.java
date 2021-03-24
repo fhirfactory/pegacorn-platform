@@ -21,19 +21,20 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
+
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 
 /**
  *
  * @author Mark A. Hunter
  */
-public class WUPFunctionToken extends NodeElementFunctionToken {
+public class WUPFunctionToken extends TopologyNodeFunctionFDNToken {
 
     public WUPFunctionToken(WUPFunctionToken originalToken){
         super(originalToken);
     }
 
-    public WUPFunctionToken(NodeElementFunctionToken originalNodeToken){
+    public WUPFunctionToken(TopologyNodeFunctionFDNToken originalNodeToken){
         super(originalNodeToken);
     }
 
@@ -44,8 +45,7 @@ public class WUPFunctionToken extends NodeElementFunctionToken {
     @Override
     public String toString() {
         String toString = "{WUPFunctionToken=("
-                + this.getFunctionID().toString() + "),("
-                + this.getVersion() + ")}";
+                + this.getToken().toString() + ")";
         return (toString);
     }
     

@@ -25,6 +25,8 @@ package net.fhirfactory.pegacorn.common.model.componentid;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -143,7 +145,7 @@ public class TopologyNodeFDN {
         this.hierarchicalNameSet = new ArrayList<>();
         try{
             XmlMapper xmlMapper = new XmlMapper();
-            TopologyNodeRDNSet nodeRDNSet = xmlMapper.readValue(token.getToken(), TopologyNodeRDNSet.class);
+            TopologyNodeRDNSet nodeRDNSet = xmlMapper.readValue(token.getTokenValue(), TopologyNodeRDNSet.class);
             int rdnCount = nodeRDNSet.payload.size();
             for(int counter = 0; counter < rdnCount; counter ++){
                 this.hierarchicalNameSet.set(counter, nodeRDNSet.getPayload().get(counter));
@@ -178,5 +180,21 @@ public class TopologyNodeFDN {
             }
         }
         return(null);
+    }
+
+    public FDN toTypeBasedFDN(){
+        FDN newFDN = new FDN();
+        for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
+            newFDN.appendRDN(new RDN(nodeRDN.getNodeType().getNodeElementType(),nodeRDN.getNodeName()));
+        }
+        return(newFDN);
+    }
+
+    public FDN toVersionBasedFDN(){
+        FDN newFDN = new FDN();
+        for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
+            newFDN.appendRDN(new RDN(nodeRDN.getNodeName(), nodeRDN.getNodeVersion()));
+        }
+        return(newFDN);
     }
 }
