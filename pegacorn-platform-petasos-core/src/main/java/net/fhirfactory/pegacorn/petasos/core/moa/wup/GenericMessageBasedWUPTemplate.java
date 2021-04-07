@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.model.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.model.WorkshopInterface;
-import net.fhirfactory.pegacorn.datasets.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
+import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
@@ -204,12 +204,12 @@ public abstract class GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
-        WorkUnitProcessorTopologyNode wupNode = getWorkshop()
-                .getTopologyFactory()
-                .addWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode(), wupNode);
-        setWupTopologyNode(wupNode);
-        wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
-        wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
+ //       WorkUnitProcessorTopologyNode wupNode = getWorkshop()
+ //               .getTopologyFactory()
+ //               .addWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.WUP);
+ //       getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode(), wupNode);
+ //       setWupTopologyNode(wupNode);
+ //       wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
+ //       wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
     }
 }

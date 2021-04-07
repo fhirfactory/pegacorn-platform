@@ -145,13 +145,18 @@
         </dependency>
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-model</artifactId>
+            <artifactId>pegacorn-buildingblocks-datamodels-components</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
-
-		
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-datamodels-fhir</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
         <!-- Infinispan -->
         <dependency>
             <groupId>org.infinispan</groupId>
@@ -196,11 +201,7 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
-
-
 
     <build>
         <plugins>
@@ -219,10 +220,10 @@
                 <version>${version-org.apache.maven-surefire-plugin}</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${version-org.apache.maven-failsafe-plugin}</version>
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -22,6 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.archetypes;
 
+import net.fhirfactory.pegacorn.deployment.topology.map.common.archetypes.common.PegacornTopologyFactoryBase;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAServerWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -51,4 +54,6 @@ public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAS
         LOG.debug(".registerActivityFinish(): Entry, unitOfWork --> {}", unitOfWork);
 
     }
+
+
 }
