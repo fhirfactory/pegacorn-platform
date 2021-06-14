@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
@@ -157,7 +157,7 @@ public class SynchroniseMOAWorkUnitActivityJobCardTask {
         	LOG.debug(".standaloneModeSynchroniseJobCard(): actionableJobCard (WUPJobCard).updateDate (Date) --> {}", actionableJobCard.getUpdateDate());
         }
 		ResilienceParcelIdentifier parcelInstanceID = actionableJobCard.getActivityID().getPresentParcelIdentifier();
-		EpisodeIdentifier wuaEpisodeID = actionableJobCard.getActivityID().getPresentEpisodeIdentifier();
+		PetasosEpisodeIdentifier wuaEpisodeID = actionableJobCard.getActivityID().getPresentEpisodeIdentifier();
 		LOG.trace(".standaloneModeSynchroniseJobCard(): Retrieve the ParcelStatusElement from the Cache for ParcelInstanceID --> {}", parcelInstanceID);
 		ParcelStatusElement statusElement = activityMatrixDM.getParcelStatusElement(parcelInstanceID);
 		LOG.trace(".standaloneModeSynchroniseJobCard(): Retrieved ParcelStatusElement --> {}", statusElement);

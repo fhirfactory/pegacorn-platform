@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.common.model.componentid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class TopologyNodeRDN {
     private String nodeName;
     private String nodeVersion;
@@ -62,8 +64,18 @@ public class TopologyNodeRDN {
         this.nodeType = nodeType;
     }
 
+    @JsonIgnore
     public String getTag(){
         String newTag = getNodeType().getNodeElementType() + "[" + getNodeName() + "(" + getNodeVersion() +")]";
         return(newTag);
+    }
+
+    @Override
+    public String toString() {
+        return "TopologyNodeRDN{" +
+                "nodeName='" + nodeName + '\'' +
+                ", nodeVersion='" + nodeVersion + '\'' +
+                ", nodeType=" + nodeType +
+                '}';
     }
 }

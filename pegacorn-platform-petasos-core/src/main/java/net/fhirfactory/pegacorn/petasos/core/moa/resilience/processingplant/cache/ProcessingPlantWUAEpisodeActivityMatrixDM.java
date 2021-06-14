@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cac
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
@@ -53,7 +53,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantWUAEpisodeActivityMatrixDM.class);
 
     private ConcurrentHashMap<ResilienceParcelIdentifier, ParcelStatusElement> parcelStatusElementCache;
-    private ConcurrentHashMap<EpisodeIdentifier, HashSet<ResilienceParcelIdentifier>> wuaEpisode2ParcelInstanceMap;
+    private ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<ResilienceParcelIdentifier>> wuaEpisode2ParcelInstanceMap;
 
     @Inject
     ProcessingPlantParcelCacheDM parcelCacheDM;
@@ -63,7 +63,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
 
     public ProcessingPlantWUAEpisodeActivityMatrixDM() {
         parcelStatusElementCache = new ConcurrentHashMap<ResilienceParcelIdentifier, ParcelStatusElement>();
-        wuaEpisode2ParcelInstanceMap = new ConcurrentHashMap<EpisodeIdentifier, HashSet<ResilienceParcelIdentifier>>();
+        wuaEpisode2ParcelInstanceMap = new ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<ResilienceParcelIdentifier>>();
     }
     
     /**
@@ -209,10 +209,10 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
         }
     }
 
-    private EpisodeIdentifier findEpisodeIdentifierForParcelInstance(ResilienceParcelIdentifier parcelInstanceID) {
-        Enumeration<EpisodeIdentifier> wuaEpisodeEnumeration = wuaEpisode2ParcelInstanceMap.keys();
+    private PetasosEpisodeIdentifier findEpisodeIdentifierForParcelInstance(ResilienceParcelIdentifier parcelInstanceID) {
+        Enumeration<PetasosEpisodeIdentifier> wuaEpisodeEnumeration = wuaEpisode2ParcelInstanceMap.keys();
         while (wuaEpisodeEnumeration.hasMoreElements()) {
-            EpisodeIdentifier presentWUAEpisode = wuaEpisodeEnumeration.nextElement();
+            PetasosEpisodeIdentifier presentWUAEpisode = wuaEpisodeEnumeration.nextElement();
             Set<ResilienceParcelIdentifier> tokenSet = wuaEpisode2ParcelInstanceMap.get(presentWUAEpisode);
             if(tokenSet == null){
                 return(null);
@@ -239,7 +239,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
      * @return Returns the Parcel Instance Identifier for the Parcel that has
      * System Wide Focus, or null.
      */
-    public ResilienceParcelIdentifier getSiteWideFocusElement(EpisodeIdentifier wuaEpisodeID) {
+    public ResilienceParcelIdentifier getSiteWideFocusElement(PetasosEpisodeIdentifier wuaEpisodeID) {
         LOG.debug(".getSiteWideFocusElement(): Entry, wuaEpisodeID --> {}", wuaEpisodeID);
         LOG.trace(".getSiteWideFocusElement(): Retrieve the ResilienceParcels for the Episode");
         if(!wuaEpisode2ParcelInstanceMap.containsKey(wuaEpisodeID)) {
@@ -281,7 +281,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
      * @return Returns the Parcel Instance Identifier for the Parcel that has
      * Cluster Focus, or null.
      */
-    public ResilienceParcelIdentifier getClusterFocusElement(EpisodeIdentifier wuaEpisodeID) {
+    public ResilienceParcelIdentifier getClusterFocusElement(PetasosEpisodeIdentifier wuaEpisodeID) {
         LOG.debug(".getClusterFocusElement(): Entry, wuaEpisodeID --> {}", wuaEpisodeID);
         Set<ResilienceParcelIdentifier> wuaEpisodeParcelIDSet = wuaEpisode2ParcelInstanceMap.get(wuaEpisodeID);
         Iterator<ResilienceParcelIdentifier> wuaEpisodeParcelIDIterator = wuaEpisodeParcelIDSet.iterator();
@@ -303,13 +303,13 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
     public List<ResilienceParcelIdentifier> getAgedContentFromUpActivityMatrix() {
         LOG.debug(".getAgedContentFromUpActivityMatrix(): Entry");
         ArrayList<ResilienceParcelIdentifier> agedContent = new ArrayList<ResilienceParcelIdentifier>();
-        Enumeration<EpisodeIdentifier> parcelEpisodeIDIterator = wuaEpisode2ParcelInstanceMap.keys();
+        Enumeration<PetasosEpisodeIdentifier> parcelEpisodeIDIterator = wuaEpisode2ParcelInstanceMap.keys();
         LOG.trace(".getAgedContentFromUpActivityMatrix(): Iterating through each EpisodeID");
         Date currentDate = Date.from(Instant.now());
         Long cutOffAge = currentDate.getTime() - (PetasosPropertyConstants.CACHE_ENTRY_RETENTION_PERIOD_SECONDS);
         Long timeOutAge = currentDate.getTime() - (PetasosPropertyConstants.WUP_ACTIVITY_DURATION_SECONDS);
         while (parcelEpisodeIDIterator.hasMoreElements()) {
-            EpisodeIdentifier parcelEpisodeID = parcelEpisodeIDIterator.nextElement();
+            PetasosEpisodeIdentifier parcelEpisodeID = parcelEpisodeIDIterator.nextElement();
             Set<ResilienceParcelIdentifier> statusSet = wuaEpisode2ParcelInstanceMap.get(parcelEpisodeID);
             LOG.trace(".clearAgedContentFromUpActivityMatrix(): Iterating through ALL ParcelStatusElements to see if one is FINISHED, ParcelEpisodeID --> {}, ", parcelEpisodeID);
             Iterator<ResilienceParcelIdentifier> initialSearchStatusIterator = statusSet.iterator();
@@ -343,7 +343,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
         return(agedContent);
     }
 
-    public List<ParcelStatusElement> getEpisodeElementSet(EpisodeIdentifier episodeID){
+    public List<ParcelStatusElement> getEpisodeElementSet(PetasosEpisodeIdentifier episodeID){
         LOG.debug(".getEpisodeElementSet(): Entry, episodeID --> {}", episodeID);
         ArrayList<ParcelStatusElement> episodeSet = new ArrayList<ParcelStatusElement>();
         Set<ResilienceParcelIdentifier> episodeParcelIDs = wuaEpisode2ParcelInstanceMap.get(episodeID);
@@ -372,7 +372,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
      * @param parcelIdentifier The ResilienceParcelIdentifier for the Parcel we want to take the lead on doing the actual work -
      *                         with the context of the whole deployed system.
      */
-    public void setSystemWideFocusElement(EpisodeIdentifier episode, ResilienceParcelIdentifier parcelIdentifier) {
+    public void setSystemWideFocusElement(PetasosEpisodeIdentifier episode, ResilienceParcelIdentifier parcelIdentifier) {
         if(LOG.isDebugEnabled()){
             LOG.debug(".setSiteWideFocusElement(): Entry");
             LOG.debug(".setSiteWideFocusElement(): episode (EpisodeIdentifier) --> {}", episode);
@@ -409,7 +409,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
      * @param parcelIdentifier The ResilienceParcelIdentifier for the Parcel we want to take the lead on doing the actual work -
      *                         the context of the Cluster.
      */
-    public void setClusterWideFocusElement(EpisodeIdentifier episode, ResilienceParcelIdentifier parcelIdentifier){
+    public void setClusterWideFocusElement(PetasosEpisodeIdentifier episode, ResilienceParcelIdentifier parcelIdentifier){
         if(LOG.isDebugEnabled()){
             LOG.debug(".setClusterWideFocusElement(): Entry");
             LOG.debug(".setClusterWideFocusElement(): episode (EpisodeIdentifier) --> {}", episode);

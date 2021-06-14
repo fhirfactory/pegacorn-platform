@@ -36,8 +36,8 @@ import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
 /**
@@ -55,9 +55,9 @@ public class WorkUnitProcessorFrameworkManager {
     TopologyIM topologyIM;
 
     @Inject
-    TopicIM topicServer;
+    DataParcelSubscriptionIM topicServer;
 
-    public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, Set<TopicToken> subscribedTopics, WUPArchetypeEnum wupArchetype) {
+    public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, Set<DataParcelToken> subscribedTopics, WUPArchetypeEnum wupArchetype) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
         try {
             switch (wupArchetype) {
@@ -135,15 +135,15 @@ public class WorkUnitProcessorFrameworkManager {
 
     }
 
-    public void uowTopicSubscribe(Set<TopicToken> subscribedTopics, WorkUnitProcessorTopologyNode wupNode) {
+    public void uowTopicSubscribe(Set<DataParcelToken> subscribedTopics, WorkUnitProcessorTopologyNode wupNode) {
         LOG.debug(".uowTopicSubscribe(): Entry, subscribedTopics --> {}, wupNode --> {}", subscribedTopics, wupNode);
         if (subscribedTopics.isEmpty()) {
             LOG.debug(".uowTopicSubscribe(): Something's wrong, no Topics are subscribed for this WUP");
             return;
         }
-        Iterator<TopicToken> topicIterator = subscribedTopics.iterator();
+        Iterator<DataParcelToken> topicIterator = subscribedTopics.iterator();
         while (topicIterator.hasNext()) {
-            TopicToken currentTopicID = topicIterator.next();
+            DataParcelToken currentTopicID = topicIterator.next();
             LOG.trace(".uowTopicSubscribe(): wupNode --> {} is subscribing to UoW Content Topic --> {}", wupNode, currentTopicID);
             topicServer.addTopicSubscriber(currentTopicID, wupNode.getNodeFDN().getToken());
         }

@@ -32,6 +32,7 @@ public class InterProcessingPlantHandoverResponsePacket {
     private Integer messageSize;
     private Date sendDate;
     private InterProcessingPlantHandoverPacketStatusEnum status;
+    private String statusReason;
 
     public InterProcessingPlantHandoverPacketStatusEnum getStatus() {
         return status;
@@ -71,5 +72,25 @@ public class InterProcessingPlantHandoverResponsePacket {
 
     public void setSendDate(Date sendDate) {
         this.sendDate = sendDate;
+    }
+
+    public String getStatusReason() {
+        return statusReason;
+    }
+
+    public void setStatusReason(String statusReason) {
+        this.statusReason = statusReason;
+    }
+
+    @Override
+    public String toString() {
+        return "InterProcessingPlantHandoverResponsePacket{" +
+                "activityID=" + activityID +
+                ", messageIdentifier='" + messageIdentifier + '\'' +
+                ", messageSize=" + messageSize +
+                ", sendDate=" + sendDate +
+                ", status=" + status +
+                ", statusReason='" + statusReason + '\'' +
+                '}';
     }
 }

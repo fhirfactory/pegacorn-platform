@@ -32,6 +32,8 @@ public enum WUPArchetypeEnum {
     WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR("pegacorn.petasos.wup.nature.behaviour.ladon_timer_triggered"),
     WUP_NATURE_LADON_STANDARD_MOA("pegacorn.petasos.wup.nature.behaviour.ladon_moa_triggered"),
     WUP_NATURE_LADON_BEHAVIOUR_WRAPPER("pegacorn.petasos.wup.nature.statespace.behaviour_wrapper"),
+    WUP_NATURE_IRIS_MATRIXCONTROL_PATHWAY("pegacorn.petasos.wup.nature.iris.matrixcontrol.pathway"),
+    WUP_NATURE_IRIS_MATRIXCONTROL_BEHAVIOUR("pegacorn.petasos.wup.nature.iris.matrixcontrol.behaviour"),
     WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT("pegacorn.petasos.wup.nature.message.ingres_point"),
     WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT("pegacorn.petasos.wup.nature.message.egress_point"),
     WUP_NATURE_MESSAGE_EXTERNAL_CONCURRENT_INGRES_POINT("pegacorn.petasos.wup.nature.message.concurrent_ingres_point"),

@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -63,27 +64,23 @@ public class WUPEgressConduit {
      *
      * @param incomingUoW   The Unit of Work (UoW) received as output from the actual Work Unit Processor (Business Logic)
      * @param camelExchange The Apache Camel Exchange object, for extracting the WUPJobCard & ParcelStatusElement from
-     * @param wupFDNTokenValue The NodeElement Key Instance - an absolutely unique identifier for the instance of WUP within the entiry deployment.
      * @return A WorkUnitTransportPacket object for relay to the other
      */
-    public WorkUnitTransportPacket receiveFromWUP(UoW incomingUoW, Exchange camelExchange, String wupFDNTokenValue) {
-        LOG.debug(".receiveFromWUP(): Entry, incomingUoW (UoW) --> {}, wupFDNTokenValue (String) --> {}", incomingUoW, wupFDNTokenValue);
+    public WorkUnitTransportPacket receiveFromWUP(UoW incomingUoW, Exchange camelExchange) {
+        LOG.debug(".receiveFromWUP(): Entry, incomingUoW->{}", incomingUoW);
         // Get my Petasos Context
         if( topologyProxy == null ) {
         	LOG.error(".receiveFromWUP(): Guru Software Meditation Error: topologyProxy is null");
         }
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupFDNTokenValue);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
         // Now, continue with business logic
         RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
         // Retrieve the information from the CamelExchange
-        String jobcardPropertyKey = exchangePropertyNames.getExchangeJobCardPropertyName(wupFDNTokenValue); // this value should match the one in WUPIngresConduit.java
-        String parcelStatusPropertyKey = exchangePropertyNames.getExchangeStatusElementPropertyName(wupFDNTokenValue); // this value should match the one in WUPIngresConduit.java
-        WUPJobCard jobCard = camelExchange.getProperty(jobcardPropertyKey, WUPJobCard.class);
-        ParcelStatusElement statusElement = camelExchange.getProperty(parcelStatusPropertyKey, ParcelStatusElement.class);
+        WUPJobCard jobCard = camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
+        ParcelStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
         // Now process incoming content
         WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(jobCard.getActivityID(), Date.from(Instant.now()), incomingUoW);
         LOG.trace(".receiveFromWUP(): We only want to check if the UoW was successful and modify the JobCard/StatusElement accordingly.");
@@ -93,6 +90,14 @@ public class WUPEgressConduit {
                 LOG.trace(".receiveFromWUP(): UoW was processed successfully - updating JobCard/StatusElement to FINISHED!");
                 jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                statusElement.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
+                statusElement.setEntryDate(Date.from(Instant.now()));
+                break;
+            case UOW_OUTCOME_NO_PROCESSING_REQUIRED:
+                LOG.trace(".receiveFromWUP(): UoW was processed with no actions required - updating JobCard/StatusElement to FINISHED!");
+                jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                jobCard.setIsToBeDiscarded(true);
                 statusElement.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
                 statusElement.setEntryDate(Date.from(Instant.now()));
                 break;

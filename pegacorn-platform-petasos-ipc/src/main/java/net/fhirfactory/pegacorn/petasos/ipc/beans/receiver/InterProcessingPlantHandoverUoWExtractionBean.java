@@ -23,16 +23,16 @@
  */
 package net.fhirfactory.pegacorn.petasos.ipc.beans.receiver;
 
-import javax.enterprise.context.ApplicationScoped;
-
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  *
@@ -43,16 +43,16 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterProcessingPlantHandoverResponseGenerationBean.class);
 
-    public UoW extractUoW(InterProcessingPlantHandoverPacket thePacket, Exchange camelExchange, String sourceSubsystem) {
+    public UoW extractUoW(InterProcessingPlantHandoverPacket thePacket, Exchange camelExchange) {
         LOG.debug(".extractUoW(): Entry, thePacket --> {}", thePacket);
         UoW theUoW = thePacket.getPayloadPacket();
         UoWPayload outputPayload = new UoWPayload();
         outputPayload.setPayload(theUoW.getIngresContent().getPayload());
-        TopicToken topicId = theUoW.getPayloadTopicID();
+        DataParcelToken topicId = theUoW.getPayloadTopicID();
         LOG.trace(".extractUoW(): Original Topic Id --> {}", topicId);
-        topicId.removeDescriminator();
+        topicId.removeDiscriminator();
         LOG.trace(".extractUoW(): Topic Id with Descriminator Removed --> {}", topicId);
-        topicId.addDescriminator("Source", sourceSubsystem);
+        topicId.addDiscriminator("Source", thePacket.getSource());
         LOG.trace(".extractUoW(): Topic Id with new Descriminator --> {}", topicId);
         outputPayload.setPayloadTopicID(topicId);
         theUoW.getEgressContent().addPayloadElement(outputPayload);

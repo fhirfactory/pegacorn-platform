@@ -32,7 +32,7 @@ import java.util.UUID;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +89,7 @@ public class UoW {
         this.ingresContent = new UoWPayload(inputPayload);
         this.egressContent = new UoWPayloadSet();
         this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
-        this.typeID = new FDNToken(inputPayload.getPayloadTopicID().getIdentifier());
+        this.typeID = new FDNToken(inputPayload.getPayloadTopicID().getToken());
         LOG.trace(".UoW(): typeID --> {}", this.typeID);
         this.failureDescription = null;
         generateInstanceID();
@@ -308,7 +308,7 @@ public class UoW {
     }
 
     @JsonIgnore
-    public TopicToken getPayloadTopicID() {
+    public DataParcelToken getPayloadTopicID() {
         if (hasPayloadTopicID()) {
             return (this.getIngresContent().getPayloadTopicID());
         } else {

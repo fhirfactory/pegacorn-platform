@@ -23,10 +23,10 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.petasos.audit.api.PetasosAuditWriter;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
@@ -52,7 +52,7 @@ public class STAResilienceParcelServicesIM {
     ProcessingPlantParcelCacheDM parcelCacheDM;
 
     @Inject
-    PetasosAuditWriter auditWriter;
+    STAServicesAuditBroker auditWriter;
     
 
     @Transactional
@@ -85,7 +85,7 @@ public class STAResilienceParcelServicesIM {
         	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().toVersionBasedFDNToken());
         	FDN uowTypeFDN = new FDN(unitOfWork.getTypeID());
         	newWUAFDN.appendFDN(uowTypeFDN);
-        	EpisodeIdentifier wuaEpisodeToken = new EpisodeIdentifier(newWUAFDN.getToken());
+        	PetasosEpisodeIdentifier wuaEpisodeToken = new PetasosEpisodeIdentifier(newWUAFDN.getToken());
         	activityID.setPresentEpisodeIdentifier(wuaEpisodeToken);
         }
         // 1st, lets register the parcel
@@ -107,7 +107,7 @@ public class STAResilienceParcelServicesIM {
             LOG.trace(".registerSOAParcel(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             parcelInstance.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             LOG.trace(".registerSOAParcel(): Doing an Audit Write");
-            auditWriter.writeAuditEntry(parcelInstance, true);
+//            auditWriter.logActivity(parcelInstance, true);
         }
         if(LOG.isDebugEnabled()) {
             LOG.debug(".registerParcel(): Exit");
@@ -222,7 +222,7 @@ public class STAResilienceParcelServicesIM {
         LOG.trace(".notifyParcelProcessingFinish(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
         LOG.trace(".notifyParcelProcessingFinish(): Doing an Audit Write, note that it is synchronous by design");
-        auditWriter.writeAuditEntry(currentParcel,true);
+ //       auditWriter.logActivity(currentParcel, true);
         if(LOG.isDebugEnabled()) {
         	LOG.debug(".notifyParcelProcessingFinish(): Exit, returning finished Parcel");
         	LOG.debug(".notifyParcelProcessingFinish(): parcelInstance (ResilienceParcel).episodeIdentifier --> {}", currentParcel.getEpisodeIdentifier());
@@ -268,7 +268,7 @@ public class STAResilienceParcelServicesIM {
         LOG.trace(".notifyParcelProcessingFailure(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         LOG.trace(".notifyParcelProcessingFailure(): Doing an Audit Write, note that it is asynchronous by desgin");
-        auditWriter.writeAuditEntry(currentParcel,true);
+//        auditWriter.logActivity(currentParcel, true);
         LOG.debug(".notifyParcelProcessingFailure(): Exit, returning failed Parcel --> {}", currentParcel);
         return(currentParcel);
     }
@@ -324,7 +324,7 @@ public class STAResilienceParcelServicesIM {
         LOG.trace(".notifyParcelProcessingCancellation(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         LOG.trace(".notifyParcelProcessingCancellation(): Doing an Audit Write, note that it is asynchronous by design");
-        auditWriter.writeAuditEntry(currentParcel,false);
+//        auditWriter.logActivity(currentParcel, true);
         LOG.debug(".notifyParcelProcessingCancellation(): Exit, returning finished Parcel --> {}", currentParcel);
         return(currentParcel);
     }

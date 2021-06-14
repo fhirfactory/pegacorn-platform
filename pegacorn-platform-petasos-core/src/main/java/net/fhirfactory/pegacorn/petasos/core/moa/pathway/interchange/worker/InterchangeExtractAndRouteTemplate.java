@@ -24,7 +24,10 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,25 +35,28 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeExtractAndRouteTemplate.class);
 
-    private WorkUnitProcessorTopologyNode wupNodeElement;
+    private WorkUnitProcessorTopologyNode wupTopologyNode;
     private RouteElementNames nameSet;
 
     public InterchangeExtractAndRouteTemplate(CamelContext context, WorkUnitProcessorTopologyNode nodeElement) {
         super(context);
         LOG.debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
-        this.wupNodeElement = nodeElement;
-        nameSet = new RouteElementNames(wupNodeElement.getNodeFunctionFDN().getFunctionToken());
+        this.wupTopologyNode = nodeElement;
+        nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
     }
 
     @Override
     public void configure() {
-        LOG.debug(".configure(): Entry!, for wupNodeElement --> {}", this.wupNodeElement);
+        LOG.debug(".configure(): Entry!, for wupNodeElement --> {}", this.wupTopologyNode);
         LOG.debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangePayloadTransformerIngres --> {}", nameSet.getEndPointInterchangePayloadTransformerIngres());
         LOG.debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangeRouterIngres --> {}", nameSet.getEndPointInterchangeRouterIngres());
 
+        NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
+
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerIngres())
                 .routeId(nameSet.getRouteInterchangePayloadTransformer())
-                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange," + this.wupNodeElement.getNodeFDN().getToken().getTokenValue() + ")")
+                .process(nodeDetailInjector)
+                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")")
                 .to(nameSet.getEndPointInterchangePayloadTransformerEgress());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerEgress())
@@ -59,6 +65,28 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangeRouterIngres())
                 .routeId(nameSet.getRouteInterchangeRouter())
-                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange," +  this.wupNodeElement.getNodeFDN().getToken().getTokenValue() + ")");
+                .process(nodeDetailInjector)
+                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange," +  this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")");
+    }
+
+    protected class NodeDetailInjector implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            LOG.debug("NodeDetailInjector.process(): Entry");
+            boolean alreadyInPlace = false;
+            if(exchange.hasProperties()) {
+                WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+                if (wupTN != null) {
+                    alreadyInPlace = true;
+                }
+            }
+            if(!alreadyInPlace) {
+                exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getWupTopologyNode());
+            }
+        }
+    }
+
+    public WorkUnitProcessorTopologyNode getWupTopologyNode() {
+        return wupTopologyNode;
     }
 }

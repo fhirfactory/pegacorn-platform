@@ -23,23 +23,23 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.petasos.audit.api.PetasosAuditWriter;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.Date;
-import javax.transaction.Transactional;
 
 /**
  * @author Mark A. Hunter
@@ -53,7 +53,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
     ProcessingPlantParcelCacheDM parcelCacheDM;
 
     @Inject
-    PetasosAuditWriter auditWriter;
+    MOAServicesAuditBroker auditServicesBroker;
     
 
     @Transactional
@@ -86,7 +86,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().toVersionBasedFDNToken());
         	FDN uowTypeFDN = new FDN(unitOfWork.getTypeID());
         	newWUAFDN.appendFDN(uowTypeFDN);
-        	EpisodeIdentifier wuaEpisodeToken = new EpisodeIdentifier(newWUAFDN.getToken());
+        	PetasosEpisodeIdentifier wuaEpisodeToken = new PetasosEpisodeIdentifier(newWUAFDN.getToken());
         	activityID.setPresentEpisodeIdentifier(wuaEpisodeToken);
         }
         // 1st, lets register the parcel
@@ -108,7 +108,8 @@ public class ProcessingPlantResilienceParcelServicesIM {
             LOG.trace(".registerParcel(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             parcelInstance.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             LOG.trace(".registerParcel(): Doing an Audit Write");
-            auditWriter.writeAuditEntry(parcelInstance, synchronousWriteToAudit);
+            auditServicesBroker.logActivity(parcelInstance);
+
         }
         LOG.debug(".registerParcel(): Exit");
         if(LOG.isDebugEnabled()) {
@@ -182,7 +183,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
         // TODO Check to see if we should do an Audit Entry when we finish processing
         // LOG.trace(".notifyParcelProcessingFinish(): Doing an Audit Write, note that it is asynchronous by design");
-        auditWriter.writeAuditEntry(currentParcel,true);
+        auditServicesBroker.logActivity(currentParcel);
        	LOG.debug(".notifyParcelProcessingFinish(): Exit, parcelInstance (ResilienceParcel) --> {}", currentParcel);
         return(currentParcel);
     }
@@ -207,7 +208,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         LOG.trace(".notifyParcelProcessingFailure(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         LOG.trace(".notifyParcelProcessingFailure(): Doing an Audit Write, note that it is asynchronous by desgin");
-        auditWriter.writeAuditEntry(currentParcel,false);
+        auditServicesBroker.logActivity(currentParcel);
         LOG.debug(".notifyParcelProcessingFailure(): Exit, returning failed Parcel --> {}", currentParcel);
         return(currentParcel);
     }
@@ -234,7 +235,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         LOG.trace(".notifyParcelProcessingFinalisation(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         LOG.trace(".notifyParcelProcessingFinalisation(): Doing an Audit Write, note that it is asynchronous by design");
-        auditWriter.writeAuditEntry(currentParcel,false);
+        auditServicesBroker.logActivity(currentParcel);
         LOG.debug(".notifyParcelProcessingFinalisation(): Exit, returning finished Parcel --> {}", currentParcel);
         return(currentParcel);
     }
@@ -261,7 +262,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         LOG.trace(".notifyParcelProcessingCancellation(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         LOG.trace(".notifyParcelProcessingCancellation(): Doing an Audit Write, note that it is asynchronous by design");
-        auditWriter.writeAuditEntry(currentParcel,false);
+        auditServicesBroker.logActivity(currentParcel);
         LOG.debug(".notifyParcelProcessingCancellation(): Exit, returning finished Parcel --> {}", currentParcel);
         return(currentParcel);
     }

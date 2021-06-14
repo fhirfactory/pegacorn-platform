@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
@@ -48,15 +48,15 @@ public class ResilienceParcel {
     private Object instanceIDLock;
     private FDNToken typeID;
     private Object typeIDLock;
-    private EpisodeIdentifier episodeIdentifier;
+    private PetasosEpisodeIdentifier episodeIdentifier;
     private Object episodeIdentifierLock;
     private UoW actualUoW;
     private Object actualUoWLock;
     private WUPIdentifier associatedWUPIdentifier;
     private Object associatedWUPIdentifierLock;
-    private HashSet<EpisodeIdentifier> downstreamEpisodeIdentifierSet;
+    private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private Object downstreamEpisodeIdentifierSetLock;
-    private EpisodeIdentifier upstreamEpisodeIdentifier;
+    private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
     private Object upstreamEpisodeIdentifierLock;
     private final static String INSTANCE_QUALIFIER_TYPE = "ParcelInstance";
     private final static String TYPE_QUALIFIER_TYPE = "ParcelType";
@@ -113,7 +113,7 @@ public class ResilienceParcel {
         this.typeID = this.buildParcelTypeID(activityID, theUoW);
         this.identifier = this.buildParcelInstanceIdentifier(activityID, theUoW);
         this.actualUoW = theUoW;
-        this.downstreamEpisodeIdentifierSet = new HashSet<EpisodeIdentifier>();
+        this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
         this.upstreamEpisodeIdentifier = activityID.getPreviousEpisodeIdentifier();
         this.registrationDate = Date.from(Instant.now());
         this.finalisationStatus = ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED;
@@ -179,7 +179,7 @@ public class ResilienceParcel {
             this.upstreamEpisodeIdentifier = originalParcel.getUpstreamEpisodeIdentifier();
         }
         if (originalParcel.hasDownstreamEpisodeIdentifierSet()) {
-            this.downstreamEpisodeIdentifierSet = new HashSet<EpisodeIdentifier>();
+            this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
             this.downstreamEpisodeIdentifierSet.addAll(originalParcel.getDownstreamEpisodeIdentifierSet());
         }
         if (originalParcel.hasEpisodeIdentifier()) {
@@ -248,7 +248,7 @@ public class ResilienceParcel {
     /**
      * @return the downstreamParcelIDSet
      */
-    public Set<EpisodeIdentifier> getDownstreamEpisodeIdentifierSet() {
+    public Set<PetasosEpisodeIdentifier> getDownstreamEpisodeIdentifierSet() {
         if (this.downstreamEpisodeIdentifierSet == null) {
             return (null);
         } else {
@@ -260,10 +260,10 @@ public class ResilienceParcel {
      * @param downstreamEpisodeIdentifierSet the Parcels that continue on the work from
      * this Parcel
      */
-    public void setDownstreamEpisodeIdentifierSet(HashSet<EpisodeIdentifier> downstreamEpisodeIdentifierSet) {
+    public void setDownstreamEpisodeIdentifierSet(HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet) {
         synchronized (downstreamEpisodeIdentifierSetLock) {
             if (downstreamEpisodeIdentifierSet == null) {
-                this.downstreamEpisodeIdentifierSet = new HashSet<EpisodeIdentifier>();
+                this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
             }
         }
     }
@@ -279,7 +279,7 @@ public class ResilienceParcel {
     /**
      * @return the upstreamParcelInstanceID
      */
-    public EpisodeIdentifier getUpstreamEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getUpstreamEpisodeIdentifier() {
 
         return this.upstreamEpisodeIdentifier;
 
@@ -288,7 +288,7 @@ public class ResilienceParcel {
     /**
      * @param upstreamEpisodeIdentifier the "Upstream" or "Precursor" Parcel to set
      */
-    public void setUpstreamEpisodeIdentifier(EpisodeIdentifier upstreamEpisodeIdentifier) {
+    public void setUpstreamEpisodeIdentifier(PetasosEpisodeIdentifier upstreamEpisodeIdentifier) {
         synchronized (upstreamEpisodeIdentifierLock) {
             this.upstreamEpisodeIdentifier = upstreamEpisodeIdentifier;
         }
@@ -576,17 +576,17 @@ public class ResilienceParcel {
         }
     }
 
-    public EpisodeIdentifier getEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getEpisodeIdentifier() {
         return this.episodeIdentifier;
     }
 
-    public void setEpisodeIdentifier(EpisodeIdentifier episodeIdentifier) {
+    public void setEpisodeIdentifier(PetasosEpisodeIdentifier episodeIdentifier) {
         synchronized (episodeIdentifierLock) {
             this.episodeIdentifier = episodeIdentifier;
         }
     }
 
-    public EpisodeIdentifier buildEpisodeID(ActivityID activityID, UoW theUoW) {
+    public PetasosEpisodeIdentifier buildEpisodeID(ActivityID activityID, UoW theUoW) {
         if (theUoW == null) {
             throw (new IllegalArgumentException(".buildEpisodeID(): null UoW passed as parameter"));
         }
@@ -607,7 +607,7 @@ public class ResilienceParcel {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
         newEpisodeID.appendFDN(uowInstanceFDN);
-        EpisodeIdentifier episodeId = new EpisodeIdentifier(newEpisodeID.getToken());
+        PetasosEpisodeIdentifier episodeId = new PetasosEpisodeIdentifier(newEpisodeID.getToken());
         return (episodeId);
     }
 

@@ -24,5 +24,6 @@ package net.fhirfactory.pegacorn.petasos.ipc.model;
 public enum InterProcessingPlantHandoverPacketStatusEnum {
     PACKET_RECEIVED_AND_DECODED,
     PACKET_RECEIVED_BUT_FAILED_DECODING,
-    PACKET_RECEIVE_TIMED_OUT
+    PACKET_RECEIVE_TIMED_OUT,
+    PACKET_SEND_FAILURE
 }

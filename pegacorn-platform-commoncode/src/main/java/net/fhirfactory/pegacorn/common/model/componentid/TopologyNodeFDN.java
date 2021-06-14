@@ -22,11 +22,15 @@
 
 package net.fhirfactory.pegacorn.common.model.componentid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -36,6 +40,8 @@ import java.util.Objects;
  * @since 2020-08-07
  */
 public class TopologyNodeFDN {
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyNodeFDN.class);
+
     private ArrayList<TopologyNodeRDN> hierarchicalNameSet;
 
     public TopologyNodeFDN(){
@@ -43,10 +49,13 @@ public class TopologyNodeFDN {
     }
 
     public TopologyNodeFDN(TopologyNodeFDN originalToken) {
+        LOG.debug(".TopologyNodeFDN(TopologyNodeFDN): Entry, originalToken->{}", originalToken);
+        this.hierarchicalNameSet = new ArrayList<>();
         int size = originalToken.getHierarchicalNameSet().size();
         for(int counter = 0; counter < size; counter ++){
             this.hierarchicalNameSet.add(counter, originalToken.getHierarchicalNameSet().get(counter));
         }
+        LOG.debug(".TopologyNodeFDN(TopologyNodeFDN): Exit");
     }
 
     public ArrayList<TopologyNodeRDN> getHierarchicalNameSet() {
@@ -58,6 +67,7 @@ public class TopologyNodeFDN {
     }
 
     public void appendTopologyNodeRDN(TopologyNodeRDN newRDN){
+        LOG.debug(".appendTopologyNodeRDN: Entry, newRDN->{}", newRDN);
         int count = this.hierarchicalNameSet.size();
         this.hierarchicalNameSet.add(count, newRDN);
     }
@@ -73,7 +83,7 @@ public class TopologyNodeFDN {
 
     @Override
     public String toString() {
-        String simpleString = "{TopologyNodeIdentifier:";
+        String simpleString = "{TopologyNodeFDN:";
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
             simpleString += "("+nodeRDN.getNodeType()+"="+nodeRDN.getNodeName()+"-"+nodeRDN.getNodeVersion()+")";
         }
@@ -114,6 +124,7 @@ public class TopologyNodeFDN {
         return Objects.hash(getHierarchicalNameSet());
     }
 
+    @JsonIgnore
     public String toTag(){
         String simpleTag = new String();
         int count = hierarchicalNameSet.size();
@@ -127,26 +138,27 @@ public class TopologyNodeFDN {
         return(simpleTag);
     }
 
+    @JsonIgnore
     public TopologyNodeFDNToken getToken(){
         TopologyNodeRDNSet nodeRDNSet = new TopologyNodeRDNSet(this.hierarchicalNameSet);
         String tokenString = null;
         try{
-            XmlMapper xmlMapper = new XmlMapper();
-            tokenString = xmlMapper.writeValueAsString(nodeRDNSet);
+            JsonMapper mapper = new JsonMapper();
+            tokenString = mapper.writeValueAsString(nodeRDNSet);
         } catch(JsonProcessingException jsonException){
             jsonException.printStackTrace();
             tokenString = "";
         }
-        TopologyNodeFDNToken newToken = new TopologyNodeFDNToken();
+        TopologyNodeFDNToken newToken = new TopologyNodeFDNToken(tokenString);
         return(newToken);
     }
 
     public TopologyNodeFDN(TopologyNodeFDNToken token){
         this.hierarchicalNameSet = new ArrayList<>();
         try{
-            XmlMapper xmlMapper = new XmlMapper();
-            TopologyNodeRDNSet nodeRDNSet = xmlMapper.readValue(token.getTokenValue(), TopologyNodeRDNSet.class);
-            int rdnCount = nodeRDNSet.payload.size();
+            JsonMapper mapper = new JsonMapper();
+            TopologyNodeRDNSet nodeRDNSet = mapper.readValue(token.getTokenValue(), TopologyNodeRDNSet.class);
+            int rdnCount = nodeRDNSet.getPayload().size();
             for(int counter = 0; counter < rdnCount; counter ++){
                 this.hierarchicalNameSet.set(counter, nodeRDNSet.getPayload().get(counter));
             }
@@ -160,9 +172,9 @@ public class TopologyNodeFDN {
     public TopologyNodeFDN(String token){
         this.hierarchicalNameSet = new ArrayList<>();
         try{
-            XmlMapper xmlMapper = new XmlMapper();
-            TopologyNodeRDNSet nodeRDNSet = xmlMapper.readValue(token, TopologyNodeRDNSet.class);
-            int rdnCount = nodeRDNSet.payload.size();
+            JsonMapper mapper = new JsonMapper();
+            TopologyNodeRDNSet nodeRDNSet = mapper.readValue(token, TopologyNodeRDNSet.class);
+            int rdnCount = nodeRDNSet.getPayload().size();
             for(int counter = 0; counter < rdnCount; counter ++){
                 this.hierarchicalNameSet.set(counter, nodeRDNSet.getPayload().get(counter));
             }
@@ -182,6 +194,7 @@ public class TopologyNodeFDN {
         return(null);
     }
 
+    @JsonIgnore
     public FDN toTypeBasedFDN(){
         FDN newFDN = new FDN();
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
@@ -190,6 +203,7 @@ public class TopologyNodeFDN {
         return(newFDN);
     }
 
+    @JsonIgnore
     public FDN toVersionBasedFDN(){
         FDN newFDN = new FDN();
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){

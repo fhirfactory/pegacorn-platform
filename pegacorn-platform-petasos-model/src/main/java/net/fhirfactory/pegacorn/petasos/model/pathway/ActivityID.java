@@ -25,9 +25,8 @@ import java.time.Instant;
 import java.util.Date;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
 /**
@@ -36,13 +35,13 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
  */
 public class ActivityID {
 
-    private ResilienceParcelIdentifier previousParcelIdenifier;
+    private ResilienceParcelIdentifier previousParcelIdentifier;
     private Object previousParcelIdentifierLock;
-    private EpisodeIdentifier previousEpisodeIdentifier;
+    private PetasosEpisodeIdentifier previousEpisodeIdentifier;
     private Object previousEpisodeIdentifierLock;
     private ResilienceParcelIdentifier presentParcelIdentifier;
     private Object presentParcelIdenifierLock;
-    private EpisodeIdentifier presentEpisodeIdentifier;
+    private PetasosEpisodeIdentifier presentEpisodeIdentifier;
     private Object presentEpisodeIdentifierLock;
     private WUPIdentifier previousWUPIdentifier;
     private Object previousWUPIdentifierLock;
@@ -54,10 +53,12 @@ public class ActivityID {
     private Object presentWUPFunctionTokenLock;
     private Date creationDate;
     private Object creationDateLock;
+    private boolean resilientActivity;
+    private Object resilientActivityLock;
 
     public ActivityID(ResilienceParcelIdentifier previousParcelInstanceID, ResilienceParcelIdentifier presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID, Date creationDate) {
         // Clear the deck
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -66,6 +67,7 @@ public class ActivityID {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
+
         this.creationDateLock = new Object();
         this.presentParcelIdenifierLock = new Object();
         this.presentEpisodeIdentifierLock = new Object();
@@ -75,16 +77,18 @@ public class ActivityID {
         this.previousEpisodeIdentifierLock = new Object();
         this.previousWUPFunctionTokenLock = new Object();
         this.previousWUPIdentifierLock = new Object();
+        this.resilientActivityLock = new Object();
         // Set Values
-        this.previousParcelIdenifier = previousParcelInstanceID;
+        this.previousParcelIdentifier = previousParcelInstanceID;
         this.presentParcelIdentifier = presentParcelInstanceID;
         this.previousWUPIdentifier = previousWUPInstanceID;
         this.presentWUPIdentifier = presentWUPInstanceID;
         this.creationDate = creationDate;
+
     }
 
     public ActivityID(ResilienceParcelIdentifier previousParcelInstanceID, ResilienceParcelIdentifier presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID) {
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -102,16 +106,18 @@ public class ActivityID {
         this.previousEpisodeIdentifierLock = new Object();
         this.previousWUPFunctionTokenLock = new Object();
         this.previousWUPIdentifierLock = new Object();
+        this.resilientActivityLock = new Object();
         // Set Values
-        this.previousParcelIdenifier = previousParcelInstanceID;
+        this.previousParcelIdentifier = previousParcelInstanceID;
         this.presentParcelIdentifier = presentParcelInstanceID;
         this.previousWUPIdentifier = previousWUPInstanceID;
         this.presentWUPIdentifier = presentWUPInstanceID;
         this.creationDate = Date.from(Instant.now());
+        this.resilientActivity = false;
     }
 
     public ActivityID() {
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -121,6 +127,7 @@ public class ActivityID {
         this.presentWUPFunctionToken = null;
         this.creationDate = Date.from(Instant.now());
         this.creationDateLock = new Object();
+        this.resilientActivity = false;
         this.presentParcelIdenifierLock = new Object();
         this.presentEpisodeIdentifierLock = new Object();
         this.presentWUPFunctionTokenLock = new Object();
@@ -129,10 +136,11 @@ public class ActivityID {
         this.previousEpisodeIdentifierLock = new Object();
         this.previousWUPFunctionTokenLock = new Object();
         this.previousWUPIdentifierLock = new Object();
+        this.resilientActivityLock = new Object();
     }
 
     public ActivityID(ActivityID originalRecord) {
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -150,6 +158,7 @@ public class ActivityID {
         this.previousEpisodeIdentifierLock = new Object();
         this.previousWUPFunctionTokenLock = new Object();
         this.previousWUPIdentifierLock = new Object();
+        this.resilientActivityLock = new Object();
         // Set Values
         if (originalRecord.hasCreationDate()) {
             this.creationDate = originalRecord.getCreationDate();
@@ -158,7 +167,7 @@ public class ActivityID {
             this.presentParcelIdentifier = new ResilienceParcelIdentifier(originalRecord.getPresentParcelIdentifier());
         }
         if (originalRecord.hasPresentEpisodeIdentifier()) {
-            this.presentEpisodeIdentifier = new EpisodeIdentifier(originalRecord.getPresentEpisodeIdentifier());
+            this.presentEpisodeIdentifier = new PetasosEpisodeIdentifier(originalRecord.getPresentEpisodeIdentifier());
         }
         if (originalRecord.hasPresentWUPIdentifier()) {
             this.presentWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
@@ -167,10 +176,10 @@ public class ActivityID {
             this.presentWUPFunctionToken = new TopologyNodeFunctionFDNToken(originalRecord.getPresentWUPFunctionToken());
         }
         if (originalRecord.hasPreviousParcelIdentifier()) {
-            this.previousParcelIdenifier = new ResilienceParcelIdentifier(originalRecord.getPreviousParcelIdentifier());
+            this.previousParcelIdentifier = new ResilienceParcelIdentifier(originalRecord.getPreviousParcelIdentifier());
         }
         if (originalRecord.hasPreviousEpisodeIdentifier()) {
-            this.previousEpisodeIdentifier = new EpisodeIdentifier(originalRecord.getPreviousEpisodeIdentifier());
+            this.previousEpisodeIdentifier = new PetasosEpisodeIdentifier(originalRecord.getPreviousEpisodeIdentifier());
         }
         if (originalRecord.hasPreviousWUPIdentifier()) {
             this.previousWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
@@ -178,10 +187,11 @@ public class ActivityID {
         if (originalRecord.hasPreviousWUPFunctionToken()) {
             this.previousWUPFunctionToken = new TopologyNodeFunctionFDNToken(originalRecord.getPresentWUPFunctionToken());
         }
+        this.resilientActivity = originalRecord.isResilientActivity();
     }
 
     public boolean hasPreviousParcelIdentifier() {
-        if (this.previousParcelIdenifier == null) {
+        if (this.previousParcelIdentifier == null) {
             return (false);
         } else {
             return (true);
@@ -189,12 +199,12 @@ public class ActivityID {
     }
 
     public ResilienceParcelIdentifier getPreviousParcelIdentifier() {
-        return previousParcelIdenifier;
+        return previousParcelIdentifier;
     }
 
     public void setPreviousParcelIdentifier(ResilienceParcelIdentifier previousParcelID) {
         synchronized (previousParcelIdentifierLock) {
-            this.previousParcelIdenifier = previousParcelID;
+            this.previousParcelIdentifier = previousParcelID;
         }
     }
 
@@ -278,11 +288,11 @@ public class ActivityID {
         }
     }
 
-    public EpisodeIdentifier getPreviousEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getPreviousEpisodeIdentifier() {
         return previousEpisodeIdentifier;
     }
 
-    public void setPreviousEpisodeIdentifier(EpisodeIdentifier previousWUAEpisodeID) {
+    public void setPreviousEpisodeIdentifier(PetasosEpisodeIdentifier previousWUAEpisodeID) {
         synchronized (previousEpisodeIdentifierLock) {
             this.previousEpisodeIdentifier = previousWUAEpisodeID;
         }
@@ -296,11 +306,11 @@ public class ActivityID {
         }
     }
 
-    public EpisodeIdentifier getPresentEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getPresentEpisodeIdentifier() {
         return presentEpisodeIdentifier;
     }
 
-    public void setPresentEpisodeIdentifier(EpisodeIdentifier presentWUAEpisodeID) {
+    public void setPresentEpisodeIdentifier(PetasosEpisodeIdentifier presentWUAEpisodeID) {
         synchronized (presentEpisodeIdentifierLock) {
             this.presentEpisodeIdentifier = presentWUAEpisodeID;
         }
@@ -342,11 +352,19 @@ public class ActivityID {
         }
     }
 
+    public boolean isResilientActivity() {
+        return resilientActivity;
+    }
+
+    public void setResilientActivity(boolean resilientActivity) {
+        this.resilientActivity = resilientActivity;
+    }
+
     @Override
     public String toString() {
         String previousResilienceParcelInstanceIDString;
         if (hasPreviousParcelIdentifier()) {
-            previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:" + this.previousParcelIdenifier.toString() + ")";
+            previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:" + this.previousParcelIdentifier.toString() + ")";
         } else {
             previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:null)";
         }

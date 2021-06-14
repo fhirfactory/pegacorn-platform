@@ -25,14 +25,14 @@ import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.topicid.TopicToken;
+import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 
 /**
  * @author Mark A. Hunter
  */
 public class UoWPayload {
     private static final Logger LOG = LoggerFactory.getLogger(UoWPayload.class);
-    private TopicToken payloadTopicID;
+    private DataParcelToken payloadTopicID;
     private String payload;
 
     public UoWPayload() {
@@ -42,17 +42,17 @@ public class UoWPayload {
 
     public UoWPayload(UoWPayload originalUoWPayload) {
         payload = new String(originalUoWPayload.getPayload());
-        TopicToken newToken = new TopicToken();
-        FDN newTokenFDN = new FDN(originalUoWPayload.getPayloadTopicID().getIdentifier());
-        newToken.setIdentifier(newTokenFDN.getToken());
+        DataParcelToken newToken = new DataParcelToken();
+        FDN newTokenFDN = new FDN(originalUoWPayload.getPayloadTopicID().getToken());
+        newToken.setToken(newTokenFDN.getToken());
         newToken.setVersion(new String(originalUoWPayload.getPayloadTopicID().getVersion()));
         payloadTopicID = newToken;
     }
 
-    public UoWPayload(TopicToken payloadType, String payloadContent){
-        TopicToken newToken = new TopicToken();
-        FDN newTokenFDN = new FDN(payloadType.getIdentifier());
-        newToken.setIdentifier(newTokenFDN.getToken());
+    public UoWPayload(DataParcelToken payloadType, String payloadContent){
+        DataParcelToken newToken = new DataParcelToken();
+        FDN newTokenFDN = new FDN(payloadType.getToken());
+        newToken.setToken(newTokenFDN.getToken());
         newToken.setVersion(new String(payloadType.getVersion()));
         payloadTopicID = newToken;
         this.payload = new String(payloadContent);
@@ -69,17 +69,17 @@ public class UoWPayload {
         this.payload = new String(payload);
     }
 
-    public TopicToken getPayloadTopicID() {
+    public DataParcelToken getPayloadTopicID() {
         LOG.debug(".getPayloadTopicID(): Entry");
         LOG.debug(".getPayloadTopicID(): Exit, returning Payload (String) --> {}", this.payloadTopicID);
         return payloadTopicID;
     }
 
-    public void setPayloadTopicID(TopicToken payloadTopicID) {
+    public void setPayloadTopicID(DataParcelToken payloadTopicID) {
         LOG.debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadTopicID);
-        TopicToken newToken = new TopicToken();
-        FDN newTokenFDN = new FDN(payloadTopicID.getIdentifier());
-        newToken.setIdentifier(newTokenFDN.getToken());
+        DataParcelToken newToken = new DataParcelToken();
+        FDN newTokenFDN = new FDN(payloadTopicID.getToken());
+        newToken.setToken(newTokenFDN.getToken());
         newToken.setVersion(new String(payloadTopicID.getVersion()));
         this.payloadTopicID = newToken;
     }

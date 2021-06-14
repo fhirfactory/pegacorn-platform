@@ -33,6 +33,8 @@ public class InterProcessingPlantHandoverPacket {
     private String messageIdentifier;
     private Integer messageSize;
     private Date sendDate;
+    private String source;
+    private String target;
 
     public ActivityID getActivityID() {
         return activityID;
@@ -80,5 +82,35 @@ public class InterProcessingPlantHandoverPacket {
 
     public void setPayloadType(String payloadType) {
         this.payloadType = payloadType;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @Override
+    public String toString() {
+        return "InterProcessingPlantHandoverPacket{" +
+                "payloadPacket=" + payloadPacket +
+                ", payloadType='" + payloadType + '\'' +
+                ", activityID=" + activityID +
+                ", messageIdentifier='" + messageIdentifier + '\'' +
+                ", messageSize=" + messageSize +
+                ", sendDate=" + sendDate +
+                ", source='" + source + '\'' +
+                ", target='" + target + '\'' +
+                '}';
     }
 }

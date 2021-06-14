@@ -33,7 +33,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementName
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -162,7 +162,7 @@ public class WUPContainerIngresProcessor {
         ActivityID oldActivityID = transportPacket.getPacketID();
         ActivityID newActivityID = new ActivityID();
         ResilienceParcelIdentifier previousPresentParcelInstanceID = oldActivityID.getPresentParcelIdentifier();
-        EpisodeIdentifier previousPresentEpisodeID = oldActivityID.getPresentEpisodeIdentifier();
+        PetasosEpisodeIdentifier previousPresentEpisodeID = oldActivityID.getPresentEpisodeIdentifier();
         WUPIdentifier previousPresentWUPInstanceID = oldActivityID.getPresentWUPIdentifier();
         TopologyNodeFunctionFDNToken previousPresentWUPTypeID = oldActivityID.getPresentWUPFunctionToken();
         newActivityID.setPreviousParcelIdentifier(previousPresentParcelInstanceID);

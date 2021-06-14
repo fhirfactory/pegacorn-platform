@@ -47,19 +47,21 @@ public class RouteElementNames {
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
 
     public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect){
+        LOG.debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
         this.nodeFunctionToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
     }
 
     public RouteElementNames(TopologyNodeFunctionFDNToken functionToken){
+        LOG.debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
         this.nodeFunctionToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
     }
 
     public String simplifyName(){
-        LOG.debug(".simplifyName(): this.nodeFunctionToken --> {}", this.nodeFunctionToken);
+        LOG.debug(".simplifyName(): Entry, this.nodeFunctionToken --> {}", this.nodeFunctionToken);
         TopologyNodeFunctionFDN wupFunctionFDN = new TopologyNodeFunctionFDN(this.nodeFunctionToken);
         LOG.trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
         TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);

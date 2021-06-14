@@ -22,9 +22,13 @@
 
 package net.fhirfactory.pegacorn.common.model.componentid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
@@ -33,6 +37,8 @@ import java.util.ArrayList;
  * @since 2020-08-07
  */
 public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyNodeFunctionFDN.class);
+
     public TopologyNodeFunctionFDN(TopologyNodeFunctionFDN oriFDN){
         super(oriFDN);
     }
@@ -42,14 +48,18 @@ public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
     }
 
     public TopologyNodeFunctionFDN(TopologyNodeFunctionFDNToken token){
+        LOG.debug(".TopologyNodeFunctionFDN(): Entry, token->{}", token);
         ArrayList<TopologyNodeRDN> nodeSet= new ArrayList<>();
         try{
-            XmlMapper xmlMapper = new XmlMapper();
-            TopologyNodeRDNSet nodeRDNSet = xmlMapper.readValue(token.getToken(), TopologyNodeRDNSet.class);
-            int rdnCount = nodeRDNSet.payload.size();
+            JsonMapper mapper = new JsonMapper();
+            TopologyNodeRDNSet nodeRDNSet = mapper.readValue(token.getToken(), TopologyNodeRDNSet.class);
+            int rdnCount = nodeRDNSet.getPayload().size();
+            LOG.trace(".TopologyNodeFunctionFDN: RDN Count --> {}", rdnCount);
             for(int counter = 0; counter < rdnCount; counter ++){
-                nodeSet.set(counter, nodeRDNSet.getPayload().get(counter));
+                TopologyNodeRDN currentRDN = nodeRDNSet.getPayload().get(counter);
+                nodeSet.add(currentRDN);
             }
+            LOG.trace(".TopologyNodeFunctionFDN: Built nodeSet");
             setHierarchicalNameSet(nodeSet);
         } catch (JsonMappingException e) {
             e.printStackTrace();
@@ -58,17 +68,18 @@ public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
         }
     }
 
+    @JsonIgnore
     public TopologyNodeFunctionFDNToken getFunctionToken(){
         TopologyNodeRDNSet nodeRDNSet = new TopologyNodeRDNSet(this.getHierarchicalNameSet());
         String tokenString = null;
         try{
-            XmlMapper xmlMapper = new XmlMapper();
-            tokenString = xmlMapper.writeValueAsString(nodeRDNSet);
+            JsonMapper mapper = new JsonMapper();
+            tokenString = mapper.writeValueAsString(nodeRDNSet);
         } catch(JsonProcessingException jsonException){
             jsonException.printStackTrace();
             tokenString = "";
         }
-        TopologyNodeFunctionFDNToken newToken = new TopologyNodeFunctionFDNToken();
+        TopologyNodeFunctionFDNToken newToken = new TopologyNodeFunctionFDNToken(tokenString);
         return(newToken);
     }
 }

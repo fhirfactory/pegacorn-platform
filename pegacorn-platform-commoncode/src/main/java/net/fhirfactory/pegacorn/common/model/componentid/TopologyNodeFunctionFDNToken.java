@@ -39,4 +39,11 @@ public class TopologyNodeFunctionFDNToken {
         FDNToken genericFDNToken = genericFDN.getToken();
         return(genericFDNToken);
     }
+
+    @Override
+    public String toString() {
+        return "TopologyNodeFunctionFDNToken{" +
+                "token='" + token + '\'' +
+                '}';
+    }
 }
