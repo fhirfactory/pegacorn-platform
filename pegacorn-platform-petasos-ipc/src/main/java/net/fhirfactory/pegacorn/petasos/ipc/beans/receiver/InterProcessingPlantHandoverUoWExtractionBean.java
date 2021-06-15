@@ -23,7 +23,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.ipc.beans.receiver;
 
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.ipc.model.InterProcessingPlantHandoverPacket;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
@@ -52,7 +52,7 @@ public class InterProcessingPlantHandoverUoWExtractionBean {
         LOG.trace(".extractUoW(): Original Topic Id --> {}", topicId);
         topicId.removeDiscriminator();
         LOG.trace(".extractUoW(): Topic Id with Descriminator Removed --> {}", topicId);
-        topicId.addDiscriminator("Source", thePacket.getSource());
+        topicId.setDataParcelSourceSystem(thePacket.getSource());
         LOG.trace(".extractUoW(): Topic Id with new Descriminator --> {}", topicId);
         outputPayload.setPayloadTopicID(topicId);
         theUoW.getEgressContent().addPayloadElement(outputPayload);

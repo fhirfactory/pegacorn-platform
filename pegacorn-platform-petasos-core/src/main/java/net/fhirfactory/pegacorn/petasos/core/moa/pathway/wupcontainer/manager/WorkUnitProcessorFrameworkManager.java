@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 
 /**

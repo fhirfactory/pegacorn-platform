@@ -32,7 +32,7 @@ import java.util.UUID;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +89,8 @@ public class UoW {
         this.ingresContent = new UoWPayload(inputPayload);
         this.egressContent = new UoWPayloadSet();
         this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
-        this.typeID = new FDNToken(inputPayload.getPayloadTopicID().getToken());
+        DataParcelToken dataParcelToken = new DataParcelToken(inputPayload.getPayloadTopicID());
+        this.typeID = dataParcelToken.toFDN().getToken();
         LOG.trace(".UoW(): typeID --> {}", this.typeID);
         this.failureDescription = null;
         generateInstanceID();
@@ -107,7 +108,8 @@ public class UoW {
             this.egressContent.getPayloadElements().add(new UoWPayload(currentPayload));
         }
         this.processingOutcome = originalUoW.getProcessingOutcome();
-        this.typeID = new FDNToken(originalUoW.getTypeID());
+        DataParcelToken dataParcelToken = new DataParcelToken(originalUoW.getPayloadTopicID());
+        this.typeID = dataParcelToken.toFDN().getToken();
     }
 
     private void generateInstanceID() {

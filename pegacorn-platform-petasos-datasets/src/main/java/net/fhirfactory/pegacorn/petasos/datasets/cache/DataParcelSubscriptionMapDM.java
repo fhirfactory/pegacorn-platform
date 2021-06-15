@@ -32,7 +32,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 
 @ApplicationScoped
 public class DataParcelSubscriptionMapDM {
@@ -52,13 +52,7 @@ public class DataParcelSubscriptionMapDM {
      * @return The set of WUPs wanting to receive this payload type.
      */
      public Set<TopologyNodeFDNToken> getSubscriberSet(DataParcelToken topicID){
-    	LOG.debug(".getSubscriberSet(): Entry");
-    	if(LOG.isDebugEnabled()){
-    		if(topicID != null){
-				LOG.debug(".getSubscriberSet(): topicID (TopicToken).identifier --> {}", topicID.getToken());
-				LOG.debug(".getSubscriberSet(): topicID (TopicToken).version --> {}", topicID.getVersion());
-			}
-		}
+    	LOG.debug(".getSubscriberSet(): Entry, topicID->{}", topicID);
     	if(distributionList.isEmpty()) {
     		LOG.debug("getSubscriberSet(): Exit, empty list so can't match");
     		return(new HashSet<TopologyNodeFDNToken>());
@@ -90,16 +84,7 @@ public class DataParcelSubscriptionMapDM {
      */
     @Transaction
     public void addSubscriber(DataParcelToken topic, TopologyNodeFDNToken subscriberNode) {
-    	if(LOG.isDebugEnabled()){
-    		LOG.debug(".addSubscriber(): Entry");
-			if(topic != null){
-				LOG.debug(".getSubscriberSet(): topicID (TopicToken).identifier --> {}", topic.getToken());
-				LOG.debug(".getSubscriberSet(): topicID (TopicToken).version --> {}", topic.getVersion());
-			} else {
-				LOG.debug(".getSubscriberSet(): topicID (TopicToken).xxx is null");
-			}
-			LOG.debug(".getSubscriberSet(): subscriberNode (NodeElementIdentifier) --> {}", subscriberNode);
-		}
+    	LOG.debug(".addSubscriber(): Entry, topic->{}, subscriberNode->{}", topic, subscriberNode);
     	if((topic==null) || (subscriberNode==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): topic or subscriberInstanceID is null"));
     	}

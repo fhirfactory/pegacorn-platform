@@ -21,11 +21,14 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.uow;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelQualityStatement;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+
+import java.util.Objects;
 
 /**
  * @author Mark A. Hunter
@@ -33,29 +36,24 @@ import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
 public class UoWPayload {
     private static final Logger LOG = LoggerFactory.getLogger(UoWPayload.class);
     private DataParcelToken payloadTopicID;
+    private DataParcelQualityStatement payloadQuality;
     private String payload;
 
     public UoWPayload() {
         payload = null;
         payloadTopicID = null;
+        payloadQuality = null;
     }
 
     public UoWPayload(UoWPayload originalUoWPayload) {
-        payload = new String(originalUoWPayload.getPayload());
-        DataParcelToken newToken = new DataParcelToken();
-        FDN newTokenFDN = new FDN(originalUoWPayload.getPayloadTopicID().getToken());
-        newToken.setToken(newTokenFDN.getToken());
-        newToken.setVersion(new String(originalUoWPayload.getPayloadTopicID().getVersion()));
-        payloadTopicID = newToken;
+        this.payload = (String)SerializationUtils.clone(originalUoWPayload.getPayload());
+        this.payloadTopicID = (DataParcelToken) SerializationUtils.clone(originalUoWPayload.getPayloadTopicID());
+        this.payloadQuality = (DataParcelQualityStatement) SerializationUtils.clone(originalUoWPayload.getPayloadQuality());
     }
 
     public UoWPayload(DataParcelToken payloadType, String payloadContent){
-        DataParcelToken newToken = new DataParcelToken();
-        FDN newTokenFDN = new FDN(payloadType.getToken());
-        newToken.setToken(newTokenFDN.getToken());
-        newToken.setVersion(new String(payloadType.getVersion()));
-        payloadTopicID = newToken;
-        this.payload = new String(payloadContent);
+        this.payload = (String)SerializationUtils.clone(payloadContent);
+        this.payloadTopicID = (DataParcelToken) SerializationUtils.clone(payloadType);
     }
 
     public String getPayload() {
@@ -66,7 +64,7 @@ public class UoWPayload {
 
     public void setPayload(String payload) {
         LOG.debug(".setPayload(): Entry, payload (String) --> {}", payload);
-        this.payload = new String(payload);
+        this.payload = (String) SerializationUtils.clone(payload);
     }
 
     public DataParcelToken getPayloadTopicID() {
@@ -77,19 +75,39 @@ public class UoWPayload {
 
     public void setPayloadTopicID(DataParcelToken payloadTopicID) {
         LOG.debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadTopicID);
-        DataParcelToken newToken = new DataParcelToken();
-        FDN newTokenFDN = new FDN(payloadTopicID.getToken());
-        newToken.setToken(newTokenFDN.getToken());
-        newToken.setVersion(new String(payloadTopicID.getVersion()));
-        this.payloadTopicID = newToken;
+        this.payloadTopicID = (DataParcelToken) SerializationUtils.clone(payloadTopicID);
+    }
+
+    public DataParcelQualityStatement getPayloadQuality() {
+        LOG.debug(".getPayloadQuality(): Entry");
+        LOG.debug(".getPayloadQuality(): Exit, returning payloadQuality->{}", this.payloadQuality);
+        return payloadQuality;
+    }
+
+    public void setPayloadQuality(DataParcelQualityStatement payloadQuality) {
+        LOG.debug(".setPayloadQuality(): Entry, payloadQuality->{}", payloadQuality);
+        this.payloadQuality = (DataParcelQualityStatement) SerializationUtils.clone(payloadQuality);
     }
 
     @Override
-    public String toString(){
-        String payloadToString = "UoWPayload{" +
-                "(payloadTopicID="+ payloadTopicID + ")," +
-                "(payload=" +payload + ")" +
-                "}";
-        return(payloadToString);
+    public String toString() {
+        return "UoWPayload{" +
+                "payloadTopicID=" + payloadTopicID +
+                ", payloadQuality=" + payloadQuality +
+                ", payload='" + payload + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UoWPayload)) return false;
+        UoWPayload that = (UoWPayload) o;
+        return Objects.equals(getPayloadTopicID(), that.getPayloadTopicID()) && Objects.equals(getPayloadQuality(), that.getPayloadQuality()) && Objects.equals(getPayload(), that.getPayload());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPayloadTopicID(), getPayloadQuality(), getPayload());
     }
 }

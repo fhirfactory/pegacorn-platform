@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.brokers;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.STAResilienceParcelServicesIM;

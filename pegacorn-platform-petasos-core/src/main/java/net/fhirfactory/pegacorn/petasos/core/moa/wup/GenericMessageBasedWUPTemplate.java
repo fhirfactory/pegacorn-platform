@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
@@ -35,7 +35,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCTopologyEndp
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicIDBuilder;
+import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
@@ -82,7 +82,7 @@ public abstract class GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     private TopologyIM topologyIM;
 
     @Inject
-    private FHIRElementTopicIDBuilder fhirTopicIDBuilder;
+    private FHIRElementTopicFactory fhirTopicIDBuilder;
 
     @Inject
     private ProcessingPlantInterface processingPlantServices;
@@ -210,7 +210,7 @@ public abstract class GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return wupTopologyNode.getNodeRDN().getNodeVersion();
     }
 
-    public FHIRElementTopicIDBuilder getFHIRTopicIDBuilder(){
+    public FHIRElementTopicFactory getFHIRTopicIDBuilder(){
         return(this.fhirTopicIDBuilder);
     }
 

@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.brokers;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;

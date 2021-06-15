@@ -22,9 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelNormalisationStatusEnum;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelValidationStatusEnum;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DataParcelSubscriptionMapDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

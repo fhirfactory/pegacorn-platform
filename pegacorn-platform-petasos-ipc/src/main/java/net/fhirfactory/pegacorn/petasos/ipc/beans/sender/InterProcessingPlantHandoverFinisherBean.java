@@ -23,10 +23,7 @@ package net.fhirfactory.pegacorn.petasos.ipc.beans.sender;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelToken;
-import net.fhirfactory.pegacorn.common.model.topicid.DataParcelTypeKeyEnum;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
@@ -88,15 +85,13 @@ public class InterProcessingPlantHandoverFinisherBean {
         String egressPayloadData = jsonMapper.writeValueAsString(responsePacket);
         UoWPayload egressPayload = new UoWPayload();
         egressPayload.setPayload(egressPayloadData);
-        FDN egressPayloadTopicFDN = new FDN();
-        egressPayloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_DEFINER.getTopicType(), "Pegacorn"));
-        egressPayloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_CATEGORY.getTopicType(), "IPC"));
-        egressPayloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_SUBCATEGORY.getTopicType(), "Model"));
-        egressPayloadTopicFDN.appendRDN(new RDN(DataParcelTypeKeyEnum.DATASET_RESOURCE.getTopicType(), "InterProcessingPlantHandoverResponsePacket"));
-        DataParcelToken egressPayloadTopic = new DataParcelToken();
-        egressPayloadTopic.setToken(egressPayloadTopicFDN.getToken());
-        egressPayloadTopic.setVersion("1.0.0");
-        egressPayload.setPayloadTopicID(egressPayloadTopic);
+        DataParcelToken token = new DataParcelToken();
+        token.setDataParcelDefiner("Pegacorn");
+        token.setDataParcelCategory("IPC");
+        token.setDataParcelSubCategory("Model");
+        token.setDataParcelResource("InterProcessingPlantHandoverResponsePacket");
+        token.setVersion("1.0.0");
+        egressPayload.setPayloadTopicID(token);
         theUoW.getEgressContent().addPayloadElement(egressPayload);
         switch(theUoW.getProcessingOutcome()){
             case UOW_OUTCOME_SUCCESS:
