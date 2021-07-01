@@ -81,6 +81,15 @@ public class TopologyNodeFDN {
         }
     }
 
+    public TopologyNodeRDN getLeafRDN(){
+        int size = getHierarchicalNameSet().size();
+        if(size <= 0){
+            return(null);
+        }
+        TopologyNodeRDN leafRDN = getHierarchicalNameSet().get(size-1);
+        return(leafRDN);
+    }
+
     @Override
     public String toString() {
         String simpleString = "{TopologyNodeFDN:";

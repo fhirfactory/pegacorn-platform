@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 ACT Health
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,38 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.util;
+package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-@ApplicationScoped
-public class FHIRContextUtility {
-
-    private FhirContext fhirContext;
-
-    public FHIRContextUtility() {
-        fhirContext = FhirContext.forR4();
-    }
-    
-    /**
-     * NOTE: the result is thread safe.
-     * 
-     * @see {FhirContext}
-     */
-    public FhirContext getFhirContext() {
-        return fhirContext;
-    }
-
-    /**
-     * NOTE: the result is NOT thread safe.
-     * 
-     * @see {IParser.newJsonParser()}
-     */
-    @Produces
-    public IParser getJsonParser() {
-        return getFhirContext().newJsonParser();
-    }
+public enum PubSubSubscriptionStatusEnum {
+    SUBSCRIPTION_REQUESTED,
+    SUBSCRIPTION_UNKNOWN,
+    SUBSCRIPTION_ACTIVE
 }

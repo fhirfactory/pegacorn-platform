@@ -21,16 +21,16 @@
  */
 package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DataParcelSubscriptionMapDM;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.Set;
+import java.util.List;
 
 /**
  * This class WILL do more in the future, but it is for now just a proxy to the
@@ -48,13 +48,13 @@ public class DataParcelSubscriptionIM {
      * This function retrieves the list (FDNTokenSet) of WUPs that are
      * interested in receiving the identified uowPayloadTopicID (FDNToken).
      *
-     * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic
+     * @param parcelManifest The FDNToken representing the UoW (Ingres) Payload Topic
  that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-    public Set<TopologyNodeFDNToken> getSubscriberSet(DataParcelToken topicID) {
-        LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, topicID --> {}", topicID);
-        Set<TopologyNodeFDNToken> subscribedTopicSet = subscriptionCache.getSubscriberSet(topicID);
+    public List<PubSubSubscriber> getSubscriberSet(DataParcelManifest parcelManifest) {
+        LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, parcelManifest --> {}", parcelManifest);
+        List<PubSubSubscriber> subscribedTopicSet = subscriptionCache.deriveSubscriberList(parcelManifest);
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit");
         return (subscribedTopicSet);
     }
@@ -64,21 +64,21 @@ public class DataParcelSubscriptionIM {
      * processing/using it.
      * 
      * @param contentTopicID The contentTopicID (FDNToken) of the payload we have received from a WUP
-     * @param interestedNode The ID of the (Topology) Node that is interested in the payload type.
+     * @param subscriber The ID of the (Topology) Node that is interested in the payload type.
      */
     @Transactional
-    public void addTopicSubscriber(DataParcelToken contentTopicID, TopologyNodeFDNToken interestedNode) {
-        LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
-        if(contentTopicID == null || interestedNode == null){
-            LOG.debug(".addSubscriberToUoWContentTopic(): Exit, Either contentTopicID or interestedNode is null!");
+    public void addTopicSubscriber(DataParcelManifest contentTopicID, PubSubSubscriber subscriber) {
+        LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, subscriber --> {}", contentTopicID, subscriber);
+        if(contentTopicID == null || subscriber == null){
+            LOG.debug(".addSubscriberToUoWContentTopic(): Exit, Either contentTopicID or subscriber is null!");
             return;
         }
-        subscriptionCache.addSubscriber(contentTopicID, interestedNode);
+        subscriptionCache.addSubscriber(contentTopicID, subscriber);
         LOG.debug(".addSubscriberToUoWContentTopic(): Exit");
     }
 
     @Transactional
-    public void removeSubscriber(DataParcelToken contentTopicID, TopologyNodeFDNToken interestedNode) {
+    public void removeSubscriber(DataParcelManifest contentTopicID, PubSubSubscriber interestedNode) {
         LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
         LOG.debug(".removeSubscriber(): Exit");

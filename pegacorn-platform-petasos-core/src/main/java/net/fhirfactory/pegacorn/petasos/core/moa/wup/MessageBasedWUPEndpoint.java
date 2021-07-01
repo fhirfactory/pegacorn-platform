@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 ACT Health
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,38 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.util;
+package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-@ApplicationScoped
-public class FHIRContextUtility {
+public class MessageBasedWUPEndpoint {
+    private IPCServerTopologyEndpoint endpointTopologyNode;
+    private String endpointSpecification;
+    private boolean frameworkEnabled;
 
-    private FhirContext fhirContext;
-
-    public FHIRContextUtility() {
-        fhirContext = FhirContext.forR4();
-    }
-    
-    /**
-     * NOTE: the result is thread safe.
-     * 
-     * @see {FhirContext}
-     */
-    public FhirContext getFhirContext() {
-        return fhirContext;
+    public IPCServerTopologyEndpoint getEndpointTopologyNode() {
+        return endpointTopologyNode;
     }
 
-    /**
-     * NOTE: the result is NOT thread safe.
-     * 
-     * @see {IParser.newJsonParser()}
-     */
-    @Produces
-    public IParser getJsonParser() {
-        return getFhirContext().newJsonParser();
+    public void setEndpointTopologyNode(IPCServerTopologyEndpoint endpointTopologyNode) {
+        this.endpointTopologyNode = endpointTopologyNode;
+    }
+
+    public String getEndpointSpecification() {
+        return endpointSpecification;
+    }
+
+    public void setEndpointSpecification(String endpointSpecification) {
+        this.endpointSpecification = endpointSpecification;
+    }
+
+    public boolean isFrameworkEnabled() {
+        return frameworkEnabled;
+    }
+
+    public void setFrameworkEnabled(boolean frameworkEnabled) {
+        this.frameworkEnabled = frameworkEnabled;
     }
 }

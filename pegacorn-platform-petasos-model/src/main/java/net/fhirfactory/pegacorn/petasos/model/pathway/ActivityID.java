@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pathway;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
@@ -33,7 +34,7 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
  *
  * @author Mark A. Hunter
  */
-public class ActivityID {
+public class ActivityID implements Serializable {
 
     private ResilienceParcelIdentifier previousParcelIdentifier;
     private Object previousParcelIdentifierLock;

@@ -27,8 +27,16 @@ import ca.uhn.fhir.rest.annotation.Transaction;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
+import javax.xml.crypto.Data;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
+import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelValidationStatusEnum;
+import net.fhirfactory.pegacorn.components.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,112 +46,157 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 public class DataParcelSubscriptionMapDM {
 	private static final Logger LOG = LoggerFactory.getLogger(DataParcelSubscriptionMapDM.class);
 	
-	ConcurrentHashMap<DataParcelToken, Set<TopologyNodeFDNToken>> distributionList;
+	private ConcurrentHashMap<DataParcelTypeDescriptor, List<PubSubSubscription>> distributionList;
+	private Object distributionListUpdateLock;
 	
     public DataParcelSubscriptionMapDM(){
-        distributionList = new ConcurrentHashMap<DataParcelToken, Set<TopologyNodeFDNToken>>();
+        this.distributionList = new ConcurrentHashMap<DataParcelTypeDescriptor, List<PubSubSubscription>>();
+        this.distributionListUpdateLock = new Object();
     }
 
     /**
      * This function retrieves the list (FDNTokenSet) of WUPs that are interested in 
      * receiving the identified uowPayloadTopicID (FDNToken).
      * 
-     * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
+     * @param parcelDescriptor The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-     public Set<TopologyNodeFDNToken> getSubscriberSet(DataParcelToken topicID){
-    	LOG.debug(".getSubscriberSet(): Entry, topicID->{}", topicID);
-    	if(distributionList.isEmpty()) {
-    		LOG.debug("getSubscriberSet(): Exit, empty list so can't match");
-    		return(new HashSet<TopologyNodeFDNToken>());
-    	}
-   		Set<TopologyNodeFDNToken> interestedWUPSet = this.distributionList.get(topicID);
-    	if(interestedWUPSet == null ){
-			LOG.debug(".getSubscriberSet(): Couldn't find any associated FDNTokenSet elements (i.e. couldn't find any interested WUPs), returning an empty set");
-			return(new HashSet<TopologyNodeFDNToken>());
-    	} else {
-    		if(LOG.isDebugEnabled()) {
-				LOG.debug(".getSubscriberSet(): Exit, returning associated FDNSet of the WUPs interested:");
-				int count = 0;
-				Iterator<TopologyNodeFDNToken> nodeIterator = interestedWUPSet.iterator();
-				while(nodeIterator.hasNext()){
-					LOG.debug(".getSubscriberSet(): Interested Node [{}] Identifier --> {}", count, nodeIterator.next());
-					count++;
-				}
-			}
-			return (interestedWUPSet);
+
+    public List<PubSubSubscription> getSubsciberList(DataParcelTypeDescriptor parcelDescriptor){
+		LOG.debug(".getSubsciberList(): Entry, parcelDescriptor->{}", parcelDescriptor);
+		List<PubSubSubscription> subscriptionList = this.distributionList.get(parcelDescriptor);
+		if(subscriptionList == null ) {
+			LOG.debug(".getSubsciberList(): Couldn't find any associated PubSubSubscriber elements (i.e. couldn't find any interested WUPs), returning an empty set");
+			return (new ArrayList<>());
 		}
-    }
+		if(LOG.isDebugEnabled()) {
+			LOG.debug(".getSubsciberList(): Exit, returning associated FDNSet of the WUPs interested:");
+			int count = 0;
+			for(PubSubSubscription currentSubscription : subscriptionList){
+				PubSubSubscriber currentSubscriber = currentSubscription.getSubscriber();
+				LOG.debug(".getSubsciberList(): Subscriber[{}]->{}", count, currentSubscriber);
+				count++;
+			}
+		}
+		LOG.debug(".getSubsciberList(): Exit, subscriptionList->{}", subscriptionList);
+		return (subscriptionList);
+
+	}
     
     /**
      * This function establishes a link between a Payload Type and a WUP that is interested in
      * processing/using it.
      * 
-     * @param topic The contentTopicID (FDNToken) of the payload we have received from a WUP
-     * @param subscriberNode The NodeElement of the WUP that is interested in the payload type.
+     * @param parcelManifest The contentTopicID (FDNToken) of the payload we have received from a WUP
+     * @param subscriber The NodeElement of the WUP that is interested in the payload type.
      */
-    @Transaction
-    public void addSubscriber(DataParcelToken topic, TopologyNodeFDNToken subscriberNode) {
-    	LOG.debug(".addSubscriber(): Entry, topic->{}, subscriberNode->{}", topic, subscriberNode);
-    	if((topic==null) || (subscriberNode==null)) {
-    		throw(new IllegalArgumentException(".addSubscriber(): topic or subscriberInstanceID is null"));
+    public void addSubscriber(DataParcelManifest parcelManifest, PubSubSubscriber subscriber) {
+    	LOG.debug(".addSubscriber(): Entry, parcelManifest->{}, subscriber->{}", parcelManifest, subscriber);
+    	if((parcelManifest==null) || (subscriber==null)) {
+    		throw(new IllegalArgumentException(".addSubscriber(): parcelManifest or subscriberInstanceID is null"));
     	}
-		Set<TopologyNodeFDNToken> interestedWUPSet = this.distributionList.get(topic);
-		if(interestedWUPSet != null) {
-    		LOG.trace(".addSubscriber(): Adding subscriber to existing map for topic --> {}", topic);
-			interestedWUPSet.add(subscriberNode);
-    	} else {
-			LOG.trace(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
-			interestedWUPSet = new LinkedHashSet<TopologyNodeFDNToken> ();
-			interestedWUPSet.add(subscriberNode);
-    		this.distributionList.put(topic, interestedWUPSet);
-    	}
-		if(LOG.isDebugEnabled()) {
+		DataParcelTypeDescriptor contentDescriptor = null;
+    	if(parcelManifest.hasContentDescriptor()) {
+			contentDescriptor = parcelManifest.getContentDescriptor();
+		} else {
+			if (parcelManifest.hasContainerDescriptor()) {
+				contentDescriptor = parcelManifest.getContainerDescriptor();
+			}
+		}
+    	if(contentDescriptor == null){
+			throw(new IllegalArgumentException(".addSubscriber(): parcelManifest does not contain suitable contentDescriptor or containerDescriptor"));
+		}
+		List<PubSubSubscription> subscriptionList = this.distributionList.get(contentDescriptor);
+    	synchronized (this.distributionListUpdateLock) {
+			if (subscriptionList != null) {
+				LOG.trace(".addSubscriber(): Adding subscriber to existing map for parcelManifest --> {}", parcelManifest);
+				PubSubSubscription existingSubscription = null;
+				for(PubSubSubscription currentSubscription: subscriptionList){
+					if(currentSubscription.getSubscriber().equals(subscriber)){
+						if(currentSubscription.getParcelManifest().getContainerDescriptor().equals(parcelManifest.getContainerDescriptor())){
+							existingSubscription = currentSubscription;
+							break;
+						}
+					}
+				}
+				if(existingSubscription != null){
+					subscriptionList.remove(existingSubscription);
+				}
+				PubSubSubscription newSubscription = new PubSubSubscription(parcelManifest, subscriber);
+				subscriptionList.add(newSubscription);
+			} else {
+				LOG.trace(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
+				PubSubSubscription newSubscription = new PubSubSubscription(parcelManifest, subscriber);
+				subscriptionList = new ArrayList<PubSubSubscription>();
+				subscriptionList.add(newSubscription);
+				this.distributionList.put(contentDescriptor, subscriptionList);
+			}
+		}
+		if (LOG.isDebugEnabled()) {
 			LOG.debug(".addSubscriber(): Exit, here is the Subscription list for the Topic:");
 			int count = 0;
-			Iterator<TopologyNodeFDNToken> nodeIterator = interestedWUPSet.iterator();
-			while(nodeIterator.hasNext()){
-				LOG.debug(".addSubscriber(): Interested Node [{}] Identifier --> {}", count, nodeIterator.next());
+			for(PubSubSubscription currentSubscription : subscriptionList){
+				PubSubSubscriber currentSubscriber = currentSubscription.getSubscriber();
+				LOG.debug(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber);
 				count++;
 			}
 		}
     }
+
+    public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, TopologyNodeFDNToken localSubscriberWUP){
+		LOG.debug(".addSubscriber(): Entry, contentDescriptor->{}, localSubscriberWUP->{}", contentDescriptor, localSubscriberWUP);
+		if((contentDescriptor==null) || (localSubscriberWUP==null)) {
+			throw(new IllegalArgumentException(".addSubscriber(): payloadTopic or localSubscriberWUP is null"));
+		}
+		DataParcelManifest descriptor = new DataParcelManifest(contentDescriptor);
+		PubSubSubscriber subscriber = new PubSubSubscriber(localSubscriberWUP);
+		addSubscriber(descriptor, subscriber);
+	}
     
     /**
      * Remove a Subscriber from the Topic Subscription list
      * 
-     * @param topic The TopicToken of the Topic we want to unsubscribe from.
+     * @param parcelManifest The DataParcelManifest of the Topic we want to unsubscribe from.
      * @param subscriberInstanceID  The subscriber we are removing from the subscription list.
      */
-    @Transaction
-    public void removeSubscriber(DataParcelToken topic, TopologyNodeFDNToken subscriberInstanceID) {
-    	LOG.debug(".removeSubscriber(): Entry, topic --> {}, subscriberInstanceID --> {}", topic, subscriberInstanceID);
-    	if((topic==null) || (subscriberInstanceID==null)) {
+    public void removeSubscriber(DataParcelManifest parcelManifest, PubSubSubscriber subscriberInstanceID) {
+    	LOG.debug(".removeSubscriber(): Entry, parcelManifest --> {}, subscriberInstanceID --> {}", parcelManifest, subscriberInstanceID);
+    	if((parcelManifest==null) || (subscriberInstanceID==null)) {
     		throw(new IllegalArgumentException(".removeSubscriber(): topic or subscriberInstanceID is null"));
     	}
 		boolean found = false;
-		DataParcelToken currentToken = null;
-		Enumeration<DataParcelToken> topicEnumerator = distributionList.keys();
+		DataParcelTypeDescriptor currentToken = null;
+		DataParcelTypeDescriptor contentDescriptor = null;
+		if(parcelManifest.hasContentDescriptor()) {
+			contentDescriptor = parcelManifest.getContentDescriptor();
+		} else {
+			if (parcelManifest.hasContainerDescriptor()) {
+				contentDescriptor = parcelManifest.getContainerDescriptor();
+			}
+		}
+		Enumeration<DataParcelTypeDescriptor> topicEnumerator = distributionList.keys();
 		while(topicEnumerator.hasMoreElements()){
 			currentToken = topicEnumerator.nextElement();
-			if(currentToken.equals(topic)){
+			if(currentToken.equals(contentDescriptor)){
 				LOG.trace(".removeSubscriber(): Found Topic in Subscription Cache");
 				found = true;
 				break;
 			}
 		}
 		if(found) {
-    		LOG.trace(".removeSubscriber(): Removing Subscriber from topic --> {}", topic);
-			Set<TopologyNodeFDNToken> payloadDistributionList = this.distributionList.get(currentToken);
-			Iterator<TopologyNodeFDNToken> nodeIterator = payloadDistributionList.iterator();
-			while(nodeIterator.hasNext()){
-				TopologyNodeFDNToken currentNode = nodeIterator.next();
-				if(currentNode.equals(subscriberInstanceID)){
-					LOG.trace(".removeSubscriber(): Found Subscriber in Subscription List, removing");
-					payloadDistributionList.remove(currentNode);
-					LOG.debug(".removeSubscriber(): Exit, removed the subscriberInstanceID from the topic");
-					LOG.trace("Topic Subscription Map: (Remove Subscriber) Topic [{}] <-- Subscriber [{}]", currentToken, subscriberInstanceID);
-					break;
+    		LOG.trace(".removeSubscriber(): Removing Subscriber from contentDescriptor --> {}", contentDescriptor);
+    		synchronized (this.distributionListUpdateLock) {
+				List<PubSubSubscription> subscriptionList = this.distributionList.get(currentToken);
+				for(PubSubSubscription currentSubscription: subscriptionList){
+					boolean sameSubscriber = currentSubscription.getSubscriber().equals(subscriberInstanceID);
+					boolean sameParcelManifest = currentSubscription.getParcelManifest().equals(parcelManifest);
+					if (sameParcelManifest && sameSubscriber) {
+						LOG.trace(".removeSubscriber(): Found Subscriber in Subscription List, removing");
+						subscriptionList.remove(currentSubscription);
+						LOG.debug(".removeSubscriber(): Exit, removed the subscriberInstanceID from the topic");
+						LOG.trace("Topic Subscription Map: (Remove Subscriber) Topic [{}] <-- Subscriber [{}]", currentToken, subscriberInstanceID);
+						break;
+					}
 				}
 			}
     	} else {
@@ -157,20 +210,203 @@ public class DataParcelSubscriptionMapDM {
     	if(!LOG.isDebugEnabled()){
     		return;
 		}
-    	Enumeration<DataParcelToken> topicEnumerator = distributionList.keys();
+    	Enumeration<DataParcelTypeDescriptor> topicEnumerator = distributionList.keys();
     	LOG.debug(".printAllSubscriptionSets(): Printing ALL Subscription Lists");
     	while(topicEnumerator.hasMoreElements()){
-    		DataParcelToken currentToken = topicEnumerator.nextElement();
+			DataParcelTypeDescriptor currentToken = topicEnumerator.nextElement();
     		LOG.debug(".printAllSubscriptionSets(): Topic (TopicToken) --> {}", currentToken);
-			Set<TopologyNodeFDNToken> subscribers = getSubscriberSet(currentToken);
-			if(subscribers != null){
-				Iterator<TopologyNodeFDNToken> currentNodeIdentifierIterator = subscribers.iterator();
-				while(currentNodeIdentifierIterator.hasNext()){
-					LOG.debug(".printAllSubscriptionSets(): Subscriber --> {}", currentNodeIdentifierIterator.next());
+			List<PubSubSubscription> subscriptionList = getSubsciberList(currentToken);
+			if(subscriptionList != null){
+				for(PubSubSubscription currentSubscription: subscriptionList){
+					PubSubSubscriber currentSubscriber = currentSubscription.getSubscriber();
+					LOG.debug(".printAllSubscriptionSets(): Subscriber --> {}", currentSubscriber);
 				}
 			}
 
 		}
 	}
 
+	//
+	// More sophisticated SubscriberList derivation
+	//
+
+	public List<PubSubSubscriber> deriveSubscriberList(DataParcelManifest parcelManifest){
+		LOG.debug(".getSubsciberList(): Entry, parcelManifest->{}", parcelManifest);
+		DataParcelTypeDescriptor parcelDescriptor = parcelManifest.getContentDescriptor();
+		List<PubSubSubscription> subscriberList = this.distributionList.get(parcelDescriptor);
+		if(subscriberList == null ){
+			LOG.debug(".getSubsciberList(): Couldn't find any associated PubSubSubscriber elements (i.e. couldn't find any interested WUPs), returning an empty set");
+			return(new ArrayList<>());
+		}
+		List<PubSubSubscriber> derivedSubscriberList = new ArrayList<>();
+		for(PubSubSubscription currentRegisteredSubscription: subscriberList){
+			DataParcelManifest subscribedManifest = currentRegisteredSubscription.getParcelManifest();
+			boolean containerIsEqual = containerIsEqual(parcelManifest, subscribedManifest);
+			boolean contentIsEqual = contentIsEqual(parcelManifest, subscribedManifest);
+			boolean containerOnlyIsEqual = containerOnlyEqual(parcelManifest, subscribedManifest);
+			boolean matchedNormalisation = normalisationMatches(parcelManifest, subscribedManifest);
+			boolean matchedValidation = validationMatches(parcelManifest, subscribedManifest);
+			boolean matchedManifestType = manifestTypeMatches(parcelManifest, subscribedManifest);
+			boolean matchedSource = sourceSystemMatches(parcelManifest, subscribedManifest);
+			boolean matchedTarget = targetSystemMatches(parcelManifest, subscribedManifest);
+			boolean matchedPEStatus = enforcementPointApprovalStatusMatches(parcelManifest, subscribedManifest);
+			boolean matchedDistributionStatus = isDistributableMatches(parcelManifest, subscribedManifest);
+			boolean matchedDirection = parcelFlowDirectionMatches(parcelManifest, subscribedManifest);
+
+			boolean goodEnoughMatch = containerIsEqual
+					&& contentIsEqual
+					&& matchedNormalisation
+					&& matchedValidation
+					&& matchedManifestType
+					&& matchedSource
+					&& matchedTarget
+					&& matchedPEStatus
+					&& matchedDirection
+					&& matchedDistributionStatus;
+
+			boolean containerBasedOKMatch = containerOnlyIsEqual
+					&& matchedNormalisation
+					&& matchedValidation
+					&& matchedManifestType
+					&& matchedSource
+					&& matchedTarget
+					&& matchedPEStatus
+					&& matchedDirection
+					&& matchedDistributionStatus;
+
+			if(goodEnoughMatch || containerBasedOKMatch){
+				derivedSubscriberList.add(currentRegisteredSubscription.getSubscriber());
+			}
+		}
+		return(derivedSubscriberList);
+	}
+
+	private boolean containerIsEqual(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
+    	if(testManifest == null || subscribedManifest == null){
+    		return(false);
+		}
+		if(!(testManifest.hasContainerDescriptor() && subscribedManifest.hasContainerDescriptor()))
+		{
+			return(true);
+		}
+    	if(testManifest.hasContainerDescriptor() && subscribedManifest.hasContentDescriptor()) {
+			if (testManifest.getContainerDescriptor().equals(subscribedManifest.getContainerDescriptor())) {
+				return (true);
+			}
+		}
+    	return(false);
+	}
+
+	private boolean contentIsEqual(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
+    	if(testManifest == null || subscribedManifest == null){
+    		return(false);
+		}
+		if(!(testManifest.hasContentDescriptor() && subscribedManifest.hasContentDescriptor()))
+		{
+			return(true);
+		}
+		if(testManifest.hasContentDescriptor() && subscribedManifest.hasContentDescriptor()) {
+			if (testManifest.getContainerDescriptor().equals(subscribedManifest.getContainerDescriptor())) {
+				return (true);
+			}
+		}
+		return(false);
+	}
+
+	private boolean containerOnlyEqual(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
+		if(testManifest == null || subscribedManifest == null){
+			return(false);
+		}
+		if(testManifest.hasContentDescriptor() && subscribedManifest.hasContentDescriptor()){
+			return(contentIsEqual(testManifest, subscribedManifest));
+		}
+		if(subscribedManifest.hasContentDescriptor()){
+			return(false);
+		}
+		if(testManifest.hasContainerDescriptor() && subscribedManifest.hasContainerDescriptor()){
+			return(containerIsEqual(testManifest, subscribedManifest));
+		}
+		return(false);
+	}
+
+	private boolean normalisationMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
+		if(testManifest == null || subscribedManifest == null){
+			return(false);
+		}
+		if(subscribedManifest.getNormalisationStatus().equals(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY)){
+			return(true);
+		}
+		boolean normalisationStatusIsEqual = subscribedManifest.getNormalisationStatus().equals(testManifest.getNormalisationStatus());
+		return(normalisationStatusIsEqual);
+	}
+
+	private boolean validationMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
+		if (testManifest == null || subscribedManifest == null) {
+			return (false);
+		}
+		if(subscribedManifest.getValidationStatus().equals(DataParcelValidationStatusEnum.DATA_PARCEL_CONTENT_VALIDATION_ANY)){
+			return(true);
+		}
+		boolean validationStatusIsEqual = subscribedManifest.getValidationStatus().equals(testManifest.getValidationStatus());
+		return(validationStatusIsEqual);
+	}
+
+	private boolean manifestTypeMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
+		if (testManifest == null || subscribedManifest == null) {
+			return (false);
+		}
+		boolean manifestTypeMatches = subscribedManifest.getDataParcelType().equals(testManifest.getDataParcelType());
+		return(manifestTypeMatches);
+	}
+
+	private boolean sourceSystemMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
+		if (testManifest == null || subscribedManifest == null) {
+			return (false);
+		}
+		if (testManifest.hasSourceSystem() && subscribedManifest.hasSourceSystem()) {
+			boolean sourceIsSame = testManifest.getSourceSystem().contentEquals(subscribedManifest.getSourceSystem());
+			return (sourceIsSame);
+		}
+		return(false);
+	}
+
+	private boolean targetSystemMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
+		if (testManifest == null || subscribedManifest == null) {
+			return (false);
+		}
+		if (testManifest.hasIntendedTargetSystem() && subscribedManifest.hasIntendedTargetSystem()) {
+			boolean targetIsSame = testManifest.getIntendedTargetSystem().contentEquals(subscribedManifest.getIntendedTargetSystem());
+			return (targetIsSame);
+		}
+		if(!subscribedManifest.hasIntendedTargetSystem()){
+			return(true);
+		}
+		return(false);
+	}
+
+	private boolean enforcementPointApprovalStatusMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
+		if (testManifest == null || subscribedManifest == null) {
+			return (false);
+		}
+		if (subscribedManifest.getEnforcementPointApprovalStatus().equals(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_ANY)) {
+			return (true);
+		}
+		boolean approvalStatusMatch = subscribedManifest.getEnforcementPointApprovalStatus().equals(testManifest.getEnforcementPointApprovalStatus());
+		return (approvalStatusMatch);
+	}
+
+	private boolean isDistributableMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
+		if (testManifest == null || subscribedManifest == null) {
+			return (false);
+		}
+		return (testManifest.isInterSubsystemDistributable() == subscribedManifest.isInterSubsystemDistributable());
+	}
+
+	private boolean parcelFlowDirectionMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
+    	if(testManifest == null || subscribedManifest == null){
+    		return(false);
+		}
+    	boolean directionMatches = testManifest.getDataParcelFlowDirection() == subscribedManifest.getDataParcelFlowDirection();
+    	return(directionMatches);
+	}
 }

@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.common.model.generalid;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * "dig amongst the weeds"!!!
  *
  */
-public class FDN {
+public class FDN implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(FDN.class);
     private ArrayList<RDN> rdnSet;

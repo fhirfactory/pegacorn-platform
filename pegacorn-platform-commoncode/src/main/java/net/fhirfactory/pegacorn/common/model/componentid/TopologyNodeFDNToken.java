@@ -3,7 +3,10 @@ package net.fhirfactory.pegacorn.common.model.componentid;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
-public class TopologyNodeFDNToken {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class TopologyNodeFDNToken implements Serializable {
     private String tokenValue;
 
     public TopologyNodeFDNToken(){
@@ -11,7 +14,7 @@ public class TopologyNodeFDNToken {
     }
 
     public TopologyNodeFDNToken(TopologyNodeFDNToken ori){
-        this.tokenValue = new String(ori.getTokenValue());
+        this.tokenValue = ori.getTokenValue();
     }
 
     public TopologyNodeFDNToken(String token){
@@ -38,5 +41,25 @@ public class TopologyNodeFDNToken {
         FDN genericFDN = topologyFDN.toVersionBasedFDN();
         FDNToken genericFDNToken = genericFDN.getToken();
         return(genericFDNToken);
+    }
+
+    @Override
+    public String toString() {
+        return "TopologyNodeFDNToken{" +
+                "tokenValue='" + tokenValue + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TopologyNodeFDNToken)) return false;
+        TopologyNodeFDNToken that = (TopologyNodeFDNToken) o;
+        return Objects.equals(getTokenValue(), that.getTokenValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTokenValue());
     }
 }

@@ -22,16 +22,21 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +57,9 @@ public class WorkUnitProcessorFrameworkManager {
     CamelContext camelctx;
 
     @Inject
-    TopologyIM topologyIM;
-
-    @Inject
     DataParcelSubscriptionIM topicServer;
 
-    public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, Set<DataParcelToken> subscribedTopics, WUPArchetypeEnum wupArchetype) {
+    public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
         try {
             switch (wupArchetype) {
@@ -132,21 +134,28 @@ public class WorkUnitProcessorFrameworkManager {
         } catch (Exception Ex) {
             // TODO We really must handle this exception, either by cancelling the whole Processing Plant or, at least, raising an alarm
         }
-
     }
 
-    public void uowTopicSubscribe(Set<DataParcelToken> subscribedTopics, WorkUnitProcessorTopologyNode wupNode) {
+    public void uowTopicSubscribe(List<DataParcelManifest> subscribedTopics, WorkUnitProcessorTopologyNode wupNode) {
         LOG.debug(".uowTopicSubscribe(): Entry, subscribedTopics --> {}, wupNode --> {}", subscribedTopics, wupNode);
         if (subscribedTopics.isEmpty()) {
             LOG.debug(".uowTopicSubscribe(): Something's wrong, no Topics are subscribed for this WUP");
             return;
         }
-        Iterator<DataParcelToken> topicIterator = subscribedTopics.iterator();
-        while (topicIterator.hasNext()) {
-            DataParcelToken currentTopicID = topicIterator.next();
+        for(DataParcelManifest currentTopicID: subscribedTopics) {
             LOG.trace(".uowTopicSubscribe(): wupNode --> {} is subscribing to UoW Content Topic --> {}", wupNode, currentTopicID);
-            topicServer.addTopicSubscriber(currentTopicID, wupNode.getNodeFDN().getToken());
+            PubSubSubscriber subscriber = constructPubSubSubscriber(wupNode);
+            topicServer.addTopicSubscriber(currentTopicID, subscriber);
         }
         LOG.debug(".uowTopicSubscribe(): Exit");
+    }
+
+    private PubSubSubscriber constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
+        PubSubSubscriber subscriber = new PubSubSubscriber();
+        LocalPubSubSubscriber localSubscriber = new LocalPubSubSubscriber();
+        LocalPubSubParticipantIdentifier identifier = new LocalPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
+        localSubscriber.setIdentifier(identifier);
+        subscriber.setLocalSubscriber(localSubscriber);
+        return(subscriber);
     }
 }

@@ -65,7 +65,7 @@ public class UoWPayloadSet {
         while (payloadIterator.hasNext()) {
             UoWPayload payload = payloadIterator.next();
             newString = newString + "(";
-            newString = newString + "(PayloadTopicID=" + payload.getPayloadTopicID() +"),";
+            newString = newString + "(PayloadTopicID=" + payload.getPayloadManifest() +"),";
             newString = newString + "(Payload=" + payload.getPayload() + ")";
             newString = newString + ")";
             if (payloadIterator.hasNext()) {

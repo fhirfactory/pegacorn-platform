@@ -3,7 +3,9 @@ package net.fhirfactory.pegacorn.common.model.componentid;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
-public class TopologyNodeFunctionFDNToken {
+import java.io.Serializable;
+
+public class TopologyNodeFunctionFDNToken implements Serializable {
     public String token;
 
     public TopologyNodeFunctionFDNToken(){

@@ -24,13 +24,15 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import org.apache.camel.*;
 import org.slf4j.Logger;
@@ -84,21 +86,20 @@ public class InterchangeTargetWUPTypeRouter {
         // Get my Petasos Context
         TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
         WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(nodeFDNToken);
-        DataParcelToken uowTopicID = null;
+        DataParcelManifest uowTopicID = null;
         if (ingresPacket.getPayload().hasIngresContent()) {
-            uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadTopicID();
+            uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadManifest();
             LOG.trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
         } else {
             LOG.debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
             return (new ArrayList<String>());
         }
-        Set<TopologyNodeFDNToken> nodeSet = topicServer.getSubscriberSet(uowTopicID);
-        if (nodeSet != null) {
-            Iterator<TopologyNodeFDNToken> nodeIterator = nodeSet.iterator();
-            while (nodeIterator.hasNext()) {
-                TopologyNodeFDNToken currentNodeIdentifier = nodeIterator.next();
-                LOG.trace(".forwardUoW2WUPs(): Subscriber --> {}", currentNodeIdentifier);
-                WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(currentNodeIdentifier);
+        List<PubSubSubscriber> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
+        if (subscriberSet != null) {
+           for(PubSubSubscriber currentSubscriber: subscriberSet){
+                LOG.trace(".forwardUoW2WUPs(): Subscriber --> {}", currentSubscriber);
+                LocalPubSubParticipantIdentifier localSubscriberIdentifier = currentSubscriber.getLocalSubscriber().getIdentifier();
+                WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
                 TopologyNodeFunctionFDNToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
                 RouteElementNames routeName = new RouteElementNames(currentNodeFunctionToken);
                 // Clone and Inject Message into Target Route

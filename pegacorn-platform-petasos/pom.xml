@@ -25,7 +25,7 @@
         <module>../pegacorn-platform-petasos-model</module>
         <module>../pegacorn-platform-petasos-datasets</module>
         <module>../pegacorn-platform-petasos-core</module>
-        <module>../pegacorn-platform-petasos-ipc</module>
         <module>../pegacorn-platform-petasos-audit</module>
+	<module>../pegacorn-platform-petasos-caches</module>
     </modules>
 </project>

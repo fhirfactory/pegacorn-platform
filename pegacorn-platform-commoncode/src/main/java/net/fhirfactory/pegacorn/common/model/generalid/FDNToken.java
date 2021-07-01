@@ -23,10 +23,11 @@ package net.fhirfactory.pegacorn.common.model.generalid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class FDNToken {
+public class FDNToken implements Serializable {
 
     private String content;
 

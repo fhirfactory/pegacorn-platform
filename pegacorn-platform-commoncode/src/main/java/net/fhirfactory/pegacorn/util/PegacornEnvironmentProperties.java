@@ -21,36 +21,24 @@
  */
 package net.fhirfactory.pegacorn.util;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
+import java.util.Locale;
+import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+
+/**
+ * Based on ca.uhn.fhir.jpa.starter.HapiProperties, where properties can be overridden with environment variables
+ * 
+ * @author Jasen Schremmer
+ */
 @ApplicationScoped
-public class FHIRContextUtility {
+public class PegacornEnvironmentProperties extends PegacornProperties {
 
-    private FhirContext fhirContext;
-
-    public FHIRContextUtility() {
-        fhirContext = FhirContext.forR4();
-    }
-    
-    /**
-     * NOTE: the result is thread safe.
-     * 
-     * @see {FhirContext}
-     */
-    public FhirContext getFhirContext() {
-        return fhirContext;
-    }
-
-    /**
-     * NOTE: the result is NOT thread safe.
-     * 
-     * @see {IParser.newJsonParser()}
-     */
-    @Produces
-    public IParser getJsonParser() {
-        return getFhirContext().newJsonParser();
+    public PegacornEnvironmentProperties(){
+        super();
     }
 }

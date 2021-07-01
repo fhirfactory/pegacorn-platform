@@ -25,6 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.brokers;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
@@ -52,6 +53,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -172,7 +174,7 @@ public class PetasosMOAServicesBroker {
         return (null);
     }
 
-    public void registerWorkUnitProcessor(WorkUnitProcessorTopologyNode newElement, Set<DataParcelToken> payloadTopicSet,
+    public void registerWorkUnitProcessor(WorkUnitProcessorTopologyNode newElement, List<DataParcelManifest> payloadTopicSet,
                                           WUPArchetypeEnum wupNature) {
         LOG.debug(".registerWorkUnitProcessor(): Entry, newElement --> {}, payloadTopicSet --> {}", newElement,
                 payloadTopicSet);

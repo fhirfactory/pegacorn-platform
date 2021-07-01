@@ -26,14 +26,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkUnitTransportPacket {
+public class WorkUnitTransportPacket implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitTransportPacket.class);
 
     private ActivityID packetID;
@@ -291,22 +293,7 @@ public class WorkUnitTransportPacket {
     }
 
     public WorkUnitTransportPacket deepClone(){
-        WorkUnitTransportPacket newPacket = new WorkUnitTransportPacket();
-        ObjectMapper objectMapper = new ObjectMapper();
-        if(hasSenderSendDate()) {
-            newPacket.setSenderSendDate(getSenderSendDate());
-        }
-        if(hasPayload()){
-            newPacket.setPayload(new UoW(getPayload()));
-        }
-        if(hasPacketID()) {
-            newPacket.setPacketID(new ActivityID(getPacketID()));
-        }
-        newPacket.setRetryCount(getIsARetry());
-        if(hasCurrentJobCard()) {
-            newPacket.setCurrentJobCard(new WUPJobCard(getCurrentJobCard()));
-        }
-        newPacket.setCurrentParcelStatus(getCurrentParcelStatus());
+        WorkUnitTransportPacket newPacket = (WorkUnitTransportPacket) SerializationUtils.clone(this);
         newPacket.generateString();
         return(newPacket);
     }

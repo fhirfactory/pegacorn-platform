@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,14 +33,16 @@ import java.util.UUID;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Mark A. Hunter
  */
-public class UoW {
+public class UoW implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(UoW.class);
 
@@ -86,11 +89,12 @@ public class UoW {
 
     public UoW(UoWPayload inputPayload) {
         LOG.debug(".UoW(): Constructor: inputPayload -->{}", inputPayload);
-        this.ingresContent = new UoWPayload(inputPayload);
+        this.ingresContent = SerializationUtils.clone(inputPayload);
         this.egressContent = new UoWPayloadSet();
         this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
-        DataParcelToken dataParcelToken = new DataParcelToken(inputPayload.getPayloadTopicID());
-        this.typeID = dataParcelToken.toFDN().getToken();
+        FDN contentFDN = inputPayload.getPayloadManifest().getContentDescriptor().toFDN();
+        FDNToken contentFDNToken = contentFDN.getToken();
+        this.typeID = SerializationUtils.clone(contentFDNToken);
         LOG.trace(".UoW(): typeID --> {}", this.typeID);
         this.failureDescription = null;
         generateInstanceID();
@@ -101,37 +105,25 @@ public class UoW {
 
     public UoW(UoW originalUoW) {
         this.failureDescription = null;
-        this.instanceID = new UoWIdentifier(originalUoW.getInstanceID());
-        this.ingresContent = new UoWPayload(originalUoW.getIngresContent());
+        this.instanceID = SerializationUtils.clone(originalUoW.getInstanceID());
+        this.ingresContent = SerializationUtils.clone(originalUoW.getIngresContent());
         this.egressContent = new UoWPayloadSet();
         for(UoWPayload currentPayload: originalUoW.egressContent.getPayloadElements()) {
-            this.egressContent.getPayloadElements().add(new UoWPayload(currentPayload));
+            this.egressContent.getPayloadElements().add(SerializationUtils.clone(currentPayload));
         }
         this.processingOutcome = originalUoW.getProcessingOutcome();
-        DataParcelToken dataParcelToken = new DataParcelToken(originalUoW.getPayloadTopicID());
-        this.typeID = dataParcelToken.toFDN().getToken();
+        this.typeID = SerializationUtils.clone(originalUoW.getTypeID());
     }
 
     private void generateInstanceID() {
         LOG.debug(".generateInstanceID(): Entry");
-        if (this.ingresContent == null) {
-            LOG.trace(".generateInstanceID(): no content, so generating an instance id based on Timestamp");
-            String generatedInstanceValue = Long.toString(Instant.now().getNano());
-            FDN instanceFDN = new FDN(this.typeID);
-            RDN newRDN = new RDN(HASH_ATTRIBUTE, generatedInstanceValue);
-            instanceFDN.appendRDN(newRDN);
-            this.instanceID = new UoWIdentifier(instanceFDN.getToken());
-        } else {
-            LOG.trace(".generateInstanceID(): has content, so creating has key");
-            /*
-            int payloadHash = this.ingresContent.getPayload().hashCode();
-            String payloadHashAsHex = Integer.toHexString(payloadHash); */
-            String payload = UUID.randomUUID().toString();
-            RDN newRDN = new RDN(HASH_ATTRIBUTE, payload);
-            FDN instanceFDN = new FDN(this.typeID);
-            instanceFDN.appendRDN(newRDN);
-            this.instanceID = new UoWIdentifier(instanceFDN.getToken());
-        }
+        LOG.trace(".generateInstanceID(): generating an instance id based on Timestamp");
+        String generatedInstanceValue = Long.toString(Instant.now().getNano());
+        FDN instanceFDN = new FDN(this.typeID);
+        RDN newRDN = new RDN(HASH_ATTRIBUTE, generatedInstanceValue);
+        instanceFDN.appendRDN(newRDN);
+        this.instanceID = new UoWIdentifier(instanceFDN.getToken());
+        LOG.debug(".generateInstanceID(): Exit");
     }
 
     // instanceID Helper/Bean methods
@@ -263,7 +255,7 @@ public class UoW {
             uowToString = uowToString + "(typeID:null),";
         }
         if (hasIngresContent()) {
-            if (ingresContent.getPayloadTopicID() != null) {
+            if (ingresContent.getPayloadManifest() != null) {
                 uowToString = uowToString + "(payloadTopic:" + getPayloadTopicID().toString() + "),";
             } else {
                 uowToString = uowToString + "(payloadTopic:null),";
@@ -301,7 +293,7 @@ public class UoW {
         if (this.ingresContent == null) {
             return (false);
         } else {
-            if (ingresContent.getPayloadTopicID() == null) {
+            if (ingresContent.getPayloadManifest() == null) {
                 return (false);
             } else {
                 return (true);
@@ -310,9 +302,9 @@ public class UoW {
     }
 
     @JsonIgnore
-    public DataParcelToken getPayloadTopicID() {
+    public DataParcelManifest getPayloadTopicID() {
         if (hasPayloadTopicID()) {
-            return (this.getIngresContent().getPayloadTopicID());
+            return (this.getIngresContent().getPayloadManifest());
         } else {
             return (null);
         }

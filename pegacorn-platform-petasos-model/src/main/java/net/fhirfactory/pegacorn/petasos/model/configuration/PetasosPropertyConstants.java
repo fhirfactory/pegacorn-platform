@@ -62,5 +62,6 @@ public final class PetasosPropertyConstants {
     public final static String WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME = "WUPTopologyNode";
     public final static String WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME = "WUPJobCard";
     public final static String WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME = "WUPPetasosParcel";
+    public final static String WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME = "WUPCurrentUnitOfWork";
 
 }

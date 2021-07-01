@@ -26,13 +26,14 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class WUPIdentifier extends TopologyNodeFDNToken {
+public class WUPIdentifier extends TopologyNodeFDNToken implements Serializable {
 	
     public WUPIdentifier(TopologyNodeFDNToken originalToken) {
         this.setTokenValue(new String(originalToken.getTokenValue()));

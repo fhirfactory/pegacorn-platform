@@ -29,10 +29,11 @@ import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
-public class ParcelStatusElement {
+public class ParcelStatusElement implements Serializable {
 
     private ActivityID activityID;
     private Object activityIDLock;

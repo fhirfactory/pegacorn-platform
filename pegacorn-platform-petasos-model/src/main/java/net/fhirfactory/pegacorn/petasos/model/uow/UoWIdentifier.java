@@ -25,7 +25,9 @@ import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
-public class UoWIdentifier extends FDNToken{
+import java.io.Serializable;
+
+public class UoWIdentifier extends FDNToken implements Serializable {
 	
     public UoWIdentifier(FDNToken originalToken) {
         this.setContent(new String(originalToken.getContent()));

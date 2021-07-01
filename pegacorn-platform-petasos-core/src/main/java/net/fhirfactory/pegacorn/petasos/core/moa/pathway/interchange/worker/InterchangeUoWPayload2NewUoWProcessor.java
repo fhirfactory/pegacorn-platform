@@ -36,10 +36,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Dependent
 public class InterchangeUoWPayload2NewUoWProcessor {
@@ -70,22 +67,18 @@ public class InterchangeUoWPayload2NewUoWProcessor {
         TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
         WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(nodeFDNToken);
         UoW incomingUoW = ingresPacket.getPayload();
+        UoWPayloadSet egressContent = incomingUoW.getEgressContent();
+        Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
         if (LOG.isDebugEnabled()) {
-            UoWPayloadSet egressContent = incomingUoW.getEgressContent();
-            Iterator<UoWPayload> incomingPayloadIterator = egressContent.getPayloadElements().iterator();
             int counter = 0;
-            while (incomingPayloadIterator.hasNext()) {
-                UoWPayload payload = incomingPayloadIterator.next();
-                LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).PayloadTopic --> [{}] {}", counter, payload.getPayloadTopicID());
-                LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).Payload --> [{}] {}", counter, payload.getPayload());
+            for(UoWPayload currentPayload: egressPayloadList){
+                LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).PayloadTopic --> [{}] {}", counter, currentPayload.getPayloadManifest());
+                LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).Payload --> [{}] {}", counter, currentPayload.getPayload());
                 counter++;
             }
         }
         ArrayList<WorkUnitTransportPacket> newEgressTransportPacketSet = new ArrayList<WorkUnitTransportPacket>();
-        UoWPayloadSet egressPayloadSet = incomingUoW.getEgressContent();
-        Iterator<UoWPayload> incomingPayloadIterator = egressPayloadSet.getPayloadElements().iterator();
-        while (incomingPayloadIterator.hasNext()) {
-            UoWPayload currentPayload = incomingPayloadIterator.next();
+        for(UoWPayload currentPayload: egressPayloadList) {
             UoW newUoW = new UoW(currentPayload);
             WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(ingresPacket.getPacketID(), Date.from(Instant.now()), newUoW);
             newEgressTransportPacketSet.add(transportPacket);

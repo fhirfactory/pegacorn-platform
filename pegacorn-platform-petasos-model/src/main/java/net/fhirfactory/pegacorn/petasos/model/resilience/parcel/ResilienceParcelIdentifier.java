@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
@@ -31,7 +32,7 @@ import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 
-public class ResilienceParcelIdentifier extends FDNToken {
+public class ResilienceParcelIdentifier extends FDNToken implements Serializable {
 	
     public ResilienceParcelIdentifier(FDNToken originalToken) {
         this.setContent(new String(originalToken.getContent()));

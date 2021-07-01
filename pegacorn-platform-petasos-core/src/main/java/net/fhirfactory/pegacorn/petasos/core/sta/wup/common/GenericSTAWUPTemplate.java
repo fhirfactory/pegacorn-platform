@@ -77,7 +77,7 @@ public abstract class GenericSTAWUPTemplate {
         getLogger().debug(".buildSTAClientNode(): Entry");
         TopologyNodeFDN staClientTypeFDN = new TopologyNodeFDN(getWorkshop().getNodeFDN());
         getLogger().trace(".buildSTAClientNode(): Now construct the Work Unit Processing Node");
-        WorkUnitProcessorTopologyNode wup = getTopologyFactory().addWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), TopologyNodeTypeEnum.WUP);
+        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), TopologyNodeTypeEnum.WUP);
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Concurrency Mode");
         wup.setConcurrencyMode(getWorkshop().getConcurrencyMode());
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Resillience Mode");

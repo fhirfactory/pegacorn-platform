@@ -59,6 +59,7 @@ public class WUPIngresConduit {
         UoW theUoW = ingresPacket.getPayload();
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentJobCard());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentParcelStatus());
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, theUoW);
         LOG.debug(".forwardIntoWUP(): Exit, returning the UoW --> {}", theUoW);
         return(theUoW);
     }
