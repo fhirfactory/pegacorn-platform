@@ -82,7 +82,7 @@ public class UoWPayload implements Serializable {
         if(payloadManifest == null){
             return(false);
         }
-        return(payloadManifest.hasDataParcelQualityStatement());
+        return(true);
     }
 
     @JsonIgnore

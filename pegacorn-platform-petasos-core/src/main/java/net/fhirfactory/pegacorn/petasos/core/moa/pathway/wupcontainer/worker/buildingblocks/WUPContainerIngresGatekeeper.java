@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
@@ -58,15 +59,14 @@ public class WUPContainerIngresGatekeeper {
      *
      * @param ingresPacket     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @param nodeFDNTokenValue    The Work Unit Processor Instance: only to be used for instance debugging (not used at the moment)
      * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String nodeFDNTokenValue) {
-        LOG.debug(".ingresGatekeeper(): Enter, ingresPacket --> {}, nodeFDNTokenValue --> {}", ingresPacket, nodeFDNTokenValue);
+    public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
+        LOG.debug(".ingresGatekeeper(): Enter, ingresPacket->{}", ingresPacket);
         // Get my Petasos Context
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(nodeFDNTokenValue);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
+        LOG.trace(".egressContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);

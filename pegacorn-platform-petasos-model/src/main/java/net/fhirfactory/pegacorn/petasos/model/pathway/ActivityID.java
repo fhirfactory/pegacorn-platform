@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.Date;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
@@ -37,25 +38,25 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 public class ActivityID implements Serializable {
 
     private ResilienceParcelIdentifier previousParcelIdentifier;
-    private Object previousParcelIdentifierLock;
+    private SerializableObject previousParcelIdentifierLock;
     private PetasosEpisodeIdentifier previousEpisodeIdentifier;
-    private Object previousEpisodeIdentifierLock;
+    private SerializableObject previousEpisodeIdentifierLock;
     private ResilienceParcelIdentifier presentParcelIdentifier;
-    private Object presentParcelIdenifierLock;
+    private SerializableObject presentParcelIdenifierLock;
     private PetasosEpisodeIdentifier presentEpisodeIdentifier;
-    private Object presentEpisodeIdentifierLock;
+    private SerializableObject presentEpisodeIdentifierLock;
     private WUPIdentifier previousWUPIdentifier;
-    private Object previousWUPIdentifierLock;
+    private SerializableObject previousWUPIdentifierLock;
     private TopologyNodeFunctionFDNToken previousWUPFunctionToken;
-    private Object previousWUPFunctionTokenLock;
+    private SerializableObject previousWUPFunctionTokenLock;
     private WUPIdentifier presentWUPIdentifier;
-    private Object presentWUPIdentifierLock;
+    private SerializableObject presentWUPIdentifierLock;
     private TopologyNodeFunctionFDNToken presentWUPFunctionToken;
-    private Object presentWUPFunctionTokenLock;
+    private SerializableObject presentWUPFunctionTokenLock;
     private Date creationDate;
-    private Object creationDateLock;
+    private SerializableObject creationDateLock;
     private boolean resilientActivity;
-    private Object resilientActivityLock;
+    private SerializableObject resilientActivityLock;
 
     public ActivityID(ResilienceParcelIdentifier previousParcelInstanceID, ResilienceParcelIdentifier presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID, Date creationDate) {
         // Clear the deck
@@ -69,16 +70,16 @@ public class ActivityID implements Serializable {
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
 
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
-        this.resilientActivityLock = new Object();
+        this.creationDateLock = new SerializableObject();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
         // Set Values
         this.previousParcelIdentifier = previousParcelInstanceID;
         this.presentParcelIdentifier = presentParcelInstanceID;
@@ -98,16 +99,16 @@ public class ActivityID implements Serializable {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
-        this.resilientActivityLock = new Object();
+        this.creationDateLock = new SerializableObject();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
         // Set Values
         this.previousParcelIdentifier = previousParcelInstanceID;
         this.presentParcelIdentifier = presentParcelInstanceID;
@@ -127,17 +128,17 @@ public class ActivityID implements Serializable {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = Date.from(Instant.now());
-        this.creationDateLock = new Object();
+        this.creationDateLock = new SerializableObject();
         this.resilientActivity = false;
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
-        this.resilientActivityLock = new Object();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
     }
 
     public ActivityID(ActivityID originalRecord) {
@@ -150,16 +151,16 @@ public class ActivityID implements Serializable {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
-        this.resilientActivityLock = new Object();
+        this.creationDateLock = new SerializableObject();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
         // Set Values
         if (originalRecord.hasCreationDate()) {
             this.creationDate = originalRecord.getCreationDate();

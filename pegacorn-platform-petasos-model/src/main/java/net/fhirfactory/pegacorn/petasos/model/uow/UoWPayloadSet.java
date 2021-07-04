@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.uow;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +30,7 @@ import java.util.Set;
  * @author Mark A. Hunter
  * @since 08-Jun-2020
  */
-public class UoWPayloadSet {
+public class UoWPayloadSet implements Serializable {
     HashSet<UoWPayload> payloadElements;
 
     public UoWPayloadSet() {

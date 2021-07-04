@@ -42,24 +42,25 @@ public class WUPIdentifier extends TopologyNodeFDNToken implements Serializable 
 	
 	@Override
 	public String toString() {
-	        TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getTokenValue());
-	        String simpleString = "WUPIdentifier{";
-	        ArrayList<TopologyNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
-	        int setSize = rdnSet.size();
-	        for (int counter = 0; counter < setSize; counter++) {
-	            TopologyNodeRDN currentRDN = rdnSet.get(counter);
-	            String currentNameValue = currentRDN.getNodeName();
-	            if(currentNameValue.contains(".")){
-	                String outputString = currentNameValue.replace(".", "_");
-	                simpleString = simpleString + outputString;
-	            } else {
-	                simpleString = simpleString + currentNameValue;
-	            }
-	            if(counter < (setSize - 1)){
-	                simpleString = simpleString + ".";
-	            }
-	        }
-	        simpleString = simpleString + "}";
-	        return(simpleString);
+
+		TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getTokenValue());
+		String simpleString = "WUPIdentifier{";
+		ArrayList<TopologyNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
+		int setSize = rdnSet.size();
+		for (int counter = 0; counter < setSize; counter++) {
+			TopologyNodeRDN currentRDN = rdnSet.get(counter);
+			String currentNameValue = currentRDN.getNodeName();
+			if(currentNameValue.contains(".")){
+				String outputString = currentNameValue.replace(".", "_");
+				simpleString = simpleString + outputString;
+			} else {
+				simpleString = simpleString + currentNameValue;
+			}
+			if(counter < (setSize - 1)){
+				simpleString = simpleString + ".";
+			}
+		}
+		simpleString = simpleString + "}";
+		return(simpleString);
 	}
 }

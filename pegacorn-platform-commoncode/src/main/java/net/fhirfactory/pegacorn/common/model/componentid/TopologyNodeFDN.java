@@ -163,13 +163,14 @@ public class TopologyNodeFDN {
     }
 
     public TopologyNodeFDN(TopologyNodeFDNToken token){
+        LOG.debug(".TopologyNodeFDN(): Entry, token->{}", token);
         this.hierarchicalNameSet = new ArrayList<>();
         try{
             JsonMapper mapper = new JsonMapper();
             TopologyNodeRDNSet nodeRDNSet = mapper.readValue(token.getTokenValue(), TopologyNodeRDNSet.class);
             int rdnCount = nodeRDNSet.getPayload().size();
             for(int counter = 0; counter < rdnCount; counter ++){
-                this.hierarchicalNameSet.set(counter, nodeRDNSet.getPayload().get(counter));
+                this.hierarchicalNameSet.add(counter, nodeRDNSet.getPayload().get(counter));
             }
         } catch (JsonMappingException e) {
             e.printStackTrace();
@@ -178,14 +179,18 @@ public class TopologyNodeFDN {
         }
     }
 
-    public TopologyNodeFDN(String token){
+    public TopologyNodeFDN(String tokenString){
+        LOG.debug(".TopologyNodeFDN(): Entry, tokenString->{}", tokenString);
         this.hierarchicalNameSet = new ArrayList<>();
         try{
             JsonMapper mapper = new JsonMapper();
-            TopologyNodeRDNSet nodeRDNSet = mapper.readValue(token, TopologyNodeRDNSet.class);
+            TopologyNodeRDNSet nodeRDNSet = mapper.readValue(tokenString, TopologyNodeRDNSet.class);
             int rdnCount = nodeRDNSet.getPayload().size();
+            LOG.trace(".TopologyNodeFDN(): Converted tokenString (String) to nodeRDNSet(TopologyNodeRDNSet), rdnCount->{}", rdnCount);
             for(int counter = 0; counter < rdnCount; counter ++){
-                this.hierarchicalNameSet.set(counter, nodeRDNSet.getPayload().get(counter));
+                TopologyNodeRDN topologyNodeRDN = nodeRDNSet.getPayload().get(counter);
+                LOG.trace(".TopologyNodeFDN(): Adding entry[{}], to this.hierarchicalNameSet, value->{}", counter, topologyNodeRDN );
+                this.hierarchicalNameSet.add(counter, topologyNodeRDN);
             }
         } catch (JsonMappingException e) {
             e.printStackTrace();
@@ -195,6 +200,7 @@ public class TopologyNodeFDN {
     }
 
     public TopologyNodeRDN extractRDNForNodeType(TopologyNodeTypeEnum nodeType){
+        LOG.debug(".TopologyNodeFDN(): Entry, nodeType->{}", nodeType);
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
             if(nodeRDN.getNodeType().equals(nodeType)){
                 return(nodeRDN);

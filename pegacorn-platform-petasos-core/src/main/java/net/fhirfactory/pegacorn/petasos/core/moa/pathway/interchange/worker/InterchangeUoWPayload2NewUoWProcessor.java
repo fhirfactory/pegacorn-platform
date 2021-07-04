@@ -25,6 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
@@ -57,15 +58,14 @@ public class InterchangeUoWPayload2NewUoWProcessor {
      * It generates the 
      * @param ingresPacket
      * @param camelExchange
-     * @param wupInstanceKey
      * @return A List<> of WorkUnitTransportPackets - one for each egress UoWPayload element within the incoming UoW.
      */
 
-    public List<WorkUnitTransportPacket> extractUoWPayloadAndCreateNewUoWSet(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String wupInstanceKey) {
-        LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupInstanceKey (String) --> {}", ingresPacket, wupInstanceKey);
+    public List<WorkUnitTransportPacket> extractUoWPayloadAndCreateNewUoWSet(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
+        LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
         // Get my Petasos Context
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(nodeFDNToken);
+        LOG.info(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         UoW incomingUoW = ingresPacket.getPayload();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
         Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();

@@ -29,6 +29,7 @@ import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
@@ -67,20 +68,20 @@ public class WUPContainerEgressGatekeeper {
      *
      * @param transportPacket The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange   The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
-     * @param wupFDNTokenValue  The Work Unit Processor Instance Key, used to retrieve the associated NodeElement for the WUP
      * @return Should either return the ingres point into the associated Interchange Payload Transformer or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange, String wupFDNTokenValue) {
-        LOG.debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket,wupFDNTokenValue );
+    public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange) {
+        LOG.debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket );
         // Get my Petasos Context
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupFDNTokenValue);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
-        LOG.trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
+        LOG.info(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+        LOG.info(".egressGatekeeper(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
-        LOG.trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        LOG.info(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);
+        LOG.info(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
         ArrayList<String> targetList = new ArrayList<String>();
         if(!transportPacket.hasCurrentJobCard()) {
             LOG.error(".egressGatekeeper(): CurrentJobCard is null!");
@@ -91,10 +92,10 @@ public class WUPContainerEgressGatekeeper {
             return (targetList);
         } else {
             LOG.trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so we need to set the Semaphore (so we know we've processed this packet)");
-            LOG.trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
+            LOG.info(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
             String targetEndpoint = nameSet.getEndPointInterchangePayloadTransformerIngres();
             targetList.add(targetEndpoint);
-            LOG.debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
+            LOG.info(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);
         }
     }

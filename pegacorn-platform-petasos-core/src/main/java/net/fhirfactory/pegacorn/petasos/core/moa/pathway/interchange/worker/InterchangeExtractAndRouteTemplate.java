@@ -56,7 +56,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerIngres())
                 .routeId(nameSet.getRouteInterchangePayloadTransformer())
                 .process(nodeDetailInjector)
-                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")")
+                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange)")
                 .to(nameSet.getEndPointInterchangePayloadTransformerEgress());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerEgress())
@@ -66,7 +66,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangeRouterIngres())
                 .routeId(nameSet.getRouteInterchangeRouter())
                 .process(nodeDetailInjector)
-                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange," +  this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")");
+                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange)");
     }
 
     protected class NodeDetailInjector implements Processor {

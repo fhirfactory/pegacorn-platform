@@ -89,15 +89,24 @@ public class UoW implements Serializable {
 
     public UoW(UoWPayload inputPayload) {
         LOG.debug(".UoW(): Constructor: inputPayload -->{}", inputPayload);
+        LOG.trace(".UoW(): Clone the ingressContent and assign it");
         this.ingresContent = SerializationUtils.clone(inputPayload);
+        LOG.trace(".UoW(): ingressContent cloned and assigned");
+        LOG.trace(".UoW(): create an empty UoWPayloadSet and assign it to the egressContent");
         this.egressContent = new UoWPayloadSet();
+        LOG.trace(".UoW(): egressContent created and assigned");
         this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
+        LOG.trace(".UoW(): Creating the typeID, first extract inputPayload manifest");
         FDN contentFDN = inputPayload.getPayloadManifest().getContentDescriptor().toFDN();
+        LOG.trace(".UoW(): Creating the typeID, now convert to an FDNToken");
         FDNToken contentFDNToken = contentFDN.getToken();
+        LOG.trace(".UoW(): Creating the typeID, now clone it and assign it to the typeID of this UoW");
         this.typeID = SerializationUtils.clone(contentFDNToken);
         LOG.trace(".UoW(): typeID --> {}", this.typeID);
         this.failureDescription = null;
+        LOG.trace(".UoW(): Now generating instanceID");
         generateInstanceID();
+        LOG.trace(".UoW(): instanceID generated");
         if (LOG.isTraceEnabled()) {
             LOG.trace(".UoW(FDN, UoWPayloadSet): this.typeID --> {}, this.instanceID --> {}", this.typeID, this.instanceID);
         }

@@ -70,11 +70,13 @@ public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
 
     @JsonIgnore
     public TopologyNodeFunctionFDNToken getFunctionToken(){
+        LOG.debug(".getFunctionToken(): Entry");
         TopologyNodeRDNSet nodeRDNSet = new TopologyNodeRDNSet(this.getHierarchicalNameSet());
         String tokenString = null;
         try{
             JsonMapper mapper = new JsonMapper();
             tokenString = mapper.writeValueAsString(nodeRDNSet);
+            LOG.trace(".getFunctionToken(): Generated tokenString, value->{}", tokenString);
         } catch(JsonProcessingException jsonException){
             jsonException.printStackTrace();
             tokenString = "";

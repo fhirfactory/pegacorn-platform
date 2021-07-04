@@ -86,14 +86,13 @@ public class WUPContainerIngresProcessor {
      *
      * @param transportPacket The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange The Apache Camel Exchange object, used to store a Semaphors and Attributes
-     * @param wupFDNTokenValue The NodeElement Instance key: will be unique is as used to established uniqueness across deployment of Parcel/Activity sets
      * @return Should return a WorkUnitTransportPacket that is forwarding onto the WUP Ingres Gatekeeper.
      */
-    public WorkUnitTransportPacket ingresContentProcessor(WorkUnitTransportPacket transportPacket, Exchange camelExchange, String wupFDNTokenValue) {
-        LOG.debug(".ingresContentProcessor(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket,wupFDNTokenValue );
+    public WorkUnitTransportPacket ingresContentProcessor(WorkUnitTransportPacket transportPacket, Exchange camelExchange) {
+        LOG.debug(".ingresContentProcessor(): Enter, transportPacket (WorkUnitTransportPacket)->{}", transportPacket );
         // Get my Petasos Context
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupFDNTokenValue);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode) topologyProxy.getNode(nodeFDNToken);
+        LOG.trace(".egressContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ingresContentProcessor(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic

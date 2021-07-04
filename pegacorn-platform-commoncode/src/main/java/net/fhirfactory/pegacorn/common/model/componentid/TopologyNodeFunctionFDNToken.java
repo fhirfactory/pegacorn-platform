@@ -2,6 +2,7 @@ package net.fhirfactory.pegacorn.common.model.componentid;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 
@@ -13,11 +14,11 @@ public class TopologyNodeFunctionFDNToken implements Serializable {
     }
 
     public TopologyNodeFunctionFDNToken(TopologyNodeFunctionFDNToken ori){
-        this.token = new String(ori.getToken());
+        this.token = SerializationUtils.clone(ori.getToken());
     }
 
     public TopologyNodeFunctionFDNToken(String token){
-        this.token = token;
+        this.token = SerializationUtils.clone(token);
     }
 
     public String getToken() {

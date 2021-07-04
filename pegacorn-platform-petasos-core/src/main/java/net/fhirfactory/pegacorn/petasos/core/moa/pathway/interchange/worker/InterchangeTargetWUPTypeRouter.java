@@ -21,7 +21,6 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
@@ -30,6 +29,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
@@ -80,24 +80,26 @@ public class InterchangeTargetWUPTypeRouter {
      * @return An endpoint (name) for a recipient for the incoming UoW
      */
     @RecipientList
-    public List<String> forwardUoW2WUPs(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String wupInstanceKey) {
-        LOG.debug(".forwardUoW2WUPs(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupInstanceKey (String) --> {}", ingresPacket, wupInstanceKey);
+    public List<String> forwardUoW2WUPs(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
+        LOG.info(".forwardUoW2WUPs(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
 
         // Get my Petasos Context
-        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
-        WorkUnitProcessorTopologyNode node = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(nodeFDNToken);
+        LOG.info(".forwardUoW2WUPs(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         DataParcelManifest uowTopicID = null;
         if (ingresPacket.getPayload().hasIngresContent()) {
             uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadManifest();
-            LOG.trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
+            LOG.info(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
         } else {
-            LOG.debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
+            LOG.info(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
             return (new ArrayList<String>());
         }
+        LOG.info(".forwardUoW2WUPs(): Geting the set of subscribers for the given topic (calling the topicServer)");
         List<PubSubSubscriber> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
+        LOG.info(".forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
         if (subscriberSet != null) {
            for(PubSubSubscriber currentSubscriber: subscriberSet){
-                LOG.trace(".forwardUoW2WUPs(): Subscriber --> {}", currentSubscriber);
+                LOG.info(".forwardUoW2WUPs(): Subscriber --> {}", currentSubscriber);
                 LocalPubSubParticipantIdentifier localSubscriberIdentifier = currentSubscriber.getLocalSubscriber().getIdentifier();
                 WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
                 TopologyNodeFunctionFDNToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
