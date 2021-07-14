@@ -22,10 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class RouteElementNames {
     private static final Logger LOG = LoggerFactory.getLogger(RouteElementNames.class);
 
-    private TopologyNodeFunctionFDNToken nodeFunctionToken;
+    private TopologyNodeFDNToken nodeFDNToken;
     private boolean mustBeDirect;
     private String wupTypeName;
     private String wupVersion;
@@ -46,23 +43,23 @@ public class RouteElementNames {
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
 
-    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken, boolean mustBeDirect){
+    public RouteElementNames(TopologyNodeFDNToken functionToken, boolean mustBeDirect){
         LOG.debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
-        this.nodeFunctionToken = functionToken;
+        this.nodeFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
     }
 
-    public RouteElementNames(TopologyNodeFunctionFDNToken functionToken){
+    public RouteElementNames(TopologyNodeFDNToken functionToken){
         LOG.debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
-        this.nodeFunctionToken = functionToken;
+        this.nodeFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
     }
 
     public String simplifyName(){
-        LOG.debug(".simplifyName(): Entry, this.nodeFunctionToken --> {}", this.nodeFunctionToken);
-        TopologyNodeFunctionFDN wupFunctionFDN = new TopologyNodeFunctionFDN(this.nodeFunctionToken);
+        LOG.debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFDNToken);
+        TopologyNodeFDN wupFunctionFDN = new TopologyNodeFDN(this.nodeFDNToken);
         LOG.trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
         TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
         LOG.trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);

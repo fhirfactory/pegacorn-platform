@@ -33,6 +33,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
@@ -50,6 +51,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -113,7 +115,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().trace(".initialise(): Setting up the wupTopologyElement (NodeElement) instance, which is the Topology Server's representation of this WUP ");
         this.associatedTopologyNode = buildWUPNodeElement();
         getLogger().trace(".initialise(): Setting the WUP nameSet, which is the set of Route EndPoints that the WUP Framework will use to link various enablers");
-        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getNodeFunctionFDN().getFunctionToken());
+        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getNodeFDN().getToken());
         getLogger().trace(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
         getLogger().trace(".initialise(): Setting the WUP IngresEndpoint");
@@ -316,6 +318,20 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             }
         }
         getLogger().debug(".deriveServerTopologyEndpoint(): Exit, nothing found!");
+        return(null);
+    }
+
+    protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
+        getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
+        ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
+        for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
+            IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
+            if(endpointTopologyNode.getName().contentEquals(topologyEndpointName)){
+                getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
+                return(endpointTopologyNode);
+            }
+        }
+        getLogger().debug(".getTopologyEndpoint(): Exit, Could not find node!");
         return(null);
     }
 }

@@ -25,6 +25,7 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 public class WUPIdentifier extends TopologyNodeFDNToken implements Serializable {
 	
     public WUPIdentifier(TopologyNodeFDNToken originalToken) {
-        this.setTokenValue(new String(originalToken.getTokenValue()));
+        this.setTokenValue(SerializationUtils.clone(originalToken.getTokenValue()));
     }
     public WUPIdentifier(){super();}
 	

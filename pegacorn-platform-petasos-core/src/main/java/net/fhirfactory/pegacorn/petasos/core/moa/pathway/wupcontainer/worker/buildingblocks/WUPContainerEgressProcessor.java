@@ -85,7 +85,7 @@ public class WUPContainerEgressProcessor {
 
     private WorkUnitTransportPacket standaloneDeploymentModeECP(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, WorkUnitProcessorTopologyNode wupNode) {
        	LOG.debug(".standaloneDeploymentModeECP(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNode (NodeElement) --> {}", ingresPacket, wupNode);
-        elementNames = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken());
+        elementNames = new RouteElementNames(wupNode.getNodeFDN().getToken());
         LOG.trace(".standaloneDeploymentModeECP(): Now, extract WUPJobCard from ingresPacket (WorkUnitTransportPacket)");
         WUPJobCard jobCard = ingresPacket.getCurrentJobCard();
         LOG.trace(".standaloneDeploymentModeECP(): Now, extract ParcelStatusElement from ingresPacket (WorkUnitTransportPacket)");

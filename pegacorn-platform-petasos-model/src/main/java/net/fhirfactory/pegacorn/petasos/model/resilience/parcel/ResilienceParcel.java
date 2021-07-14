@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -31,6 +32,7 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
@@ -40,40 +42,40 @@ import java.util.Set;
  * @author Mark A. Hunter
  * @author Scott Yeadon
  */
-public class ResilienceParcel {
+public class ResilienceParcel implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResilienceParcel.class);
 
     private ResilienceParcelIdentifier identifier;
-    private Object instanceIDLock;
+    private SerializableObject instanceIDLock;
     private FDNToken typeID;
-    private Object typeIDLock;
+    private SerializableObject typeIDLock;
     private PetasosEpisodeIdentifier episodeIdentifier;
-    private Object episodeIdentifierLock;
+    private SerializableObject episodeIdentifierLock;
     private UoW actualUoW;
-    private Object actualUoWLock;
+    private SerializableObject actualUoWLock;
     private WUPIdentifier associatedWUPIdentifier;
-    private Object associatedWUPIdentifierLock;
+    private SerializableObject associatedWUPIdentifierLock;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
-    private Object downstreamEpisodeIdentifierSetLock;
+    private SerializableObject downstreamEpisodeIdentifierSetLock;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
-    private Object upstreamEpisodeIdentifierLock;
+    private SerializableObject upstreamEpisodeIdentifierLock;
     private final static String INSTANCE_QUALIFIER_TYPE = "ParcelInstance";
     private final static String TYPE_QUALIFIER_TYPE = "ParcelType";
     private ResilienceParcelFinalisationStatusEnum finalisationStatus;
-    private Object finalisationStatusLock;
+    private SerializableObject finalisationStatusLock;
     private ResilienceParcelProcessingStatusEnum processingStatus;
-    private Object processingStatusLock;
+    private SerializableObject processingStatusLock;
     private Date registrationDate;
-    private Object registrationDateLock;
+    private SerializableObject registrationDateLock;
     private Date startDate;
-    private Object startDateLock;
+    private SerializableObject startDateLock;
     private Date finishedDate;
-    private Object finishedDateLock;
+    private SerializableObject finishedDateLock;
     private Date finalisationDate;
-    private Object finalisationDateLock;
+    private SerializableObject finalisationDateLock;
     private Date cancellationDate;
-    private Object cancellationDateLock;
+    private SerializableObject cancellationDateLock;
 
     //
     // Constructors
@@ -93,20 +95,20 @@ public class ResilienceParcel {
         this.finalisationStatus = null;
         this.episodeIdentifier = null;
         this.cancellationDate = null;
-        this.instanceIDLock = new Object();
-        this.typeIDLock = new Object();
-        this.episodeIdentifierLock = new Object();
-        this.actualUoWLock = new Object();
-        this.associatedWUPIdentifierLock = new Object();
-        this.downstreamEpisodeIdentifierSetLock = new Object();
-        this.upstreamEpisodeIdentifierLock = new Object();
-        this.finalisationStatusLock = new Object();
-        this.processingStatusLock = new Object();
-        this.registrationDateLock = new Object();
-        this.startDateLock = new Object();
-        this.finishedDateLock = new Object();
-        this.finalisationDateLock = new Object();
-        this.cancellationDateLock = new Object();
+        this.instanceIDLock = new SerializableObject();
+        this.typeIDLock = new SerializableObject();
+        this.episodeIdentifierLock = new SerializableObject();
+        this.actualUoWLock = new SerializableObject();
+        this.associatedWUPIdentifierLock = new SerializableObject();
+        this.downstreamEpisodeIdentifierSetLock = new SerializableObject();
+        this.upstreamEpisodeIdentifierLock = new SerializableObject();
+        this.finalisationStatusLock = new SerializableObject();
+        this.processingStatusLock = new SerializableObject();
+        this.registrationDateLock = new SerializableObject();
+        this.startDateLock = new SerializableObject();
+        this.finishedDateLock = new SerializableObject();
+        this.finalisationDateLock = new SerializableObject();
+        this.cancellationDateLock = new SerializableObject();
         // Now, add what we have been supplied
         this.associatedWUPIdentifier = activityID.getPresentWUPIdentifier();
         this.episodeIdentifier = this.buildEpisodeID(activityID, theUoW);
@@ -133,20 +135,20 @@ public class ResilienceParcel {
         this.finalisationDate = null;
         this.episodeIdentifier = null;
         this.cancellationDate = null;
-        this.instanceIDLock = new Object();
-        this.typeIDLock = new Object();
-        this.episodeIdentifierLock = new Object();
-        this.actualUoWLock = new Object();
-        this.associatedWUPIdentifierLock = new Object();
-        this.downstreamEpisodeIdentifierSetLock = new Object();
-        this.upstreamEpisodeIdentifierLock = new Object();
-        this.finalisationStatusLock = new Object();
-        this.processingStatusLock = new Object();
-        this.registrationDateLock = new Object();
-        this.startDateLock = new Object();
-        this.finishedDateLock = new Object();
-        this.finalisationDateLock = new Object();
-        this.cancellationDateLock = new Object();
+        this.instanceIDLock = new SerializableObject();
+        this.typeIDLock = new SerializableObject();
+        this.episodeIdentifierLock = new SerializableObject();
+        this.actualUoWLock = new SerializableObject();
+        this.associatedWUPIdentifierLock = new SerializableObject();
+        this.downstreamEpisodeIdentifierSetLock = new SerializableObject();
+        this.upstreamEpisodeIdentifierLock = new SerializableObject();
+        this.finalisationStatusLock = new SerializableObject();
+        this.processingStatusLock = new SerializableObject();
+        this.registrationDateLock = new SerializableObject();
+        this.startDateLock = new SerializableObject();
+        this.finishedDateLock = new SerializableObject();
+        this.finalisationDateLock = new SerializableObject();
+        this.cancellationDateLock = new SerializableObject();
         // Now, add what we have been supplied
         if (originalParcel.hasCancellationDate()) {
             this.cancellationDate = originalParcel.getCancellationDate();
@@ -602,7 +604,7 @@ public class ResilienceParcel {
         FDN newEpisodeID;
         if (activityID.hasPresentWUPFunctionToken()) {
             TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
-            newEpisodeID = nodeFunctionFDN.toVersionBasedFDN();
+            newEpisodeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
@@ -627,7 +629,7 @@ public class ResilienceParcel {
         FDN newTypeID;
         if (activityID.hasPresentWUPFunctionToken()) {
             TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
-            newTypeID = nodeFunctionFDN.toVersionBasedFDN();
+            newTypeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
@@ -650,7 +652,7 @@ public class ResilienceParcel {
         }
         FDN newInstanceID;
         if (activityID.hasPresentWUPIdentifier()) {
-            newInstanceID = new FDN(activityID.getPresentWUPIdentifier().toVersionBasedFDNToken());
+            newInstanceID = new FDN(activityID.getPresentWUPIdentifier().toTypeBasedFDNToken());
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPInstanceID value, bad parameter"));
         }

@@ -22,7 +22,6 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
@@ -37,7 +36,10 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Dependent
 public class InterchangeUoWPayload2NewUoWProcessor {

@@ -21,8 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-public enum PubSubSubscriptionStatusEnum {
-    SUBSCRIPTION_REQUESTED,
-    SUBSCRIPTION_UNKNOWN,
-    SUBSCRIPTION_ACTIVE
+public enum InterSubsystemPubSubPublisherStatusEnum {
+    PUBLISHER_REGISTERED,
+    PUBLISHER_NOT_REGISTERED,
+    PUBLISHER_ACTIVE,
+    PUBLISHER_FAILED
 }

@@ -50,7 +50,7 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 		super(camelCTX);
 		LOG.debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFunctionFDN().getFunctionToken());
+		nameSet = new RouteElementNames(wupNode.getNodeFDN().getToken());
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresProcessorIngres())
 				.routeId(nameSet.getRouteWUPContainerIngressProcessor())
 				.process(nodeDetailInjector)
-				.bean(WUPContainerIngresProcessor.class, "ingresContentProcessor(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")")
+				.bean(WUPContainerIngresProcessor.class, "ingresContentProcessor(*, Exchange)")
 				.to(nameSet.getEndPointWUPContainerIngresProcessorEgress());
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresProcessorEgress())
@@ -78,12 +78,12 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresGatekeeperIngres())
 				.routeId(nameSet.getRouteWUPContainerIngresGateway())
 				.process(nodeDetailInjector)
-				.bean(WUPContainerIngresGatekeeper.class, "ingresGatekeeper(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")");
+				.bean(WUPContainerIngresGatekeeper.class, "ingresGatekeeper(*, Exchange)");
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPIngresConduitIngres())
 				.routeId(nameSet.getRouteIngresConduitIngres2WUPIngres())
 				.process(nodeDetailInjector)
-				.bean(WUPIngresConduit.class, "forwardIntoWUP(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")")
+				.bean(WUPIngresConduit.class, "forwardIntoWUP(*, Exchange)")
 				.to(nameSet.getEndPointWUPIngres());
 	}
 

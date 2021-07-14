@@ -22,65 +22,64 @@
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class DistributedPubSubParticipantIdentifier implements Serializable {
-    private String subsystemName;
-    private String subsystemInstanceName;
-    private NetworkSecurityZoneEnum securityZone;
+public class InterSubsystemPubSubParticipantIdentifier implements Serializable {
+    private String serviceName;
+    private String serviceInstanceName;
 
-    public String getSubsystemName() {
-        return subsystemName;
+
+    public InterSubsystemPubSubParticipantIdentifier(){
+        this.serviceInstanceName = null;
+        this.serviceName = null;
     }
 
-    public void setSubsystemName(String subsystemName) {
-        this.subsystemName = subsystemName;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public String getSubsystemInstanceName() {
-        return subsystemInstanceName;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
-    public void setSubsystemInstanceName(String subsystemInstanceName) {
-        this.subsystemInstanceName = subsystemInstanceName;
+    public String getServiceInstanceName() {
+        return serviceInstanceName;
     }
+
+    public void setServiceInstanceName(String serviceInstanceName) {
+        this.serviceInstanceName = serviceInstanceName;
+    }
+
+
 
     @JsonIgnore
     public String getJoinedName(){
-        String joinedName = subsystemName + "-" + subsystemInstanceName;
+        String joinedName = serviceName + "-" + serviceInstanceName;
         return(joinedName);
     }
 
     @Override
     public String toString() {
         return "PubSubMemberIdentifier{" +
-                "subsystemName='" + subsystemName + '\'' +
-                ", subsystemInstanceName='" + subsystemInstanceName + '\'' +
-                ", networkZone'" + securityZone + '\'' +
+                "subsystemName='" + serviceName + '\'' +
+                ", subsystemInstanceName='" + serviceInstanceName + '\'' +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DistributedPubSubParticipantIdentifier)) return false;
-        DistributedPubSubParticipantIdentifier that = (DistributedPubSubParticipantIdentifier) o;
-        return Objects.equals(getSubsystemName(), that.getSubsystemName()) && Objects.equals(getSubsystemInstanceName(), that.getSubsystemInstanceName()) && Objects.equals(getSecurityZone(), that.getSecurityZone());
+        if (!(o instanceof InterSubsystemPubSubParticipantIdentifier)) return false;
+        InterSubsystemPubSubParticipantIdentifier that = (InterSubsystemPubSubParticipantIdentifier) o;
+        boolean serviceNameIsEqual = Objects.equals(getServiceName(), that.getServiceName());
+        boolean serviceInstanceNameIsEqual = Objects.equals(getServiceInstanceName(), that.getServiceInstanceName());
+        return (serviceNameIsEqual && serviceInstanceNameIsEqual);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSubsystemName(), getSubsystemInstanceName(), getSecurityZone());
-    }
-
-    public NetworkSecurityZoneEnum getSecurityZone() {
-        return securityZone;
-    }
-
-    public void setSecurityZone(NetworkSecurityZoneEnum securityZone) {
-        this.securityZone = securityZone;
+        return Objects.hash(getServiceName(), getServiceInstanceName());
     }
 }

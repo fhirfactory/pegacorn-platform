@@ -22,12 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.datasets.cache;
 
-import ca.uhn.fhir.rest.annotation.Transaction;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
-import javax.xml.crypto.Data;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
@@ -35,12 +32,12 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelValidationStatusEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.PolicyEnforcementPointApprovalStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscription;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 
 @ApplicationScoped
 public class DataParcelSubscriptionMapDM {
@@ -73,7 +70,7 @@ public class DataParcelSubscriptionMapDM {
 			LOG.debug(".getSubsciberList(): Exit, returning associated FDNSet of the WUPs interested:");
 			int count = 0;
 			for(PubSubSubscription currentSubscription : subscriptionList){
-				PubSubSubscriber currentSubscriber = currentSubscription.getSubscriber();
+				PubSubParticipant currentSubscriber = currentSubscription.getSubscriber();
 				LOG.debug(".getSubsciberList(): Subscriber[{}]->{}", count, currentSubscriber);
 				count++;
 			}
@@ -90,7 +87,7 @@ public class DataParcelSubscriptionMapDM {
      * @param parcelManifest The contentTopicID (FDNToken) of the payload we have received from a WUP
      * @param subscriber The NodeElement of the WUP that is interested in the payload type.
      */
-    public void addSubscriber(DataParcelManifest parcelManifest, PubSubSubscriber subscriber) {
+    public void addSubscriber(DataParcelManifest parcelManifest, PubSubParticipant subscriber) {
     	LOG.debug(".addSubscriber(): Entry, parcelManifest->{}, subscriber->{}", parcelManifest, subscriber);
     	if((parcelManifest==null) || (subscriber==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): parcelManifest or subscriberInstanceID is null"));
@@ -124,23 +121,30 @@ public class DataParcelSubscriptionMapDM {
 				}
 				PubSubSubscription newSubscription = new PubSubSubscription(parcelManifest, subscriber);
 				subscriptionList.add(newSubscription);
+				if(subscriber.getInterSubsystemParticipant() != null) {
+					subscriber.getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
+				}
 			} else {
 				LOG.trace(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
 				PubSubSubscription newSubscription = new PubSubSubscription(parcelManifest, subscriber);
 				subscriptionList = new ArrayList<PubSubSubscription>();
 				subscriptionList.add(newSubscription);
 				this.distributionList.put(contentDescriptor, subscriptionList);
+				if(subscriber.getInterSubsystemParticipant() != null) {
+					subscriber.getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
+				}
 			}
 		}
 		if (LOG.isDebugEnabled()) {
 			LOG.debug(".addSubscriber(): Exit, here is the Subscription list for the Topic:");
 			int count = 0;
 			for(PubSubSubscription currentSubscription : subscriptionList){
-				PubSubSubscriber currentSubscriber = currentSubscription.getSubscriber();
+				PubSubParticipant currentSubscriber = currentSubscription.getSubscriber();
 				LOG.debug(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber);
 				count++;
 			}
 		}
+		printAllSubscriptionSets();
     }
 
     public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, TopologyNodeFDNToken localSubscriberWUP){
@@ -149,7 +153,8 @@ public class DataParcelSubscriptionMapDM {
 			throw(new IllegalArgumentException(".addSubscriber(): payloadTopic or localSubscriberWUP is null"));
 		}
 		DataParcelManifest descriptor = new DataParcelManifest(contentDescriptor);
-		PubSubSubscriber subscriber = new PubSubSubscriber(localSubscriberWUP);
+		IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(localSubscriberWUP);
+		PubSubParticipant subscriber = new PubSubParticipant(intraSubsystemParticipant);
 		addSubscriber(descriptor, subscriber);
 	}
     
@@ -159,7 +164,7 @@ public class DataParcelSubscriptionMapDM {
      * @param parcelManifest The DataParcelManifest of the Topic we want to unsubscribe from.
      * @param subscriberInstanceID  The subscriber we are removing from the subscription list.
      */
-    public void removeSubscriber(DataParcelManifest parcelManifest, PubSubSubscriber subscriberInstanceID) {
+    public void removeSubscriber(DataParcelManifest parcelManifest, PubSubParticipant subscriberInstanceID) {
     	LOG.debug(".removeSubscriber(): Entry, parcelManifest --> {}, subscriberInstanceID --> {}", parcelManifest, subscriberInstanceID);
     	if((parcelManifest==null) || (subscriberInstanceID==null)) {
     		throw(new IllegalArgumentException(".removeSubscriber(): topic or subscriberInstanceID is null"));
@@ -207,19 +212,19 @@ public class DataParcelSubscriptionMapDM {
     }
 
     public void printAllSubscriptionSets(){
-    	if(!LOG.isDebugEnabled()){
-    		return;
-		}
+//    	if(!LOG.isDebugEnabled()){
+//    		return;
+//		}
     	Enumeration<DataParcelTypeDescriptor> topicEnumerator = distributionList.keys();
-    	LOG.debug(".printAllSubscriptionSets(): Printing ALL Subscription Lists");
+    	LOG.trace(".printAllSubscriptionSets(): Printing ALL Subscription Lists");
     	while(topicEnumerator.hasMoreElements()){
 			DataParcelTypeDescriptor currentToken = topicEnumerator.nextElement();
-    		LOG.debug(".printAllSubscriptionSets(): Topic (TopicToken) --> {}", currentToken);
+    		LOG.trace(".printAllSubscriptionSets(): Topic (TopicToken) --> {}", currentToken);
 			List<PubSubSubscription> subscriptionList = getSubsciberList(currentToken);
 			if(subscriptionList != null){
 				for(PubSubSubscription currentSubscription: subscriptionList){
-					PubSubSubscriber currentSubscriber = currentSubscription.getSubscriber();
-					LOG.debug(".printAllSubscriptionSets(): Subscriber --> {}", currentSubscriber);
+					PubSubParticipant currentSubscriber = currentSubscription.getSubscriber();
+					LOG.trace(".printAllSubscriptionSets(): Subscriber --> {}", currentSubscriber);
 				}
 			}
 
@@ -230,41 +235,51 @@ public class DataParcelSubscriptionMapDM {
 	// More sophisticated SubscriberList derivation
 	//
 
-	public List<PubSubSubscriber> deriveSubscriberList(DataParcelManifest parcelManifest){
-		LOG.info(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
-		DataParcelTypeDescriptor parcelDescriptor = parcelManifest.getContentDescriptor();
-		List<PubSubSubscription> subscriberList = this.distributionList.get(parcelDescriptor);
+	public List<PubSubParticipant> deriveSubscriberList(DataParcelManifest parcelManifest){
+		LOG.debug(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
+		printAllSubscriptionSets();
+		DataParcelTypeDescriptor parcelContentDescriptor = parcelManifest.getContentDescriptor();
+		DataParcelTypeDescriptor parcelContainerDescriptor = parcelManifest.getContainerDescriptor();
+		List<PubSubSubscription> subscriberList = this.distributionList.get(parcelContentDescriptor);
+		if(parcelContainerDescriptor != null){
+			subscriberList.addAll(this.distributionList.get(parcelContainerDescriptor));
+		}
 		if(subscriberList == null ){
-			LOG.info(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements (i.e. couldn't find any interested WUPs), returning an empty set");
+			LOG.debug(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements (i.e. couldn't find any interested WUPs), returning an empty set");
 			return(new ArrayList<>());
 		}
-		List<PubSubSubscriber> derivedSubscriberList = new ArrayList<>();
+		List<PubSubParticipant> derivedSubscriberList = new ArrayList<>();
 		for(PubSubSubscription currentRegisteredSubscription: subscriberList){
-			LOG.info(".getSubscriberList(): Checking for equivalence/match is subscription");
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match in subscription");
 			DataParcelManifest subscriberRequestedManifest = currentRegisteredSubscription.getParcelManifest();
-			LOG.info(".getSubscriberList(): Checking for equivalence/match is subscription, currentSubscriberRequestedManifest->{}, availableManifest->{}", currentRegisteredSubscription, parcelManifest);
+//			LOG.trace(".getSubscriberList(): Checking for equivalence/match in subscription, currentSubscriberRequestedManifest->{}, availableManifest->{}", currentRegisteredSubscription, parcelManifest);
+//			LOG.trace(".getSubscriberList(): Checking subscriber->{}", currentRegisteredSubscription.getSubscriber());
+//			LOG.trace(".getSubscriberList(): Subscriber Manifest (container)->{}", subscriberRequestedManifest.getContainerDescriptor());
+//			LOG.trace(".getSubscriberList(): Publisher  Manifest (container)->{}", parcelManifest.getContainerDescriptor());
+//			LOG.trace(".getSubscriberList(): Subscriber Manifest (content)->{}", subscriberRequestedManifest.getContentDescriptor());
+//			LOG.trace(".getSubscriberList(): Publisher  Manifest (content)->{}", parcelManifest.getContentDescriptor());
 			boolean containerIsEqual = containerIsEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
 			boolean contentIsEqual = contentIsEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
 			boolean containerOnlyIsEqual = containerOnlyEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
 			boolean matchedNormalisation = normalisationMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
 			boolean matchedValidation = validationMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
 			boolean matchedManifestType = manifestTypeMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
 			boolean matchedSource = sourceSystemMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedSource->{}",matchedSource);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedSource->{}",matchedSource);
 			boolean matchedTarget = targetSystemMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
-			boolean matchedPEStatus = enforcementPointApprovalStatusMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedPEStatus->{}",matchedPEStatus);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
+			boolean matchedPEPStatus = enforcementPointApprovalStatusMatches(parcelManifest, subscriberRequestedManifest);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
 			boolean matchedDistributionStatus = isDistributableMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
 			boolean matchedDirection = parcelFlowDirectionMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
 			boolean goodEnoughMatch = containerIsEqual
 					&& contentIsEqual
 					&& matchedNormalisation
@@ -272,22 +287,22 @@ public class DataParcelSubscriptionMapDM {
 					&& matchedManifestType
 					&& matchedSource
 					&& matchedTarget
-					&& matchedPEStatus
+					&& matchedPEPStatus
 					&& matchedDirection
 					&& matchedDistributionStatus;
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
 			boolean containerBasedOKMatch = containerOnlyIsEqual
 					&& matchedNormalisation
 					&& matchedValidation
 					&& matchedManifestType
 					&& matchedSource
 					&& matchedTarget
-					&& matchedPEStatus
+					&& matchedPEPStatus
 					&& matchedDirection
 					&& matchedDistributionStatus;
-			LOG.info(".getSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
+			LOG.trace(".getSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 			if(goodEnoughMatch || containerBasedOKMatch){
-				LOG.info(".getSubscriberList(): Adding entry!");
+				LOG.debug(".getSubscriberList(): Adding entry!");
 				derivedSubscriberList.add(currentRegisteredSubscription.getSubscriber());
 			}
 
@@ -295,25 +310,39 @@ public class DataParcelSubscriptionMapDM {
 		return(derivedSubscriberList);
 	}
 
-	private boolean containerIsEqual(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
-    	if(testManifest == null || subscribedManifest == null){
+	private boolean containerIsEqual(DataParcelManifest publisherManifest, DataParcelManifest subscribedManifest){
+		LOG.debug(".containerIsEqual(): Entry");
+    	if(publisherManifest == null || subscribedManifest == null){
+			LOG.debug(".contentIsEqual(): publisherManifest or subscribedManifest is null, return -false-");
     		return(false);
 		}
-		if(!(testManifest.hasContainerDescriptor() && subscribedManifest.hasContainerDescriptor()))
-		{
+		LOG.trace(".contentIsEqual(): publisherManifest & subscribedManifest are bot NOT null");
+		LOG.trace(".contentIsEqual(): checking to see if publisherManifest has a containerDescriptor");
+		boolean testManifestHasContainerDescriptor = publisherManifest.hasContainerDescriptor();
+		LOG.trace(".contentIsEqual(): checking to see if subscribedManifest has a containerDescriptor");
+		boolean subscribedManifestHasContainerDescriptor = subscribedManifest.hasContainerDescriptor();
+		if(!testManifestHasContainerDescriptor && !subscribedManifestHasContainerDescriptor) {
+			LOG.debug(".contentIsEqual(): Exit, neither publisherManifest or subscribedManifest has a containerDescriptor, returning -true-");
 			return(true);
 		}
-    	if(testManifest.hasContainerDescriptor() && subscribedManifest.hasContentDescriptor()) {
-			if (testManifest.getContainerDescriptor().equals(subscribedManifest.getContainerDescriptor())) {
-				return (true);
-			}
+		if(!subscribedManifestHasContainerDescriptor){
+			LOG.debug(".contentIsEqual(): Exit, subscribedManifest has no containerDescriptor, but publisherManifest does, returning -false-");
+			return(false);
 		}
-    	return(false);
+		if(!testManifestHasContainerDescriptor ) {
+			LOG.debug(".contentIsEqual(): Exit, publisherManifest has no containerDescriptor, but subscribedManifest does, returning -false-");
+			return(false);
+		}
+		LOG.trace(".contentIsEqual(): Exit, publisherManifest and subscribedManifest both have containerDescriptors, now testing for equality");
+		boolean containersAreEqual = publisherManifest.getContainerDescriptor().equals(subscribedManifest.getContainerDescriptor());
+		LOG.debug(".contentIsEqual(): Exit, publisherManifest and subscribedManifest containerDescriptor comparison yielded->{}", containersAreEqual);
+		return(containersAreEqual);
 	}
 
 	private boolean contentIsEqual(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
 		LOG.debug(".contentIsEqual(): Entry");
     	if(testManifest == null || subscribedManifest == null){
+			LOG.debug(".contentIsEqual(): testManifest or subscribedManifest is null, return -false-");
     		return(false);
 		}
 		LOG.trace(".contentIsEqual(): testManifest & subscribedManifest are bot NOT null");
@@ -338,30 +367,45 @@ public class DataParcelSubscriptionMapDM {
 		}
 	}
 
-	private boolean containerOnlyEqual(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
-		if(testManifest == null || subscribedManifest == null){
+	private boolean containerOnlyEqual(DataParcelManifest publisherManifest, DataParcelManifest subscribedManifest){
+		LOG.debug(".containerOnlyEqual(): Entry");
+		if(publisherManifest == null || subscribedManifest == null){
+			LOG.debug(".containerOnlyEqual(): testManifest or subscribedManifest is null, return -false-");
 			return(false);
 		}
-		if(testManifest.hasContentDescriptor() && subscribedManifest.hasContentDescriptor()){
-			return(contentIsEqual(testManifest, subscribedManifest));
+		LOG.trace(".containerOnlyEqual(): testManifest & subscribedManifest are bot NOT null");
+		LOG.trace(".containerOnlyEqual(): checking to see if subscribedManifest has a contentDescriptor && containerDescriptor");
+		if(subscribedManifest.hasContainerDescriptor() && subscribedManifest.hasContentDescriptor()){
+			LOG.trace(".containerOnlyEqual(): subscribedManifest has both contentDescriptor && containerDescriptor, checking to see if they are the same");
+			if(!subscribedManifest.getContainerDescriptor().equals(subscribedManifest.getContentDescriptor())){
+				LOG.debug(".containerOnlyEqual(): contentDescriptor && containerDescriptor are different, so this subscriberManifest is after specific content, returning -false-");
+				return(false);
+			}
 		}
-		if(subscribedManifest.hasContentDescriptor()){
-			return(false);
+		LOG.trace(".containerOnlyEqual(): subscribedManifest does not have a ContentDescriber!, checking comparisons of the container only");
+		if(publisherManifest.hasContainerDescriptor() && subscribedManifest.hasContainerDescriptor()){
+			LOG.trace(".containerOnlyEqual(): publisherManifest cotnains a ContainerDescriptor, so comparing");
+			boolean containerIsEqual = containerIsEqual(publisherManifest, subscribedManifest);
+			LOG.debug(".containerOnlyEqual(): Comparison of ContainerContent is ->{}, returning it!", containerIsEqual);
+			return(containerIsEqual);
 		}
-		if(testManifest.hasContainerDescriptor() && subscribedManifest.hasContainerDescriptor()){
-			return(containerIsEqual(testManifest, subscribedManifest));
-		}
+		LOG.debug(".containerOnlyEqual(): Publisher does not have a ContainerDescriptor, returning -false-");
 		return(false);
 	}
 
 	private boolean normalisationMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest){
+		LOG.debug(".normalisationMatches(): Entry");
 		if(testManifest == null || subscribedManifest == null){
+			LOG.debug(".normalisationMatches(): Exit, either testManifest or subscribedManifest are null, returning -false-");
 			return(false);
 		}
+		LOG.trace(".normalisationMatches(): subscribedManifest.getNormalisationStatus()->{}", subscribedManifest.getNormalisationStatus());
 		if(subscribedManifest.getNormalisationStatus().equals(DataParcelNormalisationStatusEnum.DATA_PARCEL_CONTENT_NORMALISATION_ANY)){
+			LOG.debug(".normalisationMatches(): Exit, subscribedManifest has requested 'ANY', returning -true-");
 			return(true);
 		}
 		boolean normalisationStatusIsEqual = subscribedManifest.getNormalisationStatus().equals(testManifest.getNormalisationStatus());
+		LOG.debug(".normalisationMatches(): Exit, returning comparison result->{}", normalisationStatusIsEqual);
 		return(normalisationStatusIsEqual);
 	}
 
@@ -391,6 +435,11 @@ public class DataParcelSubscriptionMapDM {
 		if (testManifest == null || subscribedManifest == null) {
 			return (false);
 		}
+		if(subscribedManifest.hasSourceSystem()){
+			if(subscribedManifest.getSourceSystem().contentEquals("*")){
+				return(true);
+			}
+		}
 		if(!testManifest.hasSourceSystem() && !subscribedManifest.hasSourceSystem()){
 			return(true);
 		}
@@ -411,10 +460,15 @@ public class DataParcelSubscriptionMapDM {
 		if (testManifest == null || subscribedManifest == null) {
 			return (false);
 		}
-		if(!testManifest.hasSourceSystem() && !subscribedManifest.hasSourceSystem()){
+		if(subscribedManifest.hasIntendedTargetSystem()){
+			if(subscribedManifest.getIntendedTargetSystem().contentEquals("*")){
+				return(true);
+			}
+		}
+		if(!testManifest.hasIntendedTargetSystem() && !subscribedManifest.hasIntendedTargetSystem()){
 			return(true);
 		}
-		if(!testManifest.hasSourceSystem() || !subscribedManifest.hasSourceSystem()){
+		if(!testManifest.hasIntendedTargetSystem() || !subscribedManifest.hasIntendedTargetSystem()){
 			return(false);
 		}
 		if (testManifest.hasIntendedTargetSystem() && subscribedManifest.hasIntendedTargetSystem()) {
@@ -427,14 +481,19 @@ public class DataParcelSubscriptionMapDM {
 		return(false);
 	}
 
-	private boolean enforcementPointApprovalStatusMatches(DataParcelManifest testManifest, DataParcelManifest subscribedManifest) {
-		if (testManifest == null || subscribedManifest == null) {
+	private boolean enforcementPointApprovalStatusMatches(DataParcelManifest publishedManifest, DataParcelManifest subscribedManifest) {
+    	LOG.debug(".enforcementPointApprovalStatusMatches(): Entry");
+		if (publishedManifest == null || subscribedManifest == null) {
+			LOG.debug(".enforcementPointApprovalStatusMatches(): Exit, either publishedManifest or subscribedManifest are null, returning -false-");
 			return (false);
 		}
 		if (subscribedManifest.getEnforcementPointApprovalStatus().equals(PolicyEnforcementPointApprovalStatusEnum.POLICY_ENFORCEMENT_POINT_APPROVAL_ANY)) {
+			LOG.debug(".enforcementPointApprovalStatusMatches(): Exit, subscribedManifest is set to 'ANY', returning -true-");
 			return (true);
 		}
-		boolean approvalStatusMatch = subscribedManifest.getEnforcementPointApprovalStatus().equals(testManifest.getEnforcementPointApprovalStatus());
+		LOG.trace(".enforcementPointApprovalStatusMatches(): publishedManifest PEP Status->{}", publishedManifest.getEnforcementPointApprovalStatus());
+		LOG.trace(".enforcementPointApprovalStatusMatches(): subscribedManifest PEP Status->{}", subscribedManifest.getEnforcementPointApprovalStatus());
+		boolean approvalStatusMatch = subscribedManifest.getEnforcementPointApprovalStatus().equals(publishedManifest.getEnforcementPointApprovalStatus());
 		return (approvalStatusMatch);
 	}
 

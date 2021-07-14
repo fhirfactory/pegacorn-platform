@@ -22,7 +22,6 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;

@@ -21,18 +21,18 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
 
 public class MessageBasedWUPEndpoint {
-    private IPCServerTopologyEndpoint endpointTopologyNode;
+    private IPCTopologyEndpoint endpointTopologyNode;
     private String endpointSpecification;
     private boolean frameworkEnabled;
 
-    public IPCServerTopologyEndpoint getEndpointTopologyNode() {
+    public IPCTopologyEndpoint getEndpointTopologyNode() {
         return endpointTopologyNode;
     }
 
-    public void setEndpointTopologyNode(IPCServerTopologyEndpoint endpointTopologyNode) {
+    public void setEndpointTopologyNode(IPCTopologyEndpoint endpointTopologyNode) {
         this.endpointTopologyNode = endpointTopologyNode;
     }
 

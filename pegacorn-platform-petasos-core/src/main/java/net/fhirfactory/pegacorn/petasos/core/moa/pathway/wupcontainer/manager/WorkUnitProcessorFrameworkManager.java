@@ -21,29 +21,24 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubSubscriber;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * @author Mark A. Hunter
@@ -54,10 +49,13 @@ public class WorkUnitProcessorFrameworkManager {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorFrameworkManager.class);
 
     @Inject
-    CamelContext camelctx;
+    private CamelContext camelctx;
 
     @Inject
-    DataParcelSubscriptionIM topicServer;
+    private DataParcelSubscriptionIM topicServer;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
 
     public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
@@ -144,18 +142,18 @@ public class WorkUnitProcessorFrameworkManager {
         }
         for(DataParcelManifest currentTopicID: subscribedTopics) {
             LOG.trace(".uowTopicSubscribe(): wupNode --> {} is subscribing to UoW Content Topic --> {}", wupNode, currentTopicID);
-            PubSubSubscriber subscriber = constructPubSubSubscriber(wupNode);
+            PubSubParticipant subscriber = constructPubSubSubscriber(wupNode);
             topicServer.addTopicSubscriber(currentTopicID, subscriber);
         }
         LOG.debug(".uowTopicSubscribe(): Exit");
     }
 
-    private PubSubSubscriber constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
-        PubSubSubscriber subscriber = new PubSubSubscriber();
-        LocalPubSubSubscriber localSubscriber = new LocalPubSubSubscriber();
-        LocalPubSubParticipantIdentifier identifier = new LocalPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
+    private PubSubParticipant constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
+        PubSubParticipant subscriber = new PubSubParticipant();
+        IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
+        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
         localSubscriber.setIdentifier(identifier);
-        subscriber.setLocalSubscriber(localSubscriber);
+        subscriber.setIntraSubsystemParticipant(localSubscriber);
         return(subscriber);
     }
 }

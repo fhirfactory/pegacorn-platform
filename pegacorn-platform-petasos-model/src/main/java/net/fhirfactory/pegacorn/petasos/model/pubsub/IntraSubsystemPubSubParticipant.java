@@ -22,30 +22,29 @@
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.dates.EffectivePeriod;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class LocalPubSubParticipant implements Serializable {
-    private LocalPubSubParticipantIdentifier identifier;
+public class IntraSubsystemPubSubParticipant implements Serializable {
+    private IntraSubsystemPubSubParticipantIdentifier identifier;
 
     //
     // Constructors
     //
-    public LocalPubSubParticipant(){
+    public IntraSubsystemPubSubParticipant(){
         this.identifier = null;
     }
 
-    public LocalPubSubParticipant(LocalPubSubParticipantIdentifier identifier){
+    public IntraSubsystemPubSubParticipant(IntraSubsystemPubSubParticipantIdentifier identifier){
         this.identifier = identifier;
     }
 
-    public LocalPubSubParticipant(TopologyNodeFDNToken wupToken){
-        this.identifier = new LocalPubSubParticipantIdentifier(wupToken);
+    public IntraSubsystemPubSubParticipant(TopologyNodeFDNToken wupToken){
+        this.identifier = new IntraSubsystemPubSubParticipantIdentifier(wupToken);
     }
 
-    public LocalPubSubParticipant(LocalPubSubParticipant ori){
+    public IntraSubsystemPubSubParticipant(IntraSubsystemPubSubParticipant ori){
         this.identifier = ori.getIdentifier();
     }
 
@@ -53,19 +52,19 @@ public class LocalPubSubParticipant implements Serializable {
     // Getters and Setters
     //
 
-    public LocalPubSubParticipantIdentifier getIdentifier() {
+    public IntraSubsystemPubSubParticipantIdentifier getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(LocalPubSubParticipantIdentifier identifier) {
+    public void setIdentifier(IntraSubsystemPubSubParticipantIdentifier identifier) {
         this.identifier = identifier;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LocalPubSubParticipant)) return false;
-        LocalPubSubParticipant that = (LocalPubSubParticipant) o;
+        if (!(o instanceof IntraSubsystemPubSubParticipant)) return false;
+        IntraSubsystemPubSubParticipant that = (IntraSubsystemPubSubParticipant) o;
         return Objects.equals(getIdentifier(), that.getIdentifier());
     }
 

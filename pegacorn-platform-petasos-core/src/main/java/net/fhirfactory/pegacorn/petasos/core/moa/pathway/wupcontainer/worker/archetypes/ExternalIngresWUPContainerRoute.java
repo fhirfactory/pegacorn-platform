@@ -46,7 +46,7 @@ public class ExternalIngresWUPContainerRoute extends BaseRouteBuilder {
         super(camelCTX);
         LOG.debug(".ExternalIngresWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode );
         this.wupTopologyNode = wupNode;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ExternalIngresWUPContainerRoute extends BaseRouteBuilder {
         		.log(LoggingLevel.DEBUG, "from(nameSet.getEndPointWUPEgress()) --> ${body}")
                 .process(nodeDetailInjector)
                 .routeId(nameSet.getRouteWUPEgress2WUPEgressConduitEgress())
-                .bean(WUPEgressConduit.class, "receiveFromWUP(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")")
+                .bean(WUPEgressConduit.class, "receiveFromWUP(*, Exchange)")
                 .to(nameSet.getEndPointWUPEgressConduitEgress());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointWUPEgressConduitEgress())
@@ -73,7 +73,7 @@ public class ExternalIngresWUPContainerRoute extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressProcessorIngres())
                 .routeId(nameSet.getRouteWUPContainerEgressProcessor())
                 .process(nodeDetailInjector)
-                .bean(WUPContainerEgressProcessor.class, "egressContentProcessor(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")")
+                .bean(WUPContainerEgressProcessor.class, "egressContentProcessor(*, Exchange)")
                 .to(nameSet.getEndPointWUPContainerEgressProcessorEgress());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressProcessorEgress())
@@ -83,7 +83,7 @@ public class ExternalIngresWUPContainerRoute extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressGatekeeperIngres())
                 .routeId(nameSet.getRouteWUPContainerEgressGateway())
                 .process(nodeDetailInjector)
-                .bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange," + this.wupTopologyNode.getNodeFDN().getToken().getTokenValue() + ")");
+                .bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)");
 
     }
 

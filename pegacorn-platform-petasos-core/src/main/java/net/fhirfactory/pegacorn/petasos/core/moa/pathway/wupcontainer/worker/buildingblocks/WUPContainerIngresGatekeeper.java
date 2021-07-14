@@ -65,13 +65,13 @@ public class WUPContainerIngresGatekeeper {
     public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
         LOG.debug(".ingresGatekeeper(): Enter, ingresPacket->{}", ingresPacket);
         // Get my Petasos Context
-        LOG.trace(".egressContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        LOG.trace(".ingresGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
-        LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        LOG.trace(".ingresGatekeeper(): Node Element retrieved --> {}", node);
+        TopologyNodeFDNToken wupToken = node.getNodeFDN().getToken();
+        LOG.trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
         // Now, continue with business logic
-        RouteElementNames nameSet = new RouteElementNames(wupFunctionToken);
+        RouteElementNames nameSet = new RouteElementNames(wupToken);
         ArrayList<String> targetList = new ArrayList<String>();
         LOG.trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
         if (ingresPacket.getCurrentJobCard().getIsToBeDiscarded()) {

@@ -77,7 +77,7 @@ public class WUPContainerEgressGatekeeper {
         LOG.info(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         LOG.info(".egressGatekeeper(): Node Element retrieved --> {}", node);
-        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
+        TopologyNodeFDNToken wupFunctionToken = node.getNodeFDN().getToken();
         LOG.info(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);

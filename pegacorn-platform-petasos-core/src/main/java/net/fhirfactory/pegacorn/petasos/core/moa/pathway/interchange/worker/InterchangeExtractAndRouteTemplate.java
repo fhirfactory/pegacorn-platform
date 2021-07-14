@@ -42,7 +42,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
         super(context);
         LOG.debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
         this.wupTopologyNode = nodeElement;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFunctionFDN().getFunctionToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
     }
 
     @Override

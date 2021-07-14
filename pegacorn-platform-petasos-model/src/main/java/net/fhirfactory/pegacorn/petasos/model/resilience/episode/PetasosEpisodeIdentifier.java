@@ -69,7 +69,7 @@ public class PetasosEpisodeIdentifier extends FDNToken implements Serializable {
 
 	public PetasosEpisodeIdentifier(TopologyNodeFunctionFDN functionFDN){
     	super();
-    	this.setContent(functionFDN.toVersionBasedFDN().getToken().getContent());
+    	this.setContent(functionFDN.toTypeBasedFDNWithVersion().getToken().getContent());
 	}
 
 }

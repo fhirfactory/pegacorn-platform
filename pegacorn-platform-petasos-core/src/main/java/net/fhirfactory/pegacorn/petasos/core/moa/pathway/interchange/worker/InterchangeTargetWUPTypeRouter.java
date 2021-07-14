@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
@@ -31,10 +32,11 @@ import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.mana
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.LocalPubSubParticipantIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import org.apache.camel.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,28 +96,106 @@ public class InterchangeTargetWUPTypeRouter {
             LOG.info(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
             return (new ArrayList<String>());
         }
-        LOG.info(".forwardUoW2WUPs(): Geting the set of subscribers for the given topic (calling the topicServer)");
-        List<PubSubSubscriber> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
-        LOG.info(".forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
+        LOG.info(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
+        List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
+        LOG.info(".forwardUoW2WUPs(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
+        String alreadySentTo = "";
+        if(!StringUtils.isEmpty(uowTopicID.getIntendedTargetSystem())){
+            LOG.info(".forwardUoW2WUPs(): It's not empty, so let's see if the appropriate downstream system is registered");
+            for(PubSubParticipant currentSubscriber: subscriberSet){
+                if(hasRemoteServiceName(currentSubscriber)) {
+                    String subscriberName = currentSubscriber.getInterSubsystemParticipant().getIdentifier().getServiceName();
+                    if (subscriberName.contentEquals(uowTopicID.getIntendedTargetSystem())) {
+                        forwardPacket(currentSubscriber, ingresPacket);
+                        alreadySentTo = subscriberName;
+                    }
+                }
+            }
+        }
+
+        LOG.info(".forwardUoW2WUPs(): Iterate through the subscribers");
+        if(LOG.isInfoEnabled()){
+            LOG.info("forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
+        }
         if (subscriberSet != null) {
-           for(PubSubSubscriber currentSubscriber: subscriberSet){
-                LOG.info(".forwardUoW2WUPs(): Subscriber --> {}", currentSubscriber);
-                LocalPubSubParticipantIdentifier localSubscriberIdentifier = currentSubscriber.getLocalSubscriber().getIdentifier();
-                WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
-                TopologyNodeFunctionFDNToken currentNodeFunctionToken = currentNodeElement.getNodeFunctionFDN().getFunctionToken();
-                RouteElementNames routeName = new RouteElementNames(currentNodeFunctionToken);
-                // Clone and Inject Message into Target Route
-                WorkUnitTransportPacket clonedPacket = ingresPacket.deepClone();
-                template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
-                // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
-                // Now add the downstream WUPFunction to the Parcel Finalisation Registry
-                WUPFunctionToken functionToken = new WUPFunctionToken(currentNodeFunctionToken);
-                activityServicesController.registerWUAEpisodeDownstreamWUPInterest(ingresPacket.getPacketID().getPresentEpisodeIdentifier(), functionToken);
+            if(!subscriberSet.isEmpty()) {
+                LOG.info(".forwardUoW2WUPs(): Iterating through....");
+                for (PubSubParticipant currentSubscriber : subscriberSet) {
+                    LOG.info(".forwardUoW2WUPs(): Iterating, currentSubscriber->{}", currentSubscriber);
+                    boolean dontSendAgain = false;
+                    if (hasRemoteServiceName(currentSubscriber)) {
+                        LOG.info(".forwardUoW2WUPs(): has Inter-Subsystem element");
+                        if (currentSubscriber.getInterSubsystemParticipant().getIdentifier().getServiceName().contentEquals(alreadySentTo)) {
+                            dontSendAgain = true;
+                        }
+                    }
+                    if (!dontSendAgain) {
+                        LOG.info(".forwardUoW2WUPs(): does not Inter-Subsystem element");
+                        forwardPacket(currentSubscriber, ingresPacket);
+                    }
+                }
             }
         }
         LOG.debug(".forwardUoW2WUPs(): Exiting");
         List<String> targetSubscriberSet = new ArrayList<String>();
         return (targetSubscriberSet);
+    }
+
+    private boolean hasRemoteServiceName(PubSubParticipant subscriber){
+        if(subscriber == null){
+            return(false);
+        }
+        if(subscriber.getInterSubsystemParticipant() == null){
+            return(false);
+        }
+        if(subscriber.getInterSubsystemParticipant().getIdentifier() == null){
+            return(false);
+        }
+        if(subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName() == null){
+            return(false);
+        }
+        return(true);
+    }
+
+    private boolean hasIntendedTarget(DataParcelManifest parcelManifest){
+        if(parcelManifest == null){
+            return(false);
+        }
+        if(parcelManifest.getIntendedTargetSystem() == null){
+            return(false);
+        }
+        return(true);
+    }
+
+    private void forwardPacket(PubSubParticipant subscriber, WorkUnitTransportPacket packet){
+        LOG.info(".forwardUoW2WUPs(): Subscriber --> {}", subscriber);
+        IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
+        LOG.info(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
+        WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
+        LOG.info(".forwardUoW2WUPs(): The TopologyNode for the target subscriber->{}", currentNodeElement);
+        TopologyNodeFDNToken currentNodeToken = currentNodeElement.getNodeFDN().getToken();
+        LOG.info(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", currentNodeElement);
+        RouteElementNames routeName = new RouteElementNames(currentNodeToken);
+        // Clone and Inject Message into Target Route
+        WorkUnitTransportPacket clonedPacket = packet.deepClone();
+        // Now check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
+        if(hasRemoteServiceName(subscriber)){
+            DataParcelManifest payloadTopicID = packet.getPayload().getPayloadTopicID();
+            boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
+            boolean hasWildcardTarget = false;
+            if(hasIntendedTarget(payloadTopicID)){
+                hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.UOW_ATTRIBUTE_WILDCARD_CHARACTER);
+            }
+            boolean hasRemoteElement = hasRemoteServiceName(subscriber);
+            if((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement){
+                clonedPacket.getPayload().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName());
+            }
+        }
+        template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
+        // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
+        // Now add the downstream WUPFunction to the Parcel Finalisation Registry
+        WUPFunctionToken functionToken = new WUPFunctionToken(currentNodeElement.getNodeFunctionFDN().getFunctionToken());
+        activityServicesController.registerWUAEpisodeDownstreamWUPInterest(packet.getPacketID().getPresentEpisodeIdentifier(), functionToken);
     }
 
     private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorTopologyNode> wupSet) {

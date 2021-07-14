@@ -23,7 +23,9 @@ package net.fhirfactory.pegacorn.common.model.componentid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class TopologyNodeRDN {
+import java.io.Serializable;
+
+public class TopologyNodeRDN implements Serializable {
     private String nodeName;
     private String nodeVersion;
     private TopologyNodeTypeEnum nodeType;

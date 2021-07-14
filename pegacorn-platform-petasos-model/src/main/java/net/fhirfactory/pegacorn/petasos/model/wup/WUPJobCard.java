@@ -25,6 +25,7 @@ import java.util.Date;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,7 @@ public class WUPJobCard {
         this.updateDate = updateDate;
         this.currentStatus = currentStatus;
         this.clusterMode = clusterMode;
-        this.activityID = new ActivityID(activityID);
+        this.activityID = SerializationUtils.clone(activityID);
         this.requestedStatus = requestedStatus;
         this.systemMode = systemMode;
         this.isToBeDiscarded = false;

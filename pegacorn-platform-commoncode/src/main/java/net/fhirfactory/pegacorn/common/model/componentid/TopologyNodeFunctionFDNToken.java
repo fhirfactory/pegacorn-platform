@@ -38,7 +38,7 @@ public class TopologyNodeFunctionFDNToken implements Serializable {
 
     public FDNToken toVersionBasedFDNToken(){
         TopologyNodeFunctionFDN topologyFDN = new TopologyNodeFunctionFDN(this);
-        FDN genericFDN = topologyFDN.toVersionBasedFDN();
+        FDN genericFDN = topologyFDN.toTypeBasedFDNWithVersion();
         FDNToken genericFDNToken = genericFDN.getToken();
         return(genericFDNToken);
     }

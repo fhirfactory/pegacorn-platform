@@ -25,17 +25,17 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 
 import java.io.Serializable;
 
-public class LocalPubSubParticipantIdentifier extends TopologyNodeFDNToken implements Serializable {
+public class IntraSubsystemPubSubParticipantIdentifier extends TopologyNodeFDNToken implements Serializable {
 
-    public LocalPubSubParticipantIdentifier(){
+    public IntraSubsystemPubSubParticipantIdentifier(){
         super();
     }
 
-    public LocalPubSubParticipantIdentifier(LocalPubSubParticipantIdentifier ori){
+    public IntraSubsystemPubSubParticipantIdentifier(IntraSubsystemPubSubParticipantIdentifier ori){
         super(ori);
     }
 
-    public LocalPubSubParticipantIdentifier(TopologyNodeFDNToken ori){
+    public IntraSubsystemPubSubParticipantIdentifier(TopologyNodeFDNToken ori){
         super(ori);
     }
 

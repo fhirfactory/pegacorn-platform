@@ -32,6 +32,7 @@ import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ import java.util.Objects;
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class TopologyNodeFDN {
+public class TopologyNodeFDN implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TopologyNodeFDN.class);
 
     private ArrayList<TopologyNodeRDN> hierarchicalNameSet;
@@ -219,10 +220,15 @@ public class TopologyNodeFDN {
     }
 
     @JsonIgnore
-    public FDN toVersionBasedFDN(){
+    public FDN toTypeBasedFDNWithVersion(){
         FDN newFDN = new FDN();
-        for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
-            newFDN.appendRDN(new RDN(nodeRDN.getNodeName(), nodeRDN.getNodeVersion()));
+        TopologyNodeRDN lastRDN = null;
+        for(TopologyNodeRDN currentNodeRDN: hierarchicalNameSet){
+            newFDN.appendRDN(new RDN(currentNodeRDN.getNodeName(), currentNodeRDN.getNodeName()));
+            lastRDN = currentNodeRDN;
+        }
+        if(lastRDN != null){
+            newFDN.appendRDN(new RDN("Version", lastRDN.getNodeVersion()));
         }
         return(newFDN);
     }

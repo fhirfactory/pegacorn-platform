@@ -21,38 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-
-import java.io.Serializable;
-import java.util.Objects;
-
-public class LocalPubSubPublisher extends LocalPubSubParticipant implements Serializable {
-
-    public LocalPubSubPublisher(){
-        super();
-    }
-
-    public LocalPubSubPublisher(TopologyNodeFDNToken wupToken){
-        super(wupToken);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof LocalPubSubPublisher)) return false;
-        if (!super.equals(o)) return false;
-        return(true);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode());
-    }
-
-    @Override
-    public String toString() {
-        return "LocalPubSubPublisher{" +
-                "identifier=" + getIdentifier() +
-                '}';
-    }
+public enum PubSubNetworkConnectionStatusEnum {
+    PUB_SUB_NETWORK_PUBLISHER_NOT_REACHABLE,
+    PUB_SUB_NETWORK_SUBSCRIBER_NOT_REACHABLE,
+    PUB_SUB_NETWORK_CONNECTION_ESTABLISHED,
+    PUB_SUB_NETWORK_CONNECTION_NOT_ESTABLISHED,
+    PUB_SUB_NETWORK_CONNECTION_FAILED
 }

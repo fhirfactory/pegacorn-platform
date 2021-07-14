@@ -77,7 +77,7 @@ public class WUPEgressConduit {
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
         // Now, continue with business logic
-        RouteElementNames elementNames = new RouteElementNames(wupFunctionToken);
+        RouteElementNames elementNames = new RouteElementNames(node.getNodeFDN().getToken());
         // Retrieve the information from the CamelExchange
         WUPJobCard jobCard = camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
         ParcelStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);

@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -36,19 +36,19 @@ import java.util.Date;
 public class ParcelStatusElement implements Serializable {
 
     private ActivityID activityID;
-    private Object activityIDLock;
+    private SerializableObject activityIDLock;
     private ResilienceParcelProcessingStatusEnum parcelStatus;
-    private Object parcelStatusLock;
+    private SerializableObject parcelStatusLock;
     private Integer retryCount;
-    private Object retryCountLock;
+    private SerializableObject retryCountLock;
     private Date entryDate;
-    private Object entryDateLock;
+    private SerializableObject entryDateLock;
     private boolean hasClusterFocus;
-    private Object hasClusterFocusLock;
+    private SerializableObject hasClusterFocusLock;
     private boolean hasSystemWideFocus;
-    private Object hasSystemWideFocusLock;
+    private SerializableObject hasSystemWideFocusLock;
     private boolean requiresRetry;
-    private Object requiresRetryLock;
+    private SerializableObject requiresRetryLock;
 
     public ParcelStatusElement(ActivityID newID) {
         this.activityID = new ActivityID(newID);
@@ -57,13 +57,13 @@ public class ParcelStatusElement implements Serializable {
         this.hasSystemWideFocus = false;
         this.parcelStatus = null;
         this.requiresRetry = false;
-        this.parcelStatusLock = new Object();
-        this.activityIDLock = new Object();
-        this.requiresRetryLock = new Object();
-        this.hasClusterFocusLock = new Object();
-        this.entryDateLock = new Object();
-        this.hasSystemWideFocusLock = new Object();
-        this.requiresRetryLock = new Object();
+        this.parcelStatusLock = new SerializableObject();
+        this.activityIDLock = new SerializableObject();
+        this.requiresRetryLock = new SerializableObject();
+        this.hasClusterFocusLock = new SerializableObject();
+        this.entryDateLock = new SerializableObject();
+        this.hasSystemWideFocusLock = new SerializableObject();
+        this.requiresRetryLock = new SerializableObject();
     }
 
     public ResilienceParcelIdentifier getParcelInstanceID() {

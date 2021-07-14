@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DataParcelSubscriptionMapDM;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscriber;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +52,9 @@ public class DataParcelSubscriptionIM {
  that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-    public List<PubSubSubscriber> getSubscriberSet(DataParcelManifest parcelManifest) {
+    public List<PubSubParticipant> getSubscriberSet(DataParcelManifest parcelManifest) {
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, parcelManifest --> {}", parcelManifest);
-        List<PubSubSubscriber> subscribedTopicSet = subscriptionCache.deriveSubscriberList(parcelManifest);
+        List<PubSubParticipant> subscribedTopicSet = subscriptionCache.deriveSubscriberList(parcelManifest);
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit");
         return (subscribedTopicSet);
     }
@@ -67,7 +67,7 @@ public class DataParcelSubscriptionIM {
      * @param subscriber The ID of the (Topology) Node that is interested in the payload type.
      */
     @Transactional
-    public void addTopicSubscriber(DataParcelManifest contentTopicID, PubSubSubscriber subscriber) {
+    public void addTopicSubscriber(DataParcelManifest contentTopicID, PubSubParticipant subscriber) {
         LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, subscriber --> {}", contentTopicID, subscriber);
         if(contentTopicID == null || subscriber == null){
             LOG.debug(".addSubscriberToUoWContentTopic(): Exit, Either contentTopicID or subscriber is null!");
@@ -78,7 +78,7 @@ public class DataParcelSubscriptionIM {
     }
 
     @Transactional
-    public void removeSubscriber(DataParcelManifest contentTopicID, PubSubSubscriber interestedNode) {
+    public void removeSubscriber(DataParcelManifest contentTopicID, PubSubParticipant interestedNode) {
         LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
         LOG.debug(".removeSubscriber(): Exit");

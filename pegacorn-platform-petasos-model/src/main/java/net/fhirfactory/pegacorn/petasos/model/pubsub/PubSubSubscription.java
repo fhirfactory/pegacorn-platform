@@ -28,14 +28,14 @@ import java.util.Objects;
 
 public class PubSubSubscription implements Serializable {
     private DataParcelManifest parcelManifest;
-    private PubSubSubscriber subscriber;
+    private PubSubParticipant subscriber;
 
     public PubSubSubscription(){
         this.subscriber = null;
         this.parcelManifest = null;
     }
 
-    public PubSubSubscription(DataParcelManifest parcelManifest, PubSubSubscriber subscriber){
+    public PubSubSubscription(DataParcelManifest parcelManifest, PubSubParticipant subscriber){
         this.subscriber = subscriber;
         this.parcelManifest = parcelManifest;
     }
@@ -48,11 +48,11 @@ public class PubSubSubscription implements Serializable {
         this.parcelManifest = parcelManifest;
     }
 
-    public PubSubSubscriber getSubscriber() {
+    public PubSubParticipant getSubscriber() {
         return subscriber;
     }
 
-    public void setSubscriber(PubSubSubscriber subscriber) {
+    public void setSubscriber(PubSubParticipant subscriber) {
         this.subscriber = subscriber;
     }
 

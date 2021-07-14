@@ -21,19 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import java.io.Serializable;
-
-public class DistributedPubSubPublisher extends DistributedPubSubParticipant implements Serializable {
-    public DistributedPubSubPublisher(){
-        super();
-    }
-
-    @Override
-    public String toString() {
-        return "PubSubPublisher{" +
-                "identifier=" + getIdentifier() +
-                ", membershipStatus=" + getMembershipStatus() +
-                ", membershipPeriod=" + getMembershipPeriod() +
-                '}';
-    }
+public enum InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum {
+    PUBLISHER_REGISTRATION_FAILED,
+    PUBLISHER_REGISTRATION_SUCCESSFUL,
+    PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS,
+    PUBLISHER_REGISTRATION_REMOVED,
+    PUBLISHER_REGISTRATION_NOT_PRESENT
 }

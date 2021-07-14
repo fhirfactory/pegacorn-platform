@@ -26,7 +26,6 @@ import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;
@@ -35,8 +34,8 @@ import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.mana
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceParcelServicesIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
-import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
@@ -54,7 +53,6 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @ApplicationScoped
 public class PetasosMOAServicesBroker {
@@ -78,6 +76,12 @@ public class PetasosMOAServicesBroker {
     @Inject
     MOAServicesAuditBroker auditWriter;
 
+    /**
+     *
+     * @param jobCard
+     * @param initialUoW
+     * @return
+     */
     public ParcelStatusElement registerStandardWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW) {
         if ((jobCard == null) || (initialUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
@@ -88,6 +92,12 @@ public class PetasosMOAServicesBroker {
         return (statusElement);
     }
 
+    /**
+     *
+     * @param jobCard
+     * @param initialUoW
+     * @return
+     */
     public ParcelStatusElement registerSystemEdgeWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW) {
         if ((jobCard == null) || (initialUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
@@ -98,6 +108,10 @@ public class PetasosMOAServicesBroker {
         return (statusElement);
     }
 
+    /**
+     *
+     * @param jobCard
+     */
     public void notifyStartOfWorkUnitActivity(WUPJobCard jobCard) {
         if ((jobCard == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or startedUoW are null"));
@@ -106,6 +120,11 @@ public class PetasosMOAServicesBroker {
         rasController.synchroniseJobCard(jobCard);
     }
 
+    /**
+     *
+     * @param jobCard
+     * @param finishedUoW
+     */
     public void notifyFinishOfWorkUnitActivity(WUPJobCard jobCard, UoW finishedUoW) {
         if ((jobCard == null) || (finishedUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or finishedUoW are null"));
@@ -115,6 +134,10 @@ public class PetasosMOAServicesBroker {
         rasController.synchroniseJobCard(jobCard);
     }
 
+    /**
+     *
+     * @param jobCard
+     */
     public void notifyFinalisationOfWorkUnitActivity(WUPJobCard jobCard) {
         if ((jobCard == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard is null"));
@@ -124,6 +147,11 @@ public class PetasosMOAServicesBroker {
         rasController.synchroniseJobCard(jobCard);
     }
 
+    /**
+     *
+     * @param jobCard
+     * @param failedUoW
+     */
     public void notifyFailureOfWorkUnitActivity(WUPJobCard jobCard, UoW failedUoW) {
         if ((jobCard == null) || (failedUoW == null)) {
             throw (new IllegalArgumentException(".notifyFailureOfWorkUnitActivity(): jobCard or finishedUoW are null"));
@@ -133,6 +161,10 @@ public class PetasosMOAServicesBroker {
         rasController.synchroniseJobCard(jobCard);
     }
 
+    /**
+     *
+     * @param jobCard
+     */
     public void notifyCancellationOfWorkUnitActivity(WUPJobCard jobCard) {
         if (jobCard == null) {
             throw (new IllegalArgumentException(
@@ -142,6 +174,10 @@ public class PetasosMOAServicesBroker {
                 .notifyParcelProcessingCancellation(jobCard.getActivityID().getPresentParcelIdentifier());
     }
 
+    /**
+     *
+     * @param jobCard
+     */
     public void notifyPurgeOfWorkUnitActivity(WUPJobCard jobCard) {
         if ((jobCard == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard is null"));
@@ -155,6 +191,10 @@ public class PetasosMOAServicesBroker {
         parcelServicesIM.notifyParcelProcessingPurge(jobCard.getActivityID().getPresentParcelIdentifier());
     }
 
+    /**
+     *
+     * @param existingJobCard
+     */
     public void synchroniseJobCard(WUPJobCard existingJobCard) {
         rasController.synchroniseJobCard(existingJobCard);
     }

@@ -4,3 +4,7 @@ target/
 .classpath
 .project
 .settings
+
+pegacorn-platform-petasos-audit/.factorypath
+
+pegacorn-platform-petasos/profiles.xml
