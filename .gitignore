@@ -8,3 +8,5 @@ target/
 pegacorn-platform-petasos-audit/.factorypath
 
 pegacorn-platform-petasos/profiles.xml
+
+pegacorn-platform-petasos-caches/.factorypath
