@@ -245,49 +245,49 @@ public class DataParcelSubscriptionMapDM {
 	//
 
 	public List<PubSubParticipant> deriveSubscriberList(DataParcelManifest parcelManifest){
-		LOG.info(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
+		LOG.debug(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
 		printAllSubscriptionSets();
 		DataParcelTypeDescriptor parcelContentDescriptor = parcelManifest.getContentDescriptor();
 		DataParcelTypeDescriptor parcelContainerDescriptor = parcelManifest.getContainerDescriptor();
 		List<PubSubSubscription> contentBasedSubscriberList = null;
 		List<PubSubSubscription> containerBasedSubscriptionList = null;
 		if(parcelContentDescriptor != null ){
-			LOG.info(".getSubscriberList(): parcelContentDescriptor is not null");
+			LOG.trace(".getSubscriberList(): parcelContentDescriptor is not null");
 			contentBasedSubscriberList = this.distributionList.get(parcelContentDescriptor);
-			LOG.info(".getSubscriberList(): contentBasedSubscriberList->{}", contentBasedSubscriberList);
+			LOG.trace(".getSubscriberList(): contentBasedSubscriberList->{}", contentBasedSubscriberList);
 		}
 		if(parcelContainerDescriptor != null){
-			LOG.info(".getSubscriberList(): parcelContainerDescriptor is not null");
+			LOG.trace(".getSubscriberList(): parcelContainerDescriptor is not null");
 			containerBasedSubscriptionList = this.distributionList.get(parcelContainerDescriptor);
-			LOG.info(".getSubscriberList(): containerBasedSubscriptionList->{}", containerBasedSubscriptionList);
+			LOG.trace(".getSubscriberList(): containerBasedSubscriptionList->{}", containerBasedSubscriptionList);
 		}
 		boolean contentListIsNull = contentBasedSubscriberList == null;
 		boolean containerListIsNull = containerBasedSubscriptionList == null;
 		boolean contentListIsEmpty = true;
 		if(!contentListIsNull) {
-			LOG.info(".getSubscriberList(): contentListIsNull is -false-");
+			LOG.trace(".getSubscriberList(): contentListIsNull is -false-");
 			contentListIsEmpty = contentBasedSubscriberList.isEmpty();
 		}
 		boolean containerListEmpty = true;
 		if(!containerListIsNull) {
-			LOG.info(".getSubscriberList(): containerListIsNull is -false-");
+			LOG.trace(".getSubscriberList(): containerListIsNull is -false-");
 			containerListEmpty = containerBasedSubscriptionList.isEmpty();
 		}
 		if((contentListIsNull && containerListIsNull) || (contentListIsEmpty && containerListEmpty)) {
-			LOG.info(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty lists or nulls] (i.e. couldn't find any interested WUPs), returning an empty set");
+			LOG.trace(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty lists or nulls] (i.e. couldn't find any interested WUPs), returning an empty set");
 			return (new ArrayList<>());
 		}
 		List<PubSubSubscription> retrievedSubscriberList = new ArrayList<>();
 		if(!contentListIsNull && !contentListIsEmpty){
-			LOG.info(".getSubscriberList(): contentBasedSubscriberList contains something");
+			LOG.trace(".getSubscriberList(): contentBasedSubscriberList contains something");
 			retrievedSubscriberList.addAll(contentBasedSubscriberList);
 		}
 		if(!containerListIsNull && !containerListEmpty){
-			LOG.info(".getSubscriberList(): containerBasedSubscriptionList contains something");
+			LOG.trace(".getSubscriberList(): containerBasedSubscriptionList contains something");
 			retrievedSubscriberList.addAll(containerBasedSubscriptionList);
 		}
 		if(retrievedSubscriberList.isEmpty()){
-			LOG.info(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty aggregate list] (i.e. couldn't find any interested WUPs), returning an empty set");
+			LOG.debug(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty aggregate list] (i.e. couldn't find any interested WUPs), returning an empty set");
 			return (new ArrayList<>());
 		}
 		List<PubSubParticipant> derivedSubscriberList = new ArrayList<>();
