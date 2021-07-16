@@ -115,7 +115,7 @@ public class InterchangeTargetWUPTypeRouter {
 
         LOG.info(".forwardUoW2WUPs(): Iterate through the subscribers");
         if(LOG.isInfoEnabled()){
-            LOG.info("forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
+            LOG.info(".forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
         }
         if (subscriberSet != null) {
             if(!subscriberSet.isEmpty()) {
@@ -130,7 +130,7 @@ public class InterchangeTargetWUPTypeRouter {
                         }
                     }
                     if (!dontSendAgain) {
-                        LOG.info(".forwardUoW2WUPs(): does not Inter-Subsystem element");
+                        LOG.info(".forwardUoW2WUPs(): does not have Inter-Subsystem element");
                         forwardPacket(currentSubscriber, ingresPacket);
                     }
                 }

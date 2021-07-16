@@ -25,6 +25,7 @@ package net.fhirfactory.pegacorn.petasos.wup.helper;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
@@ -63,23 +64,21 @@ public class EgressActivityFinalisationRegistration {
     public UoW registerActivityFinishAndFinalisation(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".registerActivityFinishAndFinalisation(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
         LOG.trace(".registerActivityFinishAndFinalisation(): Get Job Card and Status Element from Exchange for extraction by the WUP Egress Conduit");
-        String jobcardPropertyKey = exchangePropertyNames.getExchangeJobCardPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java/WUPEgressConduit.java
-        String parcelStatusPropertyKey = exchangePropertyNames.getExchangeStatusElementPropertyName(wupInstanceKey); // this value should match the one in WUPIngresConduit.java/WUPEgressConduit.java
-        WUPJobCard activityJobCard = camelExchange.getProperty(jobcardPropertyKey, WUPJobCard.class); // <-- Note the "WUPJobCard" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
-        ParcelStatusElement statusElement = camelExchange.getProperty(parcelStatusPropertyKey, ParcelStatusElement.class); // <-- Note the "ParcelStatusElement" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
+        WUPJobCard jobCard = camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
+        ParcelStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
         LOG.trace(".registerActivityFinishAndFinalisation(): Extract the UoW");
         switch(theUoW.getProcessingOutcome()){
             case UOW_OUTCOME_SUCCESS:{
-                activityJobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
-                servicesBroker.notifyFinishOfWorkUnitActivity(activityJobCard, theUoW);
-                servicesBroker.notifyFinalisationOfWorkUnitActivity(activityJobCard);
+                jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                servicesBroker.notifyFinishOfWorkUnitActivity(jobCard, theUoW);
+                servicesBroker.notifyFinalisationOfWorkUnitActivity(jobCard);
                 break;
             }
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_FAILED:{
-                activityJobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
-                servicesBroker.notifyFailureOfWorkUnitActivity(activityJobCard, theUoW);
+                jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
+                servicesBroker.notifyFailureOfWorkUnitActivity(jobCard, theUoW);
             }
         }
         LOG.debug(".registerActivityFinishAndFinalisation(): exit, my work is done!");
