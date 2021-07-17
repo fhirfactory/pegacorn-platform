@@ -54,11 +54,11 @@ public class RegisterNewMOAWorkUnitActivityTask {
 		}
 		ActivityID activityID = submittedJobCard.getActivityID();
 		ParcelStatusElement newStatusElement;
-		LOG.info(".registerNewWUA(): Getting the topologyNode( WorkUnitProcessorTopologyNode) from the TopologyCache");
+		LOG.trace(".registerNewWUA(): Getting the topologyNode( WorkUnitProcessorTopologyNode) from the TopologyCache");
 		TopologyNodeFDN topologyNodeFDN = new TopologyNodeFDN(activityID.getPresentWUPIdentifier());
-		LOG.info(".registerNewWUA(): First, extracted the topologyNodeFDN (TopologyNodeFDN) from the activityID's presentWUPIdentifier field, value->{}", topologyNodeFDN);
+		LOG.trace(".registerNewWUA(): First, extracted the topologyNodeFDN (TopologyNodeFDN) from the activityID's presentWUPIdentifier field, value->{}", topologyNodeFDN);
 		WorkUnitProcessorTopologyNode topologyNode = (WorkUnitProcessorTopologyNode) topologyIM.getNode(topologyNodeFDN);
-		LOG.info(".registerNewWUA(): Extracted the topologyNode, value -->{}", topologyNode);
+		LOG.trace(".registerNewWUA(): Extracted the topologyNode, value -->{}", topologyNode);
 		switch (topologyNode.getResilienceMode()) {
 			case RESILIENCE_MODE_MULTISITE: {
 				LOG.trace(".registerNewWUA(): Asking for -Multisite- Reliability Mode for Work Unit Activity Registration");

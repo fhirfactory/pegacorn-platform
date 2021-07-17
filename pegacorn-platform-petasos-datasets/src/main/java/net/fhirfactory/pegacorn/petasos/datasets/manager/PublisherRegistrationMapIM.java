@@ -115,16 +115,16 @@ public class PublisherRegistrationMapIM {
     }
 
     public InterSubsystemPubSubPublisherSubscriptionRegistration addSubscriptionToPublisher(List<DataParcelManifest> subscriptionList, InterSubsystemPubSubParticipant publisher) {
-        LOG.info(".addSubscriptionToPublisher(): Entry, publisher->{}", publisher);
+        LOG.debug(".addSubscriptionToPublisher(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherSubscriptionRegistration registration = registrationMapDM.addSubscriptionToPublisher(subscriptionList, publisher);
-        LOG.info(".addSubscriptionToPublisher(): Exit, registration->{}", registration);
+        LOG.debug(".addSubscriptionToPublisher(): Exit, registration->{}", registration);
         return (registration);
     }
 
     public InterSubsystemPubSubPublisherSubscriptionRegistration getPublisherServiceSubscription(InterSubsystemPubSubParticipant publisher) {
-        LOG.info(".getSubscriptionToPublisher(): Entry, publisher->{}", publisher);
+        LOG.debug(".getSubscriptionToPublisher(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherSubscriptionRegistration registration = registrationMapDM.getPublisherServiceSubscription(publisher);
-        LOG.info(".getSubscriptionToPublisher(): Exit, registration->{}", registration);
+        LOG.debug(".getSubscriptionToPublisher(): Exit, registration->{}", registration);
         return (registration);
     }
 

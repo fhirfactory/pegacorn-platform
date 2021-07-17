@@ -60,6 +60,15 @@ public class WUPIngresConduit {
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentJobCard());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentParcelStatus());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, theUoW);
+        //
+        // Because auditing is not running yet
+        // Remove once Auditing is in place
+        //
+        LOG.info("ProcessingMessage->{}", theUoW.getIngresContent().getPayload());
+        //
+        //
+        //
+
         LOG.debug(".forwardIntoWUP(): Exit, returning the UoW --> {}", theUoW);
         return(theUoW);
     }

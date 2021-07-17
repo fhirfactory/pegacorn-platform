@@ -74,14 +74,14 @@ public class WUPContainerEgressGatekeeper {
     public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange) {
         LOG.debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket );
         // Get my Petasos Context
-        LOG.info(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        LOG.trace(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        LOG.info(".egressGatekeeper(): Node Element retrieved --> {}", node);
+        LOG.trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
         TopologyNodeFDNToken wupFunctionToken = node.getNodeFDN().getToken();
-        LOG.info(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        LOG.trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);
-        LOG.info(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
+        LOG.trace(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
         ArrayList<String> targetList = new ArrayList<String>();
         if(!transportPacket.hasCurrentJobCard()) {
             LOG.error(".egressGatekeeper(): CurrentJobCard is null!");
@@ -92,10 +92,10 @@ public class WUPContainerEgressGatekeeper {
             return (targetList);
         } else {
             LOG.trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so we need to set the Semaphore (so we know we've processed this packet)");
-            LOG.info(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
+            LOG.trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
             String targetEndpoint = nameSet.getEndPointInterchangePayloadTransformerIngres();
             targetList.add(targetEndpoint);
-            LOG.info(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
+            LOG.debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);
         }
     }
