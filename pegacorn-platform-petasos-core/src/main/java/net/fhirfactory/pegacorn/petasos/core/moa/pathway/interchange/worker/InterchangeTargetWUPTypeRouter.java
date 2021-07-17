@@ -98,6 +98,18 @@ public class InterchangeTargetWUPTypeRouter {
         LOG.trace(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
         List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
         LOG.trace(".forwardUoW2WUPs(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
+        //
+        // Because auditing is not running yet
+        // Remove once Auditing is in place
+        //
+        int subscriberSetSize = 0;
+        if(subscriberSet != null) {
+            subscriberSetSize = subscriberSet.size();
+        }
+        LOG.info("Number of Subscribers->{}", subscriberSetSize);
+        //
+        //
+        //
         String alreadySentTo = "";
         if(!StringUtils.isEmpty(uowTopicID.getIntendedTargetSystem())){
             LOG.trace(".forwardUoW2WUPs(): It's not empty, so let's see if the appropriate downstream system is registered");

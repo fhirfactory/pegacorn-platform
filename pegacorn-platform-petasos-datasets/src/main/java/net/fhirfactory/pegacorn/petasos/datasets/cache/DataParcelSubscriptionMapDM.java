@@ -112,8 +112,8 @@ public class DataParcelSubscriptionMapDM {
 				LOG.trace(".addSubscriber(): Topic Subscription Map: Adding subscriber to existing map for parcelManifest --> {}", parcelManifest);
 				PubSubSubscription existingSubscription = null;
 				for(PubSubSubscription currentSubscription: subscriptionList){
-					if(currentSubscription.getSubscriber().equals(subscriber)){
-						if(currentSubscription.getParcelManifest().getContainerDescriptor().equals(parcelManifest.getContainerDescriptor())){
+					if(currentSubscription.getSubscriber().getIntraSubsystemParticipant().equals(subscriber.getIntraSubsystemParticipant())){
+						if(isSameRemoteEndpointSubscriber(currentSubscription.getSubscriber(), subscriber)){
 							existingSubscription = currentSubscription;
 							break;
 						}
@@ -151,6 +151,33 @@ public class DataParcelSubscriptionMapDM {
 		}
 		printAllSubscriptionSets();
     }
+
+    private boolean isSameRemoteEndpointSubscriber(PubSubParticipant currentRegisteredParticipant, PubSubParticipant testParticipant){
+		if(currentRegisteredParticipant.getIntraSubsystemParticipant().equals(testParticipant.getIntraSubsystemParticipant())) {
+			boolean currentRegisteredParticipantHasRemoteSubscriber = currentRegisteredParticipant.getInterSubsystemParticipant() != null;
+			boolean testParticipantHasRemoteSubscriber = testParticipant.getInterSubsystemParticipant() != null;
+			if (currentRegisteredParticipantHasRemoteSubscriber && testParticipantHasRemoteSubscriber) {
+				boolean currentHasIdentifier = currentRegisteredParticipant.getInterSubsystemParticipant().getIdentifier() != null;
+				boolean testHasIdentifier = testParticipant.getInterSubsystemParticipant().getIdentifier() != null;
+				if (currentHasIdentifier && testHasIdentifier) {
+					String currentParticipantServiceName = currentRegisteredParticipant.getInterSubsystemParticipant().getIdentifier().getServiceName();
+					String testParticipantServiceName = testParticipant.getInterSubsystemParticipant().getIdentifier().getServiceName();
+					if (currentParticipantServiceName != null && testParticipantServiceName != null) {
+						if (currentParticipantServiceName.contentEquals(testParticipantServiceName)) {
+							return (true);
+						}
+					}
+				}
+			}
+			if(!currentRegisteredParticipantHasRemoteSubscriber && !testParticipantHasRemoteSubscriber){
+				return(true);
+			} else {
+				return(false);
+			}
+		} else {
+			return(false);
+		}
+	}
 
     public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, TopologyNodeFDNToken localSubscriberWUP){
 		LOG.debug(".addSubscriber(): Entry, contentDescriptor->{}, localSubscriberWUP->{}", contentDescriptor, localSubscriberWUP);
