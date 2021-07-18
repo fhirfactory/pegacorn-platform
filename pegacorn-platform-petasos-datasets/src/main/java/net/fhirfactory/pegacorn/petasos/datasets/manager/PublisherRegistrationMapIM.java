@@ -56,13 +56,13 @@ public class PublisherRegistrationMapIM {
      * @param publisher
      * @return
      */
-    public InterSubsystemPubSubPublisherRegistration unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher) {
-        LOG.debug(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
+    public InterSubsystemPubSubPublisherSubscriptionRegistration unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher) {
+        LOG.info(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherRegistration registration = registrationMapDM.unregisterPublisherInstance(publisher);
         registrationMapDM.removePublisherServiceProviderInstance(publisher);
-        registrationMapDM.checkAProviderIsAvailable(publisher.getIdentifier().getServiceName());
-        LOG.debug(".unregisterPublisherInstance(): Exit, registration->{}", registration);
-        return (registration);
+        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = registrationMapDM.checkAProviderIsAvailable(publisher.getIdentifier().getServiceName());
+        LOG.info(".unregisterPublisherInstance(): Exit, subscriptionRegistration->{}", subscriptionRegistration);
+        return (subscriptionRegistration);
     }
 
     /**
@@ -133,5 +133,19 @@ public class PublisherRegistrationMapIM {
         List<InterSubsystemPubSubPublisherSubscriptionRegistration> registrationList = registrationMapDM.getAllPublisherServiceSubscriptions();
         LOG.debug(".getAllPublisherServiceSubscriptions(): Exit");
         return(registrationList);
+    }
+
+    public List<String> getAllPublishers(){
+        LOG.debug(".getAllPublishers(): Entry");
+        List<String> publisherList = registrationMapDM.getAllPublishers();
+        LOG.debug(".getAllPublishers(): Exit");
+        return(publisherList);
+    }
+
+    public InterSubsystemPubSubPublisherRegistration getPublisherInstanceRegistration(String publisherInstanceName) {
+        LOG.debug(".getPublisherInstanceRegistration(): Entry, publisherInstanceName->{}", publisherInstanceName);
+        InterSubsystemPubSubPublisherRegistration publisherInstanceRegistration = registrationMapDM.getPublisherInstanceRegistration(publisherInstanceName);
+        LOG.debug("getPublisherInstanceRegistration(): Exit, publisherInstanceRegistration->{}", publisherInstanceRegistration);
+        return (publisherInstanceRegistration);
     }
 }

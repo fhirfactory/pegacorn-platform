@@ -73,23 +73,27 @@ public class PublisherRegistrationMapDM {
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
             LOG.debug("registerPublisherInstance(): Exit, publisher is null, registration->{}", registration);
+            return(registration);
         }
         if(publisher.getIdentifier() == null){
             registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (No Identifier)");
             LOG.debug("registerPublisherInstance(): Exit, publisher identifier is null, registration->{}", registration);
+            return(registration);
         }
         if(publisher.getIdentifier().getServiceName() == null || publisher.getIdentifier().getServiceInstanceName() == null){
             registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher SubsystemName or SubsystemInstanceName (== null)");
             LOG.debug("registerPublisherInstance(): Exit, publisher name or instance name is null, registration->{}", registration);
+            return(registration);
         }
         LOG.trace(".registerPublisherInstance(): Now, check to see if publisher (instance) is already cached and, if so, do nothing!");
         if(publisherMap.containsKey(publisher.getIdentifier().getServiceInstanceName())){
             registration = publisherMap.get(publisher.getIdentifier().getServiceInstanceName());
             LOG.debug("registerPublisherInstance(): Exit, publisher already registered, registration->{}", registration);
+            return(registration);
         }
         LOG.trace(".registerPublisherInstance(): Publisher is not in Map, so add it!");
         registration.setPublisher(publisher);
@@ -164,18 +168,21 @@ public class PublisherRegistrationMapDM {
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher is null, registration->{}", registration);
+            return(registration);
         }
         if(publisher.getIdentifier() == null){
             registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (No Identifier)");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher identifier is null, registration->{}", registration);
+            return(registration);
         }
         if(publisher.getIdentifier().getServiceName() == null || publisher.getIdentifier().getServiceInstanceName() == null){
             registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher SubsystemName or SubsystemInstanceName (== null)");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher name or instance name is null, registration->{}", registration);
+            return(registration);
         }
         LOG.trace(".getPublisherInstanceRegistration(): Now, check to see if publisher (instance) is in the cache and, if so, return detail!");
         if(publisherMap.containsKey(publisher.getIdentifier().getServiceInstanceName())){
@@ -189,6 +196,22 @@ public class PublisherRegistrationMapDM {
             registration.setRegistrationCommentary("Publisher not registered");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher not registered, registration->{}", registration);
             return (registration);
+        }
+    }
+
+    public InterSubsystemPubSubPublisherRegistration getPublisherInstanceRegistration(String publisherInstanceName){
+        LOG.debug(".getPublisherInstanceRegistration(): Entry, publisherInstanceName->{}", publisherInstanceName);
+        if(StringUtils.isEmpty(publisherInstanceName)){
+            LOG.debug(".getPublisherInstanceRegistration(): Entry, publisherInstanceName is empty, returning -null-");
+            return(null);
+        }
+        if(publisherMap.containsKey(publisherInstanceName)){
+            InterSubsystemPubSubPublisherRegistration registration = publisherMap.get(publisherInstanceName);
+            LOG.debug("getPublisherInstanceRegistration(): Exit, publisher found, registration->{}", registration);
+            return(registration);
+        } else {
+            LOG.debug("getPublisherInstanceRegistration(): Exit, publisher not registered, return -null-");
+            return (null);
         }
     }
 
@@ -228,19 +251,19 @@ public class PublisherRegistrationMapDM {
     }
 
     public void removePublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher){
-        LOG.debug(".removePublisherServiceProviderInstance(): Entry, publisher->{}", publisher);
+        LOG.info(".removePublisherServiceProviderInstance(): Entry, publisher->{}", publisher);
         if(publisher == null){
-            LOG.debug(".removePublisherServiceProviderInstance(): Exit, publisher is null");
+            LOG.info(".removePublisherServiceProviderInstance(): Exit, publisher is null");
             return;
         }
         if(publisher.getIdentifier() == null){
-            LOG.debug(".removePublisherServiceProviderInstance(): Exit, publisher.getIdentifier() is null");
+            LOG.info(".removePublisherServiceProviderInstance(): Exit, publisher.getIdentifier() is null");
             return;
         }
         String publisherInstanceName = publisher.getIdentifier().getServiceInstanceName();
         String publisherServiceName = publisher.getIdentifier().getServiceName();
         if(publisherServiceName == null || publisherInstanceName == null){
-            LOG.debug(".removePublisherServiceProviderInstance(): Exit, publisherName or publisherInstanceName is null");
+            LOG.info(".removePublisherServiceProviderInstance(): Exit, publisherName or publisherInstanceName is null");
             return;
         }
         synchronized (publisherServiceFulfillmentMapLock) {
@@ -254,7 +277,7 @@ public class PublisherRegistrationMapDM {
                 publisherServiceFulfillmentMap.remove(publisherServiceName);
             }
         }
-        LOG.debug(".removePublisherServiceProviderInstance(): Exit, publisher removed added");
+        LOG.info(".removePublisherServiceProviderInstance(): Exit, publisher removed added");
     }
 
     public List<InterSubsystemPubSubParticipant> getPublisherServiceProviderInstances(String publisherServiceName){
@@ -412,14 +435,19 @@ public class PublisherRegistrationMapDM {
         }
     }
 
-    public void checkAProviderIsAvailable(String publisherServiceName){
+    public InterSubsystemPubSubPublisherSubscriptionRegistration checkAProviderIsAvailable(String publisherServiceName){
+        LOG.info(".checkAProviderIsAvailable(): Entry, publisherServiceName->{}", publisherServiceName);
         List<InterSubsystemPubSubParticipant> publisherServiceProviderInstances = getPublisherServiceProviderInstances(publisherServiceName);
         if(publisherServiceProviderInstances.isEmpty()){
             InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = publisherSubscriptionMap.get(publisherServiceName);
             if(subscriptionRegistration != null){
                 subscriptionRegistration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS);
+                LOG.info(".checkAProviderIsAvailable(): Exit, provider available, subscriptionRegistration->{}", subscriptionRegistration);
+                return(subscriptionRegistration);
             }
         }
+        LOG.info(".checkAProviderIsAvailable(): Exit, no provider available");
+        return(null);
     }
 
     public List<InterSubsystemPubSubPublisherSubscriptionRegistration> getAllPublisherServiceSubscriptions(){
@@ -437,5 +465,20 @@ public class PublisherRegistrationMapDM {
         }
         LOG.debug(".getAllPublisherServiceSubscriptions(): Returning list");
         return(subscriptionList);
+    }
+
+    public List<String> getAllPublishers(){
+        LOG.debug(".getAllPublishers(): Entry");
+        List<String> participantList = new ArrayList<>();
+        Enumeration<String> publisherServiceNames = this.publisherServiceFulfillmentMap.keys();
+        while(publisherServiceNames.hasMoreElements()){
+            String currentPublisherServiceName = publisherServiceNames.nextElement();
+            List<String> currentPublisherInstanceNames = this.publisherServiceFulfillmentMap.get(currentPublisherServiceName);
+            if(currentPublisherInstanceNames != null){
+                participantList.addAll(currentPublisherInstanceNames);
+            }
+        }
+        LOG.debug(".getAllPublishers(): Exit");
+        return(participantList);
     }
 }
