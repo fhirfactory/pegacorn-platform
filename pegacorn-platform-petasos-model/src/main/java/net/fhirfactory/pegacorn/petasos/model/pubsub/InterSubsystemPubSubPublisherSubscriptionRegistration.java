@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Serializable {
-    private InterSubsystemPubSubParticipant publisher;
     private String publisherServiceName;
     private InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum registrationStatus;
     private List<DataParcelManifest> subscriptionList;
@@ -40,7 +39,6 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
     private SerializableObject lock;
 
     public InterSubsystemPubSubPublisherSubscriptionRegistration(){
-        this.publisher = null;
         this.registrationStatus = null;
         this.registrationDate = null;
         this.registrationCommentary = null;
@@ -107,14 +105,6 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
         this.publisherServiceName = publisherServiceName;
     }
 
-    public InterSubsystemPubSubParticipant getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(InterSubsystemPubSubParticipant publisher) {
-        this.publisher = publisher;
-    }
-
     public InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum getRegistrationStatus() {
         return registrationStatus;
     }
@@ -154,8 +144,7 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
     @Override
     public String toString() {
         return "DistributedPubSubPublisherSubscriptionRegistration{" +
-                "publisher=" + publisher +
-                ", publisherService='" + publisherServiceName + '\'' +
+                "publisherService='" + publisherServiceName + '\'' +
                 ", registrationStatus=" + registrationStatus +
                 ", subscriptionList=" + subscriptionList +
                 ", registrationCommentary='" + registrationCommentary + '\'' +
@@ -169,11 +158,11 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
         if (this == o) return true;
         if (!(o instanceof InterSubsystemPubSubPublisherSubscriptionRegistration)) return false;
         InterSubsystemPubSubPublisherSubscriptionRegistration that = (InterSubsystemPubSubPublisherSubscriptionRegistration) o;
-        return Objects.equals(getPublisher(), that.getPublisher()) && Objects.equals(getPublisherServiceName(), that.getPublisherServiceName()) && getRegistrationStatus() == that.getRegistrationStatus() && Objects.equals(getSubscriptionList(), that.getSubscriptionList()) && Objects.equals(getRegistrationCommentary(), that.getRegistrationCommentary()) && Objects.equals(getRegistrationDate(), that.getRegistrationDate()) && Objects.equals(lock, that.lock);
+        return Objects.equals(getPublisherServiceName(), that.getPublisherServiceName()) && getRegistrationStatus() == that.getRegistrationStatus() && Objects.equals(getSubscriptionList(), that.getSubscriptionList()) && Objects.equals(getRegistrationCommentary(), that.getRegistrationCommentary()) && Objects.equals(getRegistrationDate(), that.getRegistrationDate()) && Objects.equals(lock, that.lock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisher(), getPublisherServiceName(), getRegistrationStatus(), getSubscriptionList(), getRegistrationCommentary(), getRegistrationDate(), lock);
+        return Objects.hash(getPublisherServiceName(), getRegistrationStatus(), getSubscriptionList(), getRegistrationCommentary(), getRegistrationDate(), lock);
     }
 }

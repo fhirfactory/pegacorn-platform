@@ -47,7 +47,6 @@ public class PublisherRegistrationMapIM {
     public InterSubsystemPubSubPublisherRegistration registerPublisherInstance(InterSubsystemPubSubParticipant publisher) {
         LOG.debug(".registerPublisherInstance(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherRegistration registration = registrationMapDM.registerPublisherInstance(publisher);
-        registrationMapDM.addPublisherServiceProviderInstance(publisher);
         LOG.debug(".registerPublisherInstance(): Exit, registration->{}", registration);
         return (registration);
     }
@@ -59,7 +58,6 @@ public class PublisherRegistrationMapIM {
     public InterSubsystemPubSubPublisherSubscriptionRegistration unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher) {
         LOG.info(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherRegistration registration = registrationMapDM.unregisterPublisherInstance(publisher);
-        registrationMapDM.removePublisherServiceProviderInstance(publisher);
         InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = registrationMapDM.checkAProviderIsAvailable(publisher.getIdentifier().getServiceName());
         LOG.info(".unregisterPublisherInstance(): Exit, subscriptionRegistration->{}", subscriptionRegistration);
         return (subscriptionRegistration);
@@ -86,18 +84,6 @@ public class PublisherRegistrationMapIM {
             LOG.debug(".isPublisherRegistered(): Exit, publisher not found & has Status not equal to PUBLISHER_REGISTERED, returning->{}", false);
             return (false);
         }
-    }
-
-    public void addPublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher) {
-        LOG.debug(".addPublisherServiceProviderInstance(): Entry, publisher->{}", publisher);
-        registrationMapDM.addPublisherServiceProviderInstance(publisher);
-        LOG.debug(".addPublisherServiceProviderInstance(): Exit");
-    }
-
-    public void removePublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher) {
-        LOG.debug(".removePublisherServiceProviderInstance(): Entry, publisher->{}", publisher);
-        registrationMapDM.removePublisherServiceProviderInstance(publisher);
-        LOG.debug(".removePublisherServiceProviderInstance(): Exit");
     }
 
     public List<InterSubsystemPubSubParticipant> getPublisherServiceProviderInstances(String publisherServiceName) {

@@ -39,10 +39,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PublisherRegistrationMapDM {
     private static final Logger LOG = LoggerFactory.getLogger(PublisherRegistrationMapDM.class);
 
+    // ConcurrentHashMap<publisherServiceInstanceName, publisherRegistration>
     private ConcurrentHashMap<String, InterSubsystemPubSubPublisherRegistration> publisherMap;
     private Object publisherMapLock;
+
+    // ConcurrentHashMap<publisherServiceName, List<publisherServiceInstanceName>>
     private ConcurrentHashMap<String, List<String>> publisherServiceFulfillmentMap;
     private Object publisherServiceFulfillmentMapLock;
+
+    // ConcurrentHashMap<publisherServiceName, subscriptionRegistration>
     private ConcurrentHashMap<String, InterSubsystemPubSubPublisherSubscriptionRegistration> publisherSubscriptionMap;
     private Object publisherSubscriptionMapLock;
 
@@ -93,19 +98,49 @@ public class PublisherRegistrationMapDM {
         if(publisherMap.containsKey(publisher.getIdentifier().getServiceInstanceName())){
             registration = publisherMap.get(publisher.getIdentifier().getServiceInstanceName());
             LOG.debug("registerPublisherInstance(): Exit, publisher already registered, registration->{}", registration);
-            return(registration);
+        } else {
+            LOG.trace(".registerPublisherInstance(): Publisher is not in Map, so add it!");
+            registration.setPublisher(publisher);
+            registration.setRegistrationCommentary("Publisher Registered");
+            registration.setRegistrationDate(Date.from(Instant.now()));
+            registration.setLastActivityDate(Date.from(Instant.now()));
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED);
+            synchronized (this.publisherMapLock) {
+                publisherMap.put(publisher.getIdentifier().getServiceInstanceName(), registration);
+            }
+            LOG.debug(".registerPublisherInstance(): Exit, registration->{}", registration);
+            return (registration);
         }
-        LOG.trace(".registerPublisherInstance(): Publisher is not in Map, so add it!");
-        registration.setPublisher(publisher);
-        registration.setRegistrationCommentary("Publisher Registered");
-        registration.setRegistrationDate(Date.from(Instant.now()));
-        registration.setLastActivityDate(Date.from(Instant.now()));
-        registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED);
-        synchronized (this.publisherMapLock){
-            publisherMap.put(publisher.getIdentifier().getServiceInstanceName(), registration);
-        }
-        LOG.debug(".registerPublisherInstance(): Exit, registration->{}", registration);
+        addPublisherServiceProviderInstance(publisher);
         return(registration);
+    }
+
+    public InterSubsystemPubSubPublisherRegistration unregisterPublisherInstance(String publisherInstanceName){
+        LOG.debug(".unregisterPublisherInstance(): Entry, publisherInstanceName->{}", publisherInstanceName);
+        InterSubsystemPubSubPublisherRegistration registration = null;
+        if(StringUtils.isEmpty(publisherInstanceName)){
+            registration = new InterSubsystemPubSubPublisherRegistration();
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setRegistrationDate(Date.from(Instant.now()));
+            registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
+            LOG.debug("unregisterPublisherInstance(): Exit, publisher is null, registration->{}", registration);
+        }
+        if(publisherMap.containsKey(publisherInstanceName)){
+            synchronized (this.publisherMapLock) {
+                registration = publisherMap.remove(publisherInstanceName);
+            }
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED);
+            registration.setLastActivityDate(Date.from(Instant.now()));
+            registration.setRegistrationCommentary("Publisher removed");
+            LOG.debug("unregisterPublisherInstance(): Exit, publisher removed, registration->{}", registration);
+            return(registration);
+        } else {
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setLastActivityDate(Date.from(Instant.now()));
+            registration.setRegistrationCommentary("Publisher not registered");
+            LOG.debug("unregisterPublisherInstance(): Exit, publisher not registered, registration->{}", registration);
+            return (registration);
+        }
     }
 
     /**
@@ -136,22 +171,9 @@ public class PublisherRegistrationMapDM {
             LOG.debug("unregisterPublisherInstance(): Exit, publisher name or instance name is null, registration->{}", registration);
         }
         LOG.trace(".unregisterPublisherInstance(): Now, check to see if publisher (instance) is in the cache and, if so, remove it!");
-        if(publisherMap.containsKey(publisher.getIdentifier().getServiceInstanceName())){
-            synchronized (this.publisherMapLock) {
-                registration = publisherMap.remove(publisher.getIdentifier().getServiceInstanceName());
-            }
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED);
-            registration.setLastActivityDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Publisher removed");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher removed, registration->{}", registration);
-            return(registration);
-        } else {
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
-            registration.setLastActivityDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Publisher not registered");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher not registered, registration->{}", registration);
-            return (registration);
-        }
+        registration = unregisterPublisherInstance(publisher.getIdentifier().getServiceInstanceName());
+        LOG.debug("unregisterPublisherInstance(): Exit, registration->{}", registration);
+        return (registration);
     }
 
     /**
@@ -185,18 +207,20 @@ public class PublisherRegistrationMapDM {
             return(registration);
         }
         LOG.trace(".getPublisherInstanceRegistration(): Now, check to see if publisher (instance) is in the cache and, if so, return detail!");
+        unregisterPublisherInstance(publisher);
         if(publisherMap.containsKey(publisher.getIdentifier().getServiceInstanceName())){
             registration = publisherMap.get(publisher.getIdentifier().getServiceInstanceName());
-            LOG.debug("getPublisherInstanceRegistration(): Exit, publisher found, registration->{}", registration);
+            LOG.trace("getPublisherInstanceRegistration(): Exit, publisher found, registration->{}", registration);
             return(registration);
         } else {
-            LOG.debug(".getPublisherInstanceRegistration(): Exit, registration->{}", registration);
+            LOG.trace(".getPublisherInstanceRegistration(): Exit, registration->{}", registration);
             registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
             registration.setLastActivityDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Publisher not registered");
-            LOG.debug("getPublisherInstanceRegistration(): Exit, publisher not registered, registration->{}", registration);
-            return (registration);
         }
+        LOG.debug("getPublisherInstanceRegistration(): Exit, registration->{}", registration);
+        return (registration);
+
     }
 
     public InterSubsystemPubSubPublisherRegistration getPublisherInstanceRegistration(String publisherInstanceName){
@@ -219,7 +243,7 @@ public class PublisherRegistrationMapDM {
     // Publisher Instance Traceability
     //
 
-    public void addPublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher){
+    private void addPublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher){
         LOG.debug(".addPublisherServiceProviderInstance(): Entry, publisher->{}", publisher);
         if(publisher == null){
             LOG.debug(".addPublisherServiceProviderInstance(): Exit, publisher is null");
@@ -250,7 +274,7 @@ public class PublisherRegistrationMapDM {
         LOG.debug(".addPublisherServiceProviderInstance(): Exit, publisher instance added");
     }
 
-    public void removePublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher){
+    private void removePublisherServiceProviderInstance(InterSubsystemPubSubParticipant publisher){
         LOG.info(".removePublisherServiceProviderInstance(): Entry, publisher->{}", publisher);
         if(publisher == null){
             LOG.info(".removePublisherServiceProviderInstance(): Exit, publisher is null");
@@ -395,7 +419,6 @@ public class PublisherRegistrationMapDM {
             } else {
                 registration = new InterSubsystemPubSubPublisherSubscriptionRegistration();
                 registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_SUCCESSFUL);
-                registration.setPublisher(publisher);
                 registration.setSubscriptionList(subscriptionList);
                 registration.setPublisherServiceName(publisherServiceName);
                 publisherSubscriptionMap.put(publisherServiceName, registration);
@@ -468,17 +491,19 @@ public class PublisherRegistrationMapDM {
     }
 
     public List<String> getAllPublishers(){
-        LOG.debug(".getAllPublishers(): Entry");
+        LOG.info(".getAllPublishers(): Entry");
         List<String> participantList = new ArrayList<>();
-        Enumeration<String> publisherServiceNames = this.publisherServiceFulfillmentMap.keys();
-        while(publisherServiceNames.hasMoreElements()){
-            String currentPublisherServiceName = publisherServiceNames.nextElement();
-            List<String> currentPublisherInstanceNames = this.publisherServiceFulfillmentMap.get(currentPublisherServiceName);
-            if(currentPublisherInstanceNames != null){
-                participantList.addAll(currentPublisherInstanceNames);
+        synchronized(publisherSubscriptionMapLock) {
+            Enumeration<String> publisherServiceNames = this.publisherServiceFulfillmentMap.keys();
+            while (publisherServiceNames.hasMoreElements()) {
+                String currentPublisherServiceName = publisherServiceNames.nextElement();
+                List<String> currentPublisherInstanceNames = this.publisherServiceFulfillmentMap.get(currentPublisherServiceName);
+                if (currentPublisherInstanceNames != null) {
+                    participantList.addAll(currentPublisherInstanceNames);
+                }
             }
         }
-        LOG.debug(".getAllPublishers(): Exit");
+        LOG.info(".getAllPublishers(): Exit, participantList->{}", participantList);
         return(participantList);
     }
 }
