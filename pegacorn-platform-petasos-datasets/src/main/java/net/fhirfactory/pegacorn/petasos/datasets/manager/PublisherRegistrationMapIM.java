@@ -55,12 +55,16 @@ public class PublisherRegistrationMapIM {
      * @param publisher
      * @return
      */
-    public InterSubsystemPubSubPublisherSubscriptionRegistration unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher) {
+    public void unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher) {
         LOG.info(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
-        InterSubsystemPubSubPublisherRegistration registration = registrationMapDM.unregisterPublisherInstance(publisher);
-        InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = registrationMapDM.checkAProviderIsAvailable(publisher.getIdentifier().getServiceName());
-        LOG.info(".unregisterPublisherInstance(): Exit, subscriptionRegistration->{}", subscriptionRegistration);
-        return (subscriptionRegistration);
+        registrationMapDM.unregisterPublisherInstance(publisher);
+        LOG.info(".unregisterPublisherInstance(): Exit");
+    }
+
+    public void unregisterPublisherInstance(String publisherInstanceName) {
+        LOG.info(".unregisterPublisherInstance(): Entry, publisher->{}", publisherInstanceName);
+        registrationMapDM.unregisterPublisherInstance(publisherInstanceName);
+        LOG.info(".unregisterPublisherInstance(): Exit");
     }
 
     /**
@@ -110,6 +114,13 @@ public class PublisherRegistrationMapIM {
     public InterSubsystemPubSubPublisherSubscriptionRegistration getPublisherServiceSubscription(InterSubsystemPubSubParticipant publisher) {
         LOG.debug(".getSubscriptionToPublisher(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherSubscriptionRegistration registration = registrationMapDM.getPublisherServiceSubscription(publisher);
+        LOG.debug(".getSubscriptionToPublisher(): Exit, registration->{}", registration);
+        return (registration);
+    }
+
+    public InterSubsystemPubSubPublisherSubscriptionRegistration getPublisherServiceSubscription(String publisherServiceName){
+        LOG.debug(".getSubscriptionToPublisher(): Entry, publisherServiceName->{}", publisherServiceName);
+        InterSubsystemPubSubPublisherSubscriptionRegistration registration = registrationMapDM.getPublisherServiceSubscription(publisherServiceName);
         LOG.debug(".getSubscriptionToPublisher(): Exit, registration->{}", registration);
         return (registration);
     }

@@ -32,14 +32,14 @@ import java.util.Objects;
 
 public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Serializable {
     private String publisherServiceName;
-    private InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum registrationStatus;
+    private InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum publisherServiceRegistrationStatus;
     private List<DataParcelManifest> subscriptionList;
     private String registrationCommentary;
     private Date registrationDate;
     private SerializableObject lock;
 
     public InterSubsystemPubSubPublisherSubscriptionRegistration(){
-        this.registrationStatus = null;
+        this.publisherServiceRegistrationStatus = null;
         this.registrationDate = null;
         this.registrationCommentary = null;
         this.subscriptionList  = new ArrayList<>();
@@ -105,12 +105,12 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
         this.publisherServiceName = publisherServiceName;
     }
 
-    public InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum getRegistrationStatus() {
-        return registrationStatus;
+    public InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum getPublisherServiceRegistrationStatus() {
+        return publisherServiceRegistrationStatus;
     }
 
-    public void setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum registrationStatus) {
-        this.registrationStatus = registrationStatus;
+    public void setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum publisherServiceRegistrationStatus) {
+        this.publisherServiceRegistrationStatus = publisherServiceRegistrationStatus;
     }
 
     public Date getRegistrationDate() {
@@ -145,7 +145,7 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
     public String toString() {
         return "DistributedPubSubPublisherSubscriptionRegistration{" +
                 "publisherService='" + publisherServiceName + '\'' +
-                ", registrationStatus=" + registrationStatus +
+                ", registrationStatus=" + publisherServiceRegistrationStatus +
                 ", subscriptionList=" + subscriptionList +
                 ", registrationCommentary='" + registrationCommentary + '\'' +
                 ", registrationDate=" + registrationDate +
@@ -158,11 +158,11 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
         if (this == o) return true;
         if (!(o instanceof InterSubsystemPubSubPublisherSubscriptionRegistration)) return false;
         InterSubsystemPubSubPublisherSubscriptionRegistration that = (InterSubsystemPubSubPublisherSubscriptionRegistration) o;
-        return Objects.equals(getPublisherServiceName(), that.getPublisherServiceName()) && getRegistrationStatus() == that.getRegistrationStatus() && Objects.equals(getSubscriptionList(), that.getSubscriptionList()) && Objects.equals(getRegistrationCommentary(), that.getRegistrationCommentary()) && Objects.equals(getRegistrationDate(), that.getRegistrationDate()) && Objects.equals(lock, that.lock);
+        return Objects.equals(getPublisherServiceName(), that.getPublisherServiceName()) && getPublisherServiceRegistrationStatus() == that.getPublisherServiceRegistrationStatus() && Objects.equals(getSubscriptionList(), that.getSubscriptionList()) && Objects.equals(getRegistrationCommentary(), that.getRegistrationCommentary()) && Objects.equals(getRegistrationDate(), that.getRegistrationDate()) && Objects.equals(lock, that.lock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisherServiceName(), getRegistrationStatus(), getSubscriptionList(), getRegistrationCommentary(), getRegistrationDate(), lock);
+        return Objects.hash(getPublisherServiceName(), getPublisherServiceRegistrationStatus(), getSubscriptionList(), getRegistrationCommentary(), getRegistrationDate(), lock);
     }
 }

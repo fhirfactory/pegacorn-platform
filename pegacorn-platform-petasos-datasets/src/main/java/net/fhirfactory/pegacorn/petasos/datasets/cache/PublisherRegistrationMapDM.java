@@ -74,21 +74,21 @@ public class PublisherRegistrationMapDM {
         InterSubsystemPubSubPublisherRegistration registration = new InterSubsystemPubSubPublisherRegistration();
         LOG.trace(".registerPublisherInstance(): First, we check the content of the passed-in parameter");
         if(publisher == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
             LOG.debug("registerPublisherInstance(): Exit, publisher is null, registration->{}", registration);
             return(registration);
         }
         if(publisher.getIdentifier() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (No Identifier)");
             LOG.debug("registerPublisherInstance(): Exit, publisher identifier is null, registration->{}", registration);
             return(registration);
         }
         if(publisher.getIdentifier().getServiceName() == null || publisher.getIdentifier().getServiceInstanceName() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher SubsystemName or SubsystemInstanceName (== null)");
             LOG.debug("registerPublisherInstance(): Exit, publisher name or instance name is null, registration->{}", registration);
@@ -115,31 +115,32 @@ public class PublisherRegistrationMapDM {
         return(registration);
     }
 
-    public InterSubsystemPubSubPublisherRegistration unregisterPublisherInstance(String publisherInstanceName){
+    public void unregisterPublisherInstance(String publisherInstanceName){
         LOG.debug(".unregisterPublisherInstance(): Entry, publisherInstanceName->{}", publisherInstanceName);
         InterSubsystemPubSubPublisherRegistration registration = null;
         if(StringUtils.isEmpty(publisherInstanceName)){
             registration = new InterSubsystemPubSubPublisherRegistration();
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
             LOG.debug("unregisterPublisherInstance(): Exit, publisher is null, registration->{}", registration);
         }
         if(publisherMap.containsKey(publisherInstanceName)){
+            InterSubsystemPubSubPublisherRegistration publisherRegistration = publisherMap.get(publisherInstanceName);
             synchronized (this.publisherMapLock) {
                 registration = publisherMap.remove(publisherInstanceName);
             }
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_REGISTERED);
-            registration.setLastActivityDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Publisher removed");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher removed, registration->{}", registration);
-            return(registration);
-        } else {
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
-            registration.setLastActivityDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Publisher not registered");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher not registered, registration->{}", registration);
-            return (registration);
+            String serviceName = publisherRegistration.getPublisher().getIdentifier().getServiceName();
+            List<String> publisherList = this.publisherServiceFulfillmentMap.get(serviceName);
+            if(publisherList != null){
+                if(publisherList.contains(publisherInstanceName)){
+                    publisherList.remove(publisherInstanceName);
+                }
+                if(publisherList.isEmpty()){
+                    this.publisherServiceFulfillmentMap.remove(serviceName);
+                }
+            }
+            checkAProviderIsAvailable(serviceName);
         }
     }
 
@@ -148,32 +149,21 @@ public class PublisherRegistrationMapDM {
      * @param publisher
      * @return
      */
-    public InterSubsystemPubSubPublisherRegistration unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher){
+    public void unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher){
         LOG.debug(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
         InterSubsystemPubSubPublisherRegistration registration = new InterSubsystemPubSubPublisherRegistration();
         LOG.trace(".unregisterPublisherInstance(): First, we check the content of the passed-in parameter");
         if(publisher == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher is null, registration->{}", registration);
+            return;
         }
         if(publisher.getIdentifier() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Detail (No Identifier)");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher identifier is null, registration->{}", registration);
+            return;
         }
-        if(publisher.getIdentifier().getServiceName() == null || publisher.getIdentifier().getServiceInstanceName() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher SubsystemName or SubsystemInstanceName (== null)");
-            LOG.debug("unregisterPublisherInstance(): Exit, publisher name or instance name is null, registration->{}", registration);
+        if(publisher.getIdentifier().getServiceInstanceName() == null){
+            return;
         }
-        LOG.trace(".unregisterPublisherInstance(): Now, check to see if publisher (instance) is in the cache and, if so, remove it!");
-        registration = unregisterPublisherInstance(publisher.getIdentifier().getServiceInstanceName());
-        LOG.debug("unregisterPublisherInstance(): Exit, registration->{}", registration);
-        return (registration);
+        String publisherInstanceName = publisher.getIdentifier().getServiceInstanceName();
+        unregisterPublisherInstance(publisherInstanceName);
     }
 
     /**
@@ -186,21 +176,21 @@ public class PublisherRegistrationMapDM {
         InterSubsystemPubSubPublisherRegistration registration = new InterSubsystemPubSubPublisherRegistration();
         LOG.trace(".getPublisherInstanceRegistration(): First, we check the content of the passed-in parameter");
         if(publisher == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher is null, registration->{}", registration);
             return(registration);
         }
         if(publisher.getIdentifier() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher Detail (No Identifier)");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher identifier is null, registration->{}", registration);
             return(registration);
         }
         if(publisher.getIdentifier().getServiceName() == null || publisher.getIdentifier().getServiceInstanceName() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setRegistrationDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Invalid Publisher SubsystemName or SubsystemInstanceName (== null)");
             LOG.debug("getPublisherInstanceRegistration(): Exit, publisher name or instance name is null, registration->{}", registration);
@@ -214,7 +204,7 @@ public class PublisherRegistrationMapDM {
             return(registration);
         } else {
             LOG.trace(".getPublisherInstanceRegistration(): Exit, registration->{}", registration);
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_REGISTERED);
+            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_UNREACHABLE);
             registration.setLastActivityDate(Date.from(Instant.now()));
             registration.setRegistrationCommentary("Publisher not registered");
         }
@@ -397,20 +387,20 @@ public class PublisherRegistrationMapDM {
     public InterSubsystemPubSubPublisherSubscriptionRegistration addSubscriptionToPublisher(List<DataParcelManifest> subscriptionList, InterSubsystemPubSubParticipant publisher){
         LOG.debug(".addSubscriptionToPublisher(): Entry, publisher->{}", publisher);
         LOG.trace(".addSubscriptionToPublisher(): First, we check the content of the passed-in parameter, tedious, but good defensive programming");
-        InterSubsystemPubSubPublisherSubscriptionRegistration registration = new InterSubsystemPubSubPublisherSubscriptionRegistration();
         if(publisher == null){
-            registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_FAILED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
-            LOG.debug(".addSubscriptionToPublisher(): Exit, publisher is null, registration->{}", registration);
+            LOG.debug(".addSubscriptionToPublisher(): Exit, publisher is null");
+            return(null);
+        }
+        if(publisher.getIdentifier() == null){
+            LOG.debug(".addSubscriptionToPublisher(): Exit, publisher.getIdentifier() is null");
+            return(null);
         }
         if(publisher.getIdentifier().getServiceName() == null ){
-            registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_FAILED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher publisherServiceName (== null)");
-            LOG.debug(".addSubscriptionToPublisher(): Exit, publisher Service Name, registration->{}", registration);
+            LOG.debug(".addSubscriptionToPublisher(): Exit, publisherServiceName is null");
+            return(null);
         }
         LOG.trace(".addSubscriptionToPublisher(): publisher parameter is good!");
+        InterSubsystemPubSubPublisherSubscriptionRegistration registration = new InterSubsystemPubSubPublisherSubscriptionRegistration();
         String publisherServiceName = publisher.getIdentifier().getServiceName();
         synchronized (this.publisherSubscriptionMapLock) {
             registration = publisherSubscriptionMap.get(publisherServiceName);
@@ -418,7 +408,7 @@ public class PublisherRegistrationMapDM {
                 registration.addSubscriptionList(subscriptionList);
             } else {
                 registration = new InterSubsystemPubSubPublisherSubscriptionRegistration();
-                registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_SUCCESSFUL);
+                registration.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_PENDING_NO_PROVIDERS);
                 registration.setSubscriptionList(subscriptionList);
                 registration.setPublisherServiceName(publisherServiceName);
                 publisherSubscriptionMap.put(publisherServiceName, registration);
@@ -433,29 +423,42 @@ public class PublisherRegistrationMapDM {
         LOG.trace(".getSubscriptionToPublisher(): First, we check the content of the passed-in parameter, tedious, but good defensive programming");
         InterSubsystemPubSubPublisherSubscriptionRegistration registration = new InterSubsystemPubSubPublisherSubscriptionRegistration();
         if(publisher == null){
-            registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_NOT_PRESENT);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
-            LOG.trace(".getSubscriptionToPublisher(): Exit, publisher is null, registration->{}", registration);
+            LOG.debug(".getSubscriptionToPublisher(): Exit, publisher is null");
+            return(null);
+        }
+        if(publisher.getIdentifier() == null){
+            LOG.debug(".getSubscriptionToPublisher(): Exit, publisher.getIdentifier() is null");
+            return(null);
         }
         if(publisher.getIdentifier().getServiceName() == null ){
-            registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_NOT_PRESENT);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Service Name (== null)");
-            LOG.trace(".getSubscriptionToPublisher(): Exit, publisherServiceName is null, registration->{}", registration);
+            LOG.debug(".getSubscriptionToPublisher(): Exit, publisherServiceName is null");
+            return(null);
         }
         registration = publisherSubscriptionMap.get(publisher.getIdentifier().getServiceName());
         if(registration != null){
             LOG.debug(".getSubscriptionToPublisher(): Exit, registration found, value->{}", registration);
-            return(registration);
+
         } else {
-            registration = new InterSubsystemPubSubPublisherSubscriptionRegistration();
-            registration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_NOT_PRESENT);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Registration not found!");
-            LOG.debug(".getSubscriptionToPublisher(): Exit, registration not found, registration->{}", registration);
-            return(registration);
+            LOG.debug(".getSubscriptionToPublisher(): Exit, registration no found");
         }
+        return(registration);
+    }
+
+    public InterSubsystemPubSubPublisherSubscriptionRegistration getPublisherServiceSubscription(String publisherServiceName){
+        LOG.debug(".getSubscriptionToPublisher(): Entry, publisherServiceName->{}", publisherServiceName);
+        if(StringUtils.isEmpty(publisherServiceName)){
+            LOG.debug(".getSubscriptionToPublisher(): Exit, publisherServiceName is null, returning -null-");
+            return(null);
+        }
+        InterSubsystemPubSubPublisherSubscriptionRegistration registration = publisherSubscriptionMap.get(publisherServiceName);
+        registration = publisherSubscriptionMap.get(publisherServiceName);
+        if(registration != null){
+            LOG.debug(".getSubscriptionToPublisher(): Exit, registration found, value->{}", registration);
+
+        } else {
+            LOG.debug(".getSubscriptionToPublisher(): Exit, registration no found");
+        }
+        return(registration);
     }
 
     public InterSubsystemPubSubPublisherSubscriptionRegistration checkAProviderIsAvailable(String publisherServiceName){
@@ -464,7 +467,7 @@ public class PublisherRegistrationMapDM {
         if(publisherServiceProviderInstances.isEmpty()){
             InterSubsystemPubSubPublisherSubscriptionRegistration subscriptionRegistration = publisherSubscriptionMap.get(publisherServiceName);
             if(subscriptionRegistration != null){
-                subscriptionRegistration.setRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_REGISTRATION_PENDING_NO_PROVIDERS);
+                subscriptionRegistration.setPublisherServiceRegistrationStatus(InterSubsystemPubSubPublisherSubscriptionRegistrationStatusEnum.PUBLISHER_SERVICE_REGISTRATION_PENDING_NO_PROVIDERS);
                 LOG.info(".checkAProviderIsAvailable(): Exit, provider available, subscriptionRegistration->{}", subscriptionRegistration);
                 return(subscriptionRegistration);
             }
