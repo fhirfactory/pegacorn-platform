@@ -285,9 +285,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 specifyWUPInstanceVersion(),
                 getWorkshop().getWorkshopNode(),
                 TopologyNodeTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
-        wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
-        wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
+        getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
+        wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
+        wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
         return(wupNode);
     }
 

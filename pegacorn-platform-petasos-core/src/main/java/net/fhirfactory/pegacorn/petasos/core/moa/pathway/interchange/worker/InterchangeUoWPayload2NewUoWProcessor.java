@@ -82,6 +82,7 @@ public class InterchangeUoWPayload2NewUoWProcessor {
         ArrayList<WorkUnitTransportPacket> newEgressTransportPacketSet = new ArrayList<WorkUnitTransportPacket>();
         for(UoWPayload currentPayload: egressPayloadList) {
             UoW newUoW = new UoW(currentPayload);
+            LOG.info(".extractUoWPayloadAndCreateNewUoWSet(): newUoW->{}", newUoW);
             WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(ingresPacket.getPacketID(), Date.from(Instant.now()), newUoW);
             newEgressTransportPacketSet.add(transportPacket);
         }

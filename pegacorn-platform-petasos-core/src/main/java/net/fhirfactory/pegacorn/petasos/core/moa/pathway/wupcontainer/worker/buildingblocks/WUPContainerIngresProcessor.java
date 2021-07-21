@@ -42,6 +42,7 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,10 +161,10 @@ public class WUPContainerIngresProcessor {
         TopologyNodeFunctionFDNToken localWUPTypeID = new TopologyNodeFunctionFDNToken(wupFunctionToken);
         ActivityID oldActivityID = transportPacket.getPacketID();
         ActivityID newActivityID = new ActivityID();
-        ResilienceParcelIdentifier previousPresentParcelInstanceID = oldActivityID.getPresentParcelIdentifier();
-        PetasosEpisodeIdentifier previousPresentEpisodeID = oldActivityID.getPresentEpisodeIdentifier();
-        WUPIdentifier previousPresentWUPInstanceID = oldActivityID.getPresentWUPIdentifier();
-        TopologyNodeFunctionFDNToken previousPresentWUPTypeID = oldActivityID.getPresentWUPFunctionToken();
+        ResilienceParcelIdentifier previousPresentParcelInstanceID = SerializationUtils.clone(oldActivityID.getPresentParcelIdentifier());
+        PetasosEpisodeIdentifier previousPresentEpisodeID =  SerializationUtils.clone(oldActivityID.getPresentEpisodeIdentifier());
+        WUPIdentifier previousPresentWUPInstanceID =  SerializationUtils.clone(oldActivityID.getPresentWUPIdentifier());
+        TopologyNodeFunctionFDNToken previousPresentWUPTypeID =  SerializationUtils.clone(oldActivityID.getPresentWUPFunctionToken());
         newActivityID.setPreviousParcelIdentifier(previousPresentParcelInstanceID);
         newActivityID.setPreviousEpisodeIdentifier(previousPresentEpisodeID);
         newActivityID.setPreviousWUPIdentifier(previousPresentWUPInstanceID);

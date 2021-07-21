@@ -96,6 +96,7 @@ public class InterchangeTargetWUPTypeRouter {
             return (new ArrayList<String>());
         }
         LOG.trace(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
+        LOG.info(".forwardUoW2WUPs(): Looking for Subscribers To->{}:", uowTopicID);
         List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
         LOG.trace(".forwardUoW2WUPs(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
         //
@@ -135,7 +136,7 @@ public class InterchangeTargetWUPTypeRouter {
                     LOG.trace(".forwardUoW2WUPs(): Iterating, currentSubscriber->{}", currentSubscriber);
                     boolean dontSendAgain = false;
                     if (hasRemoteServiceName(currentSubscriber)) {
-                        LOG.trace(".forwardUoW2WUPs(): has Inter-Subsystem element");
+                        LOG.info(".forwardUoW2WUPs(): has Inter-Subsystem element");
                         if (currentSubscriber.getInterSubsystemParticipant().getIdentifier().getServiceName().contentEquals(alreadySentTo)) {
                             dontSendAgain = true;
                         }
