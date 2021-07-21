@@ -64,7 +64,7 @@ public class WUPIngresConduit {
         // Because auditing is not running yet
         // Remove once Auditing is in place
         //
-        LOG.info("ProcessingMessage->{}", theUoW.getIngresContent().getPayload());
+        LOG.debug("ProcessingMessage->{}", theUoW.getIngresContent().getPayload());
         //
         //
         //

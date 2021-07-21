@@ -96,7 +96,7 @@ public class InterchangeTargetWUPTypeRouter {
             return (new ArrayList<String>());
         }
         LOG.trace(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
-        LOG.info(".forwardUoW2WUPs(): Looking for Subscribers To->{}:", uowTopicID);
+        LOG.trace(".forwardUoW2WUPs(): Looking for Subscribers To->{}:", uowTopicID);
         List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
         LOG.trace(".forwardUoW2WUPs(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
         //
@@ -136,7 +136,7 @@ public class InterchangeTargetWUPTypeRouter {
                     LOG.trace(".forwardUoW2WUPs(): Iterating, currentSubscriber->{}", currentSubscriber);
                     boolean dontSendAgain = false;
                     if (hasRemoteServiceName(currentSubscriber)) {
-                        LOG.info(".forwardUoW2WUPs(): has Inter-Subsystem element");
+                        LOG.trace(".forwardUoW2WUPs(): has Inter-Subsystem element");
                         if (currentSubscriber.getInterSubsystemParticipant().getIdentifier().getServiceName().contentEquals(alreadySentTo)) {
                             dontSendAgain = true;
                         }
@@ -173,7 +173,7 @@ public class InterchangeTargetWUPTypeRouter {
         if(parcelManifest == null){
             return(false);
         }
-        if(parcelManifest.getIntendedTargetSystem() == null){
+        if(StringUtils.isEmpty(parcelManifest.getIntendedTargetSystem())){
             return(false);
         }
         return(true);
@@ -192,6 +192,7 @@ public class InterchangeTargetWUPTypeRouter {
         WorkUnitTransportPacket clonedPacket = packet.deepClone();
         // Now check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
         if(hasRemoteServiceName(subscriber)){
+            LOG.trace(".forwardPacket(): Has Remote Service as Target");
             DataParcelManifest payloadTopicID = packet.getPayload().getPayloadTopicID();
             boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
             boolean hasWildcardTarget = false;
@@ -199,8 +200,10 @@ public class InterchangeTargetWUPTypeRouter {
                 hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
             }
             boolean hasRemoteElement = hasRemoteServiceName(subscriber);
+            LOG.trace(".forwardPacket(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
             if((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement){
                 clonedPacket.getPayload().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName());
+                LOG.trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName());
             }
         }
         template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);

@@ -314,7 +314,7 @@ public class DataParcelSubscriptionMapDM {
 			retrievedSubscriberList.addAll(containerBasedSubscriptionList);
 		}
 		if(retrievedSubscriberList.isEmpty()){
-			LOG.debug(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty aggregate list] (i.e. couldn't find any interested WUPs), returning an empty set");
+			LOG.trace(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty aggregate list] (i.e. couldn't find any interested WUPs), returning an empty set");
 			return (new ArrayList<>());
 		}
 		List<PubSubParticipant> derivedSubscriberList = new ArrayList<>();
@@ -512,9 +512,6 @@ public class DataParcelSubscriptionMapDM {
 		if(!testManifest.hasSourceSystem() && !subscribedManifest.hasSourceSystem()){
 			return(true);
 		}
-		if(!testManifest.hasContainerDescriptor() || !subscribedManifest.hasSourceSystem()){
-			return(false);
-		}
 		if (testManifest.hasSourceSystem() && subscribedManifest.hasSourceSystem()) {
 			boolean sourceIsSame = testManifest.getSourceSystem().contentEquals(subscribedManifest.getSourceSystem());
 			return (sourceIsSame);
@@ -536,9 +533,6 @@ public class DataParcelSubscriptionMapDM {
 		}
 		if(!testManifest.hasIntendedTargetSystem() && !subscribedManifest.hasIntendedTargetSystem()){
 			return(true);
-		}
-		if(!testManifest.hasIntendedTargetSystem() || !subscribedManifest.hasIntendedTargetSystem()){
-			return(false);
 		}
 		if (testManifest.hasIntendedTargetSystem() && subscribedManifest.hasIntendedTargetSystem()) {
 			boolean targetIsSame = testManifest.getIntendedTargetSystem().contentEquals(subscribedManifest.getIntendedTargetSystem());

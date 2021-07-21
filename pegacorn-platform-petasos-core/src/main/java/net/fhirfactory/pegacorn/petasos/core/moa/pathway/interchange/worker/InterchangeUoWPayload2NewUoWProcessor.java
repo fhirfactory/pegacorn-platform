@@ -66,7 +66,7 @@ public class InterchangeUoWPayload2NewUoWProcessor {
     public List<WorkUnitTransportPacket> extractUoWPayloadAndCreateNewUoWSet(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
         LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
         // Get my Petasos Context
-        LOG.info(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        LOG.trace(".extractUoWPayloadAndCreateNewUoWSet(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         UoW incomingUoW = ingresPacket.getPayload();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
@@ -82,7 +82,7 @@ public class InterchangeUoWPayload2NewUoWProcessor {
         ArrayList<WorkUnitTransportPacket> newEgressTransportPacketSet = new ArrayList<WorkUnitTransportPacket>();
         for(UoWPayload currentPayload: egressPayloadList) {
             UoW newUoW = new UoW(currentPayload);
-            LOG.info(".extractUoWPayloadAndCreateNewUoWSet(): newUoW->{}", newUoW);
+            LOG.trace(".extractUoWPayloadAndCreateNewUoWSet(): newUoW->{}", newUoW);
             WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(ingresPacket.getPacketID(), Date.from(Instant.now()), newUoW);
             newEgressTransportPacketSet.add(transportPacket);
         }

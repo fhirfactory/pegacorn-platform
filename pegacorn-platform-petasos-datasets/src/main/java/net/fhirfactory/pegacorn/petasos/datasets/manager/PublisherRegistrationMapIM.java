@@ -56,15 +56,15 @@ public class PublisherRegistrationMapIM {
      * @return
      */
     public void unregisterPublisherInstance(InterSubsystemPubSubParticipant publisher) {
-        LOG.info(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
+        LOG.debug(".unregisterPublisherInstance(): Entry, publisher->{}", publisher);
         registrationMapDM.unregisterPublisherInstance(publisher);
-        LOG.info(".unregisterPublisherInstance(): Exit");
+        LOG.debug(".unregisterPublisherInstance(): Exit");
     }
 
     public void unregisterPublisherInstance(String publisherInstanceName) {
-        LOG.info(".unregisterPublisherInstance(): Entry, publisher->{}", publisherInstanceName);
+        LOG.debug(".unregisterPublisherInstance(): Entry, publisher->{}", publisherInstanceName);
         registrationMapDM.unregisterPublisherInstance(publisherInstanceName);
-        LOG.info(".unregisterPublisherInstance(): Exit");
+        LOG.debug(".unregisterPublisherInstance(): Exit");
     }
 
     /**
