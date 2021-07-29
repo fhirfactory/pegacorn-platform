@@ -35,7 +35,8 @@ import net.fhirfactory.pegacorn.components.dataparcel.valuesets.PolicyEnforcemen
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscription;
-import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubNetworkConnectionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipantUtilisationStatusEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +125,7 @@ public class DataParcelSubscriptionMapDM {
 					subscriptionList.add(newSubscription);
 				}
 				if(subscriber.getInterSubsystemParticipant() != null) {
-					subscriber.getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
+					subscriber.getInterSubsystemParticipant().setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
 				}
 			} else {
 				LOG.trace(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
@@ -136,7 +137,7 @@ public class DataParcelSubscriptionMapDM {
 				this.distributionList.put(descriptorToRegister, subscriptionList);
 				LOG.trace(".addSubscriber(): Topic Subscription Map: Added PubSubSubscription List to the distribution map");
 				if(subscriber.getInterSubsystemParticipant() != null) {
-					subscriber.getInterSubsystemParticipant().setConnectionStatus(PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
+					subscriber.getInterSubsystemParticipant().setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
 				}
 			}
 		}
@@ -157,11 +158,11 @@ public class DataParcelSubscriptionMapDM {
 			boolean currentRegisteredParticipantHasRemoteSubscriber = currentRegisteredParticipant.getInterSubsystemParticipant() != null;
 			boolean testParticipantHasRemoteSubscriber = testParticipant.getInterSubsystemParticipant() != null;
 			if (currentRegisteredParticipantHasRemoteSubscriber && testParticipantHasRemoteSubscriber) {
-				boolean currentHasIdentifier = currentRegisteredParticipant.getInterSubsystemParticipant().getIdentifier() != null;
-				boolean testHasIdentifier = testParticipant.getInterSubsystemParticipant().getIdentifier() != null;
-				if (currentHasIdentifier && testHasIdentifier) {
-					String currentParticipantServiceName = currentRegisteredParticipant.getInterSubsystemParticipant().getIdentifier().getServiceName();
-					String testParticipantServiceName = testParticipant.getInterSubsystemParticipant().getIdentifier().getServiceName();
+				boolean currentHasServiceName = !(StringUtils.isEmpty(currentRegisteredParticipant.getInterSubsystemParticipant().getEndpointServiceName()));
+				boolean testHasServiceName = !(StringUtils.isEmpty(testParticipant.getInterSubsystemParticipant().getEndpointServiceName()));
+				if (currentHasServiceName && testHasServiceName) {
+					String currentParticipantServiceName = currentRegisteredParticipant.getInterSubsystemParticipant().getEndpointServiceName();
+					String testParticipantServiceName = testParticipant.getInterSubsystemParticipant().getEndpointServiceName();
 					if (currentParticipantServiceName != null && testParticipantServiceName != null) {
 						if (currentParticipantServiceName.contentEquals(testParticipantServiceName)) {
 							return (true);
@@ -267,6 +268,61 @@ public class DataParcelSubscriptionMapDM {
 		}
 	}
 
+	private List<PubSubSubscription> getPossibleSubscriptionMatches(DataParcelTypeDescriptor testDescriptor){
+    	List<DataParcelTypeDescriptor> possibleList = new ArrayList<>();
+    	List<PubSubSubscription> possibleSubscriptionList = new ArrayList<>();
+    	if(this.distributionList.isEmpty()){
+    		return(possibleSubscriptionList);
+		}
+		Enumeration<DataParcelTypeDescriptor> descriptorEnumeration = this.distributionList.keys();
+    	while(descriptorEnumeration.hasMoreElements()){
+    		DataParcelTypeDescriptor subscribedDescriptor = descriptorEnumeration.nextElement();
+			boolean parcelDefinerIsEqual = StringUtils.equals(testDescriptor.getDataParcelDefiner(),subscribedDescriptor.getDataParcelDefiner());
+			boolean parcelDefinedHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelDefiner(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelDefinerIsGoodEnoughMatch = parcelDefinerIsEqual || parcelDefinedHasWildcard;
+			boolean parcelCategoryIsEqual = StringUtils.equals(testDescriptor.getDataParcelCategory(),subscribedDescriptor.getDataParcelCategory());
+			boolean parcelCategoryHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelCategoryIsGoodEnoughMatch = parcelCategoryIsEqual || parcelCategoryHasWildcard;
+			boolean parcelSubcategoryIsEqual = StringUtils.equals(testDescriptor.getDataParcelSubCategory(),subscribedDescriptor.getDataParcelSubCategory());
+			boolean parcelSubcategoryHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelSubCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelSubcategoryIsGoodEnoughMatch = parcelSubcategoryIsEqual || parcelSubcategoryHasWildcard;
+			boolean parcelResourceIsEqual = StringUtils.equals(testDescriptor.getDataParcelResource(),subscribedDescriptor.getDataParcelResource());
+			boolean parcelResourceHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelResource(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelResourceIsGoodEnoughMatch = parcelResourceIsEqual || parcelResourceHasWildcard;
+			boolean parcelSegmentIsEqual = StringUtils.equals(testDescriptor.getDataParcelSegment(),subscribedDescriptor.getDataParcelSegment());
+			boolean parcelSegmentHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelSegment(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelSegmentIsGoodEnoughMatch = parcelSegmentIsEqual || parcelSegmentHasWildcard;
+			boolean parcelAttributeIsEqual = StringUtils.equals(testDescriptor.getDataParcelAttribute(),subscribedDescriptor.getDataParcelAttribute());
+			boolean parcelAttributeHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelAttribute(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelAttributeIsGoodEnoughMatch = parcelAttributeIsEqual || parcelAttributeHasWildcard;
+			boolean parcelDiscriminatorTypeIsEqual = StringUtils.equals(testDescriptor.getDataParcelDiscriminatorType(),subscribedDescriptor.getDataParcelDiscriminatorType());
+			boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelDiscriminatorType(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelDiscriminatorTypeIsGoodEnoughMatch = parcelDiscriminatorTypeIsEqual || parcelDiscriminatorTypeHasWildcard;
+			boolean parcelDiscriminatorValueIsEqual = StringUtils.equals(testDescriptor.getDataParcelDiscriminatorValue(),subscribedDescriptor.getDataParcelDiscriminatorValue());
+			boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifest.WILDCARD_CHARACTER);
+			boolean parcelDiscriminatorValueIsGoodEnoughMatch = parcelDiscriminatorValueIsEqual || parcelDiscriminatorValueHasWildcard;
+			if(		parcelDefinerIsGoodEnoughMatch
+					&& parcelCategoryIsGoodEnoughMatch
+					&& parcelSubcategoryIsGoodEnoughMatch
+					&& parcelResourceIsGoodEnoughMatch
+					&& parcelSegmentIsGoodEnoughMatch
+					&& parcelAttributeIsGoodEnoughMatch
+					&& parcelDiscriminatorTypeIsGoodEnoughMatch
+					&& parcelDiscriminatorValueIsGoodEnoughMatch){
+				possibleList.add(subscribedDescriptor);
+			}
+		}
+    	if(!possibleList.isEmpty()){ ;
+			for(DataParcelTypeDescriptor possibleDescriptor: possibleList){
+				List<PubSubSubscription> currentSubscriptionSet = this.distributionList.get(possibleDescriptor);
+				if(currentSubscriptionSet != null){
+					possibleSubscriptionList.addAll(currentSubscriptionSet);
+				}
+			}
+		}
+    	return(possibleSubscriptionList);
+	}
+
 	//
 	// More sophisticated SubscriberList derivation
 	//
@@ -274,81 +330,79 @@ public class DataParcelSubscriptionMapDM {
 	public List<PubSubParticipant> deriveSubscriberList(DataParcelManifest parcelManifest){
 		LOG.debug(".deriveSubscriberList(): Entry, parcelManifest->{}", parcelManifest);
 		printAllSubscriptionSets();
+		if(LOG.isInfoEnabled()){
+			if(parcelManifest.hasContentDescriptor()){
+				String messageToken = parcelManifest.getContentDescriptor().toFDN().getToken().toTag();
+				LOG.info(".deriveSubscriberList(): parcel.ContentDescriptor->{}", messageToken);
+			}
+		}
 		DataParcelTypeDescriptor parcelContentDescriptor = parcelManifest.getContentDescriptor();
 		DataParcelTypeDescriptor parcelContainerDescriptor = parcelManifest.getContainerDescriptor();
-		List<PubSubSubscription> contentBasedSubscriberList = null;
-		List<PubSubSubscription> containerBasedSubscriptionList = null;
+		List<PubSubSubscription> contentBasedSubscriberList = new ArrayList<>();
+		List<PubSubSubscription> containerBasedSubscriptionList = new ArrayList<>();
 		if(parcelContentDescriptor != null ){
-			LOG.trace(".getSubscriberList(): parcelContentDescriptor is not null");
-			contentBasedSubscriberList = this.distributionList.get(parcelContentDescriptor);
-			LOG.trace(".getSubscriberList(): contentBasedSubscriberList->{}", contentBasedSubscriberList);
+			LOG.trace(".deriveSubscriberList(): parcelContentDescriptor is not null");
+			contentBasedSubscriberList.addAll(getPossibleSubscriptionMatches(parcelContentDescriptor));
+			LOG.trace(".deriveSubscriberList(): contentBasedSubscriberList->{}", contentBasedSubscriberList);
 		}
 		if(parcelContainerDescriptor != null){
-			LOG.trace(".getSubscriberList(): parcelContainerDescriptor is not null");
-			containerBasedSubscriptionList = this.distributionList.get(parcelContainerDescriptor);
-			LOG.trace(".getSubscriberList(): containerBasedSubscriptionList->{}", containerBasedSubscriptionList);
+			LOG.trace(".deriveSubscriberList(): parcelContainerDescriptor is not null");
+			containerBasedSubscriptionList.addAll(getPossibleSubscriptionMatches(parcelContainerDescriptor));
+			LOG.trace(".deriveSubscriberList(): containerBasedSubscriptionList->{}", containerBasedSubscriptionList);
 		}
-		boolean contentListIsNull = contentBasedSubscriberList == null;
-		boolean containerListIsNull = containerBasedSubscriptionList == null;
-		boolean contentListIsEmpty = true;
-		if(!contentListIsNull) {
-			LOG.trace(".getSubscriberList(): contentListIsNull is -false-");
-			contentListIsEmpty = contentBasedSubscriberList.isEmpty();
-		}
-		boolean containerListEmpty = true;
-		if(!containerListIsNull) {
-			LOG.trace(".getSubscriberList(): containerListIsNull is -false-");
-			containerListEmpty = containerBasedSubscriptionList.isEmpty();
-		}
-		if((contentListIsNull && containerListIsNull) || (contentListIsEmpty && containerListEmpty)) {
-			LOG.trace(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty lists or nulls] (i.e. couldn't find any interested WUPs), returning an empty set");
+
+		boolean contentListIsEmpty = contentBasedSubscriberList.isEmpty();
+		boolean containerListEmpty = containerBasedSubscriptionList.isEmpty();
+
+		if(contentListIsEmpty && containerListEmpty) {
+			LOG.trace(".deriveSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty lists or nulls] (i.e. couldn't find any interested WUPs), returning an empty set");
 			return (new ArrayList<>());
 		}
 		List<PubSubSubscription> retrievedSubscriberList = new ArrayList<>();
-		if(!contentListIsNull && !contentListIsEmpty){
-			LOG.trace(".getSubscriberList(): contentBasedSubscriberList contains something");
+		if(!contentListIsEmpty){
+			LOG.trace(".deriveSubscriberList(): contentBasedSubscriberList contains something");
 			retrievedSubscriberList.addAll(contentBasedSubscriberList);
 		}
-		if(!containerListIsNull && !containerListEmpty){
-			LOG.trace(".getSubscriberList(): containerBasedSubscriptionList contains something");
+		if(!containerListEmpty){
+			LOG.trace(".deriveSubscriberList(): containerBasedSubscriptionList contains something");
 			retrievedSubscriberList.addAll(containerBasedSubscriptionList);
 		}
 		if(retrievedSubscriberList.isEmpty()){
-			LOG.trace(".getSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty aggregate list] (i.e. couldn't find any interested WUPs), returning an empty set");
+			LOG.trace(".deriveSubscriberList(): Couldn't find any associated PubSubSubscriber elements [empty aggregate list] (i.e. couldn't find any interested WUPs), returning an empty set");
 			return (new ArrayList<>());
 		}
 		List<PubSubParticipant> derivedSubscriberList = new ArrayList<>();
 		for(PubSubSubscription currentRegisteredSubscription: retrievedSubscriberList){
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match in subscription");
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match in subscription");
 			DataParcelManifest subscriberRequestedManifest = currentRegisteredSubscription.getParcelManifest();
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match in subscription, currentSubscriberRequestedManifest->{}, availableManifest->{}", currentRegisteredSubscription, parcelManifest);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match in subscription, currentSubscriberRequestedManifest->{}, availableManifest->{}", currentRegisteredSubscription, parcelManifest);
 //			LOG.trace(".getSubscriberList(): Checking subscriber->{}", currentRegisteredSubscription.getSubscriber());
 //			LOG.trace(".getSubscriberList(): Subscriber Manifest (container)->{}", subscriberRequestedManifest.getContainerDescriptor());
 //			LOG.trace(".getSubscriberList(): Publisher  Manifest (container)->{}", parcelManifest.getContainerDescriptor());
 //			LOG.trace(".getSubscriberList(): Subscriber Manifest (content)->{}", subscriberRequestedManifest.getContentDescriptor());
 //			LOG.trace(".getSubscriberList(): Publisher  Manifest (content)->{}", parcelManifest.getContentDescriptor());
 			boolean containerIsEqual = containerIsEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
 			boolean contentIsEqual = contentIsEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
 			boolean containerOnlyIsEqual = containerOnlyEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
 			boolean matchedNormalisation = normalisationMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
 			boolean matchedValidation = validationMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
 			boolean matchedManifestType = manifestTypeMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
 			boolean matchedSource = sourceSystemMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedSource->{}",matchedSource);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedSource->{}",matchedSource);
 			boolean matchedTarget = targetSystemMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
 			boolean matchedPEPStatus = enforcementPointApprovalStatusMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
 			boolean matchedDistributionStatus = isDistributableMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
 			boolean matchedDirection = parcelFlowDirectionMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
 			boolean goodEnoughMatch = containerIsEqual
 					&& contentIsEqual
 					&& matchedNormalisation
@@ -359,7 +413,7 @@ public class DataParcelSubscriptionMapDM {
 					&& matchedPEPStatus
 					&& matchedDirection
 					&& matchedDistributionStatus;
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
 			boolean containerBasedOKMatch = containerOnlyIsEqual
 					&& matchedNormalisation
 					&& matchedValidation
@@ -369,9 +423,12 @@ public class DataParcelSubscriptionMapDM {
 					&& matchedPEPStatus
 					&& matchedDirection
 					&& matchedDistributionStatus;
-			LOG.trace(".getSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
+			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 			if(goodEnoughMatch || containerBasedOKMatch){
-				LOG.trace(".getSubscriberList(): Adding entry!");
+				if(LOG.isInfoEnabled()) {
+					String subscriber = currentRegisteredSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier().toVersionBasedFDNToken().toTag();
+					LOG.info(".deriveSubscriberList(): subscriber->{}", subscriber);
+				}
 				derivedSubscriberList.add(currentRegisteredSubscription.getSubscriber());
 			}
 		}
@@ -403,6 +460,7 @@ public class DataParcelSubscriptionMapDM {
 			return(false);
 		}
 		LOG.trace(".containerIsEqual(): publisherManifest and subscribedManifest both have containerDescriptors, now testing for equality");
+
 		boolean containersAreEqual = publisherManifest.getContainerDescriptor().equals(subscribedManifest.getContainerDescriptor());
 		LOG.debug(".containerIsEqual(): Exit, publisherManifest and subscribedManifest containerDescriptor comparison yielded->{}", containersAreEqual);
 		return(containersAreEqual);
@@ -427,13 +485,60 @@ public class DataParcelSubscriptionMapDM {
 			LOG.debug(".contentIsEqual(): Exit, subscribedManifest has not contentDescriptor, returning -false-");
 			return(false);
 		}
-		if (testManifest.getContentDescriptor().equals(subscribedManifest.getContentDescriptor())) {
-			LOG.debug(".contentIsEqual(): Exit, descriptors are equal, returning -true-");
-			return (true);
-		} else {
-			LOG.debug(".contentIsEqual(): Exit, descriptors are not equal, returning -false-");
+
+		DataParcelTypeDescriptor testDescriptor = testManifest.getContentDescriptor();
+		DataParcelTypeDescriptor subscribedDescriptor = subscribedManifest.getContentDescriptor();
+
+		boolean parcelDefinerIsEqual = StringUtils.equals(testDescriptor.getDataParcelDefiner(),subscribedDescriptor.getDataParcelDefiner());
+		boolean parcelDefinedHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelDefiner(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelDefinerIsGoodEnoughMatch = parcelDefinerIsEqual || parcelDefinedHasWildcard;
+		if (!parcelDefinerIsGoodEnoughMatch) {
 			return (false);
 		}
+		boolean parcelCategoryIsEqual = StringUtils.equals(testDescriptor.getDataParcelCategory(),subscribedDescriptor.getDataParcelCategory());
+		boolean parcelCategoryHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelCategoryIsGoodEnoughMatch = parcelCategoryIsEqual || parcelCategoryHasWildcard;
+		if(!parcelCategoryIsGoodEnoughMatch){
+			return(false);
+		}
+		boolean parcelSubcategoryIsEqual = StringUtils.equals(testDescriptor.getDataParcelSubCategory(),subscribedDescriptor.getDataParcelSubCategory());
+		boolean parcelSubcategoryHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelSubCategory(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelSubcategoryIsGoodEnoughMatch = parcelSubcategoryIsEqual || parcelSubcategoryHasWildcard;
+		if(!parcelSubcategoryIsGoodEnoughMatch){
+			return(false);
+		}
+		boolean parcelResourceIsEqual = StringUtils.equals(testDescriptor.getDataParcelResource(),subscribedDescriptor.getDataParcelResource());
+		boolean parcelResourceHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelResource(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelResourceIsGoodEnoughMatch = parcelResourceIsEqual || parcelResourceHasWildcard;
+		if (!parcelResourceIsGoodEnoughMatch) {
+			return(false);
+		}
+		boolean parcelSegmentIsEqual = StringUtils.equals(testDescriptor.getDataParcelSegment(),subscribedDescriptor.getDataParcelSegment());
+		boolean parcelSegmentHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelSegment(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelSegmentIsGoodEnoughMatch = parcelSegmentIsEqual || parcelSegmentHasWildcard;
+		if (!parcelSegmentIsGoodEnoughMatch) {
+			return(false);
+		}
+		boolean parcelAttributeIsEqual = StringUtils.equals(testDescriptor.getDataParcelAttribute(),subscribedDescriptor.getDataParcelAttribute());
+		boolean parcelAttributeHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelAttribute(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelAttributeIsGoodEnoughMatch = parcelAttributeIsEqual || parcelAttributeHasWildcard;
+		if(!parcelAttributeIsGoodEnoughMatch){
+			return(false);
+		}
+		boolean parcelDiscriminatorTypeIsEqual = StringUtils.equals(testDescriptor.getDataParcelDiscriminatorType(),subscribedDescriptor.getDataParcelDiscriminatorType());
+		boolean parcelDiscriminatorTypeHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelDiscriminatorType(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelDiscriminatorTypeIsGoodEnoughMatch = parcelDiscriminatorTypeIsEqual || parcelDiscriminatorTypeHasWildcard;
+		if(!parcelDiscriminatorTypeIsGoodEnoughMatch){
+			return(false);
+		}
+		boolean parcelDiscriminatorValueIsEqual = StringUtils.equals(testDescriptor.getDataParcelDiscriminatorValue(),subscribedDescriptor.getDataParcelDiscriminatorValue());
+		boolean parcelDiscriminatorValueHasWildcard = StringUtils.equals(subscribedDescriptor.getDataParcelDiscriminatorValue(),DataParcelManifest.WILDCARD_CHARACTER);
+		boolean parcelDiscriminatorValueIsGoodEnoughMatch = parcelDiscriminatorValueIsEqual || parcelDiscriminatorValueHasWildcard;
+		if(!parcelDiscriminatorValueIsGoodEnoughMatch){
+			return(false);
+		}
+		LOG.debug(".contentIsEqual(): Exit, -true-");
+		return (true);
 	}
 
 	private boolean containerOnlyEqual(DataParcelManifest publisherManifest, DataParcelManifest subscribedManifest){

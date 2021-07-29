@@ -26,13 +26,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Deprecated
 public class InterSubsystemPubSubParticipantIdentifier implements Serializable {
     private String serviceName;
-    private String serviceInstanceName;
+    private String petasosEndpointName;
 
 
     public InterSubsystemPubSubParticipantIdentifier(){
-        this.serviceInstanceName = null;
+        this.petasosEndpointName = null;
         this.serviceName = null;
     }
 
@@ -44,19 +45,19 @@ public class InterSubsystemPubSubParticipantIdentifier implements Serializable {
         this.serviceName = serviceName;
     }
 
-    public String getServiceInstanceName() {
-        return serviceInstanceName;
+    public String getPetasosEndpointName() {
+        return petasosEndpointName;
     }
 
-    public void setServiceInstanceName(String serviceInstanceName) {
-        this.serviceInstanceName = serviceInstanceName;
+    public void setPetasosEndpointName(String petasosEndpointName) {
+        this.petasosEndpointName = petasosEndpointName;
     }
 
 
 
     @JsonIgnore
     public String getJoinedName(){
-        String joinedName = serviceName + "-" + serviceInstanceName;
+        String joinedName = serviceName + "-" + petasosEndpointName;
         return(joinedName);
     }
 
@@ -64,7 +65,7 @@ public class InterSubsystemPubSubParticipantIdentifier implements Serializable {
     public String toString() {
         return "PubSubMemberIdentifier{" +
                 "subsystemName='" + serviceName + '\'' +
-                ", subsystemInstanceName='" + serviceInstanceName + '\'' +
+                ", subsystemInstanceName='" + petasosEndpointName + '\'' +
                 '}';
     }
 
@@ -74,12 +75,12 @@ public class InterSubsystemPubSubParticipantIdentifier implements Serializable {
         if (!(o instanceof InterSubsystemPubSubParticipantIdentifier)) return false;
         InterSubsystemPubSubParticipantIdentifier that = (InterSubsystemPubSubParticipantIdentifier) o;
         boolean serviceNameIsEqual = Objects.equals(getServiceName(), that.getServiceName());
-        boolean serviceInstanceNameIsEqual = Objects.equals(getServiceInstanceName(), that.getServiceInstanceName());
-        return (serviceNameIsEqual && serviceInstanceNameIsEqual);
+        boolean petasosEndpointNameEqual = Objects.equals(getPetasosEndpointName(), that.getPetasosEndpointName());
+        return (serviceNameIsEqual && petasosEndpointNameEqual);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getServiceName(), getServiceInstanceName());
+        return Objects.hash(getServiceName(), getPetasosEndpointName());
     }
 }

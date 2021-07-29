@@ -21,93 +21,82 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.common.valuesets.NetworkSecurityZoneEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpoint;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
 
-public class InterSubsystemPubSubParticipant implements Serializable {
-    private InterSubsystemPubSubParticipantIdentifier identifier;
-    private NetworkSecurityZoneEnum securityZone;
-    private String site;
-    private PubSubNetworkConnectionStatusEnum connectionStatus;
-    private Date connectionEstablishmentDate;
+public class InterSubsystemPubSubParticipant extends PetasosEndpoint implements Serializable {
+    private PubSubParticipantUtilisationStatusEnum connectionStatus;
+    private Date utilisationUpdateDate;
 
     public InterSubsystemPubSubParticipant(){
-        this.identifier = null;
-        this.connectionStatus = PubSubNetworkConnectionStatusEnum.PUB_SUB_NETWORK_CONNECTION_NOT_ESTABLISHED;
-        this.connectionEstablishmentDate = null;
-        connectionEstablishmentDate = null;
+        super();
+        this.connectionStatus = PubSubParticipantUtilisationStatusEnum.PUB_SUB_PARTICIPANT_NO_SUBSCRIBERS;
+        this.utilisationUpdateDate = null;
+    }
+
+    public InterSubsystemPubSubParticipant(PetasosEndpoint ori){
+        super(ori);
+        this.connectionStatus = PubSubParticipantUtilisationStatusEnum.PUB_SUB_PARTICIPANT_NO_SUBSCRIBERS;
+        this.utilisationUpdateDate = Date.from(Instant.now());
     }
 
     public InterSubsystemPubSubParticipant(InterSubsystemPubSubParticipant ori){
-        this.setIdentifier(ori.getIdentifier());
-        this.setConnectionStatus(ori.getConnectionStatus());
-        this.setConnectionEstablishmentDate(ori.getConnectionEstablishmentDate());
+        this.setEndpointDescription(ori.getEndpointDescription());
+        this.setEndpointID(ori.getEndpointID());
+        this.setInterfaceFunction(ori.getInterfaceFunction());
+        this.setEndpointServiceName(ori.getEndpointServiceName());
+        this.setRepresentativeFHIREndpoint(ori.getRepresentativeFHIREndpoint());
+        this.setEndpointStatus(ori.getEndpointStatus());
+        this.setUtilisationStatus(ori.getConnectionStatus());
+        this.setUtilisationUpdateDate(ori.getUtilisationUpdateDate());
     }
 
-    public PubSubNetworkConnectionStatusEnum getConnectionStatus() {
+    public PubSubParticipantUtilisationStatusEnum getConnectionStatus() {
         return connectionStatus;
     }
 
-    public void setConnectionStatus(PubSubNetworkConnectionStatusEnum connectionStatus) {
+    public void setUtilisationStatus(PubSubParticipantUtilisationStatusEnum connectionStatus) {
         this.connectionStatus = connectionStatus;
     }
 
-    public Date getConnectionEstablishmentDate() {
-        return connectionEstablishmentDate;
+    public Date getUtilisationUpdateDate() {
+        return utilisationUpdateDate;
     }
 
-    public void setConnectionEstablishmentDate(Date connectionEstablishmentDate) {
-        this.connectionEstablishmentDate = connectionEstablishmentDate;
+    public void setUtilisationUpdateDate(Date utilisationUpdateDate) {
+        this.utilisationUpdateDate = utilisationUpdateDate;
     }
 
-    public InterSubsystemPubSubParticipantIdentifier getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(InterSubsystemPubSubParticipantIdentifier identifier) {
-        this.identifier = identifier;
-    }
-
-    public NetworkSecurityZoneEnum getSecurityZone() {
-        return securityZone;
-    }
-
-    public void setSecurityZone(NetworkSecurityZoneEnum securityZone) {
-        this.securityZone = securityZone;
-    }
-
-    public String getSite() {
-        return site;
-    }
-
-    public void setSite(String site) {
-        this.site = site;
+    @Override
+    public String toString() {
+        return "InterSubsystemPubSubParticipant{" +
+                "endpointScope=" + getEndpointScope() +
+                ", interfaceFunction=" + getInterfaceFunction() +
+                ", endpointServiceName='" + getEndpointServiceName() + '\'' +
+                ", representativeFHIREndpoint=" + getRepresentativeFHIREndpoint() +
+                ", endpointStatus=" + getEndpointStatus() +
+                ", endpointDescription='" + getEndpointDescription() + '\'' +
+                ", endpointID=" + getEndpointID() +
+                ", connectionStatus=" + connectionStatus +
+                ", utilisationUpdateDate=" + utilisationUpdateDate +
+                '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof InterSubsystemPubSubParticipant)) return false;
+        if (!super.equals(o)) return false;
         InterSubsystemPubSubParticipant that = (InterSubsystemPubSubParticipant) o;
-        return Objects.equals(getIdentifier(), that.getIdentifier()) && getSecurityZone() == that.getSecurityZone() && Objects.equals(getSite(), that.getSite()) && getConnectionStatus() == that.getConnectionStatus() && Objects.equals(getConnectionEstablishmentDate(), that.getConnectionEstablishmentDate());
+        return getConnectionStatus() == that.getConnectionStatus() && Objects.equals(getUtilisationUpdateDate(), that.getUtilisationUpdateDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIdentifier(), getSecurityZone(), getSite(), getConnectionStatus(), getConnectionEstablishmentDate());
-    }
-
-    @Override
-    public String toString() {
-        return "DistributedPubSubParticipant{" +
-                "identifier=" + identifier +
-                ", securityZone=" + securityZone +
-                ", site='" + site + '\'' +
-                ", connectionStatus=" + connectionStatus +
-                ", connectionEstablishmentDate=" + connectionEstablishmentDate +
-                '}';
+        return Objects.hash(super.hashCode(), getConnectionStatus(), getUtilisationUpdateDate());
     }
 }

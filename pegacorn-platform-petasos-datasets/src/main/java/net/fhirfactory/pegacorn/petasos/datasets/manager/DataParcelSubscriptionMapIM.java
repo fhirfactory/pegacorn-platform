@@ -37,9 +37,9 @@ import java.util.List;
  TopicCacheDM.
  */
 @ApplicationScoped
-public class DataParcelSubscriptionIM {
+public class DataParcelSubscriptionMapIM {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataParcelSubscriptionIM.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataParcelSubscriptionMapIM.class);
 
     @Inject
     DataParcelSubscriptionMapDM subscriptionCache;

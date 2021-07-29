@@ -32,7 +32,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.Pat
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceParcelServicesIM;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
@@ -71,7 +71,7 @@ public class PetasosMOAServicesBroker {
     PathwayInterchangeManager wupInterchangeManager;
 
     @Inject
-    DataParcelSubscriptionIM topicManager;
+    DataParcelSubscriptionMapIM topicManager;
 
     @Inject
     MOAServicesAuditBroker auditWriter;

@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.STAResilienceParcelServicesIM;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -54,7 +54,7 @@ public class PetasosSTAServicesBroker {
     STAServiceModuleActivityMatrixDM activityMatrixDM;
 
     @Inject
-    DataParcelSubscriptionIM topicManager;
+    DataParcelSubscriptionMapIM topicManager;
 
     public TransactionStatusElement registerSTAWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW){
         if((jobCard == null) || (initialUoW == null)){

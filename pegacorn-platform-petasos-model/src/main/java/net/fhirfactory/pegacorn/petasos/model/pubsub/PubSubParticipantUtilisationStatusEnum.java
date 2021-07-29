@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-public enum PubSubNetworkConnectionStatusEnum {
+public enum PubSubParticipantUtilisationStatusEnum {
     PUB_SUB_NETWORK_CONNECTION_ESTABLISHED,
-    PUB_SUB_NETWORK_CONNECTION_NOT_ESTABLISHED,
+    PUB_SUB_PARTICIPANT_NO_SUBSCRIBERS,
     PUB_SUB_NETWORK_CONNECTION_FAILED
 }

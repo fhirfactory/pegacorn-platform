@@ -23,6 +23,6 @@ package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
 public enum InterSubsystemPubSubPublisherStatusEnum {
     PUBLISHER_REGISTERED,
-    PUBLISHER_UNREACHABLE,
-    PUBLISHER_ACTIVE
+    PUBLISHER_NOT_UTILISED,
+    PUBLISHER_UTILISED
 }

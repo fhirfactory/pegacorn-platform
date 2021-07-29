@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.datasets.cache.PublisherRegistrationMapDM;
+import net.fhirfactory.pegacorn.petasos.datasets.cache.DistributedPubSubSubscriptionMapDM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherRegistration;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
@@ -34,11 +34,11 @@ import javax.inject.Inject;
 import java.util.List;
 
 @ApplicationScoped
-public class PublisherRegistrationMapIM {
-    private static final Logger LOG = LoggerFactory.getLogger(PublisherRegistrationMapIM.class);
+public class DistributedPubSubSubscriptionMapIM {
+    private static final Logger LOG = LoggerFactory.getLogger(DistributedPubSubSubscriptionMapIM.class);
 
     @Inject
-    private PublisherRegistrationMapDM registrationMapDM;
+    private DistributedPubSubSubscriptionMapDM registrationMapDM;
 
     /**
      * @param publisher
@@ -104,9 +104,9 @@ public class PublisherRegistrationMapIM {
         return (publisherRegistrationList);
     }
 
-    public InterSubsystemPubSubPublisherSubscriptionRegistration addSubscriptionToPublisher(List<DataParcelManifest> subscriptionList, InterSubsystemPubSubParticipant publisher) {
-        LOG.debug(".addSubscriptionToPublisher(): Entry, publisher->{}", publisher);
-        InterSubsystemPubSubPublisherSubscriptionRegistration registration = registrationMapDM.addSubscriptionToPublisher(subscriptionList, publisher);
+    public InterSubsystemPubSubPublisherSubscriptionRegistration addSubscriptionToPublisher(List<DataParcelManifest> subscriptionList, String publisherServiceName) {
+        LOG.debug(".addSubscriptionToPublisher(): Entry, publisherServiceName->{}", publisherServiceName);
+        InterSubsystemPubSubPublisherSubscriptionRegistration registration = registrationMapDM.addSubscriptionToPublisher(subscriptionList, publisherServiceName);
         LOG.debug(".addSubscriptionToPublisher(): Exit, registration->{}", registration);
         return (registration);
     }

@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionIM;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
@@ -56,7 +56,7 @@ public class InterchangeTargetWUPTypeRouter {
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeTargetWUPTypeRouter.class);
 
     @Inject
-    DataParcelSubscriptionIM topicServer;
+    DataParcelSubscriptionMapIM topicServer;
 
     @Inject
     TopologyIM topologyProxy;
@@ -103,11 +103,13 @@ public class InterchangeTargetWUPTypeRouter {
         // Because auditing is not running yet
         // Remove once Auditing is in place
         //
-        int subscriberSetSize = 0;
-        if(subscriberSet != null) {
-            subscriberSetSize = subscriberSet.size();
+        if(LOG.isTraceEnabled()) {
+            int subscriberSetSize = 0;
+            if (subscriberSet != null) {
+                subscriberSetSize = subscriberSet.size();
+            }
+            LOG.trace("Number of Subscribers->{}", subscriberSetSize);
         }
-        LOG.info("Number of Subscribers->{}", subscriberSetSize);
         //
         //
         //
@@ -116,7 +118,7 @@ public class InterchangeTargetWUPTypeRouter {
             LOG.trace(".forwardUoW2WUPs(): It's not empty, so let's see if the appropriate downstream system is registered");
             for(PubSubParticipant currentSubscriber: subscriberSet){
                 if(hasRemoteServiceName(currentSubscriber)) {
-                    String subscriberName = currentSubscriber.getInterSubsystemParticipant().getIdentifier().getServiceName();
+                    String subscriberName = currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName();
                     if (subscriberName.contentEquals(uowTopicID.getIntendedTargetSystem())) {
                         forwardPacket(currentSubscriber, ingresPacket);
                         alreadySentTo = subscriberName;
@@ -137,7 +139,7 @@ public class InterchangeTargetWUPTypeRouter {
                     boolean dontSendAgain = false;
                     if (hasRemoteServiceName(currentSubscriber)) {
                         LOG.trace(".forwardUoW2WUPs(): has Inter-Subsystem element");
-                        if (currentSubscriber.getInterSubsystemParticipant().getIdentifier().getServiceName().contentEquals(alreadySentTo)) {
+                        if (currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName().contentEquals(alreadySentTo)) {
                             dontSendAgain = true;
                         }
                     }
@@ -160,10 +162,10 @@ public class InterchangeTargetWUPTypeRouter {
         if(subscriber.getInterSubsystemParticipant() == null){
             return(false);
         }
-        if(subscriber.getInterSubsystemParticipant().getIdentifier() == null){
+        if(subscriber.getInterSubsystemParticipant().getEndpointID() == null){
             return(false);
         }
-        if(subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName() == null){
+        if(subscriber.getInterSubsystemParticipant().getEndpointServiceName() == null){
             return(false);
         }
         return(true);
@@ -202,8 +204,8 @@ public class InterchangeTargetWUPTypeRouter {
             boolean hasRemoteElement = hasRemoteServiceName(subscriber);
             LOG.trace(".forwardPacket(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
             if((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement){
-                clonedPacket.getPayload().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName());
-                LOG.trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getIdentifier().getServiceName());
+                clonedPacket.getPayload().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getEndpointServiceName());
+                LOG.trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getEndpointServiceName());
             }
         }
         template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
