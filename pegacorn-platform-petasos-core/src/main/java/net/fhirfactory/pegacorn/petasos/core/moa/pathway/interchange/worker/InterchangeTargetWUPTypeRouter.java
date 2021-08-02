@@ -103,12 +103,12 @@ public class InterchangeTargetWUPTypeRouter {
         // Because auditing is not running yet
         // Remove once Auditing is in place
         //
-        if(LOG.isTraceEnabled()) {
+        if(LOG.isWarnEnabled()) {
             int subscriberSetSize = 0;
             if (subscriberSet != null) {
                 subscriberSetSize = subscriberSet.size();
             }
-            LOG.trace("Number of Subscribers->{}", subscriberSetSize);
+            LOG.warn("Number of Subscribers->{}", subscriberSetSize);
         }
         //
         //

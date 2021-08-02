@@ -89,7 +89,7 @@ public class DataParcelSubscriptionMapDM {
      * @param subscriber The NodeElement of the WUP that is interested in the payload type.
      */
     public void addSubscriber(DataParcelManifest parcelManifest, PubSubParticipant subscriber) {
-    	LOG.debug(".addSubscriber(): Entry, parcelManifest->{}, subscriber->{}", parcelManifest, subscriber);
+    	LOG.warn(".addSubscriber(): Entry, parcelManifest->{}, subscriber->{}", parcelManifest, subscriber);
     	if((parcelManifest==null) || (subscriber==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): parcelManifest or subscriberInstanceID is null"));
     	}
@@ -110,7 +110,7 @@ public class DataParcelSubscriptionMapDM {
 		List<PubSubSubscription> subscriptionList = this.distributionList.get(descriptorToRegister);
     	synchronized (this.distributionListUpdateLock) {
 			if (subscriptionList != null) {
-				LOG.trace(".addSubscriber(): Topic Subscription Map: Adding subscriber to existing map for parcelManifest --> {}", parcelManifest);
+				LOG.warn(".addSubscriber(): Topic Subscription Map: Adding subscriber to existing map for parcelManifest --> {}", parcelManifest);
 				PubSubSubscription existingSubscription = null;
 				for(PubSubSubscription currentSubscription: subscriptionList){
 					if(currentSubscription.getSubscriber().getIntraSubsystemParticipant().equals(subscriber.getIntraSubsystemParticipant())){
@@ -128,25 +128,25 @@ public class DataParcelSubscriptionMapDM {
 					subscriber.getInterSubsystemParticipant().setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
 				}
 			} else {
-				LOG.trace(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
+				LOG.warn(".addSubscriber(): Topic Subscription Map: Created new Distribution List and Added Subscriber");
 				PubSubSubscription newSubscription = new PubSubSubscription(parcelManifest, subscriber);
-				LOG.trace(".addSubscriber(): Topic Subscription Map: Created new PubSubSubscription, adding to a newly created List");
+				LOG.warn(".addSubscriber(): Topic Subscription Map: Created new PubSubSubscription, adding to a newly created List");
 				subscriptionList = new ArrayList<PubSubSubscription>();
 				subscriptionList.add(newSubscription);
-				LOG.trace(".addSubscriber(): Topic Subscription Map: PubSubSubscription List created, adding it to the distribution map");
+				LOG.warn(".addSubscriber(): Topic Subscription Map: PubSubSubscription List created, adding it to the distribution map");
 				this.distributionList.put(descriptorToRegister, subscriptionList);
-				LOG.trace(".addSubscriber(): Topic Subscription Map: Added PubSubSubscription List to the distribution map");
+				LOG.warn(".addSubscriber(): Topic Subscription Map: Added PubSubSubscription List to the distribution map");
 				if(subscriber.getInterSubsystemParticipant() != null) {
 					subscriber.getInterSubsystemParticipant().setUtilisationStatus(PubSubParticipantUtilisationStatusEnum.PUB_SUB_NETWORK_CONNECTION_ESTABLISHED);
 				}
 			}
 		}
-		if (LOG.isDebugEnabled()) {
-			LOG.debug(".addSubscriber(): Exit, here is the Subscription list for the Topic:");
+		if (LOG.isWarnEnabled()) {
+			LOG.warn(".addSubscriber(): Exit, here is the Subscription list for the Topic:");
 			int count = 0;
 			for(PubSubSubscription currentSubscription : subscriptionList){
 				PubSubParticipant currentSubscriber = currentSubscription.getSubscriber();
-				LOG.debug(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber);
+				LOG.warn(".addSubscriber(): Subscriber[{}]->{}", count, currentSubscriber);
 				count++;
 			}
 		}
@@ -373,36 +373,36 @@ public class DataParcelSubscriptionMapDM {
 		}
 		List<PubSubParticipant> derivedSubscriberList = new ArrayList<>();
 		for(PubSubSubscription currentRegisteredSubscription: retrievedSubscriberList){
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match in subscription");
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match in subscription");
 			DataParcelManifest subscriberRequestedManifest = currentRegisteredSubscription.getParcelManifest();
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match in subscription, currentSubscriberRequestedManifest->{}, availableManifest->{}", currentRegisteredSubscription, parcelManifest);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match in subscription, currentSubscriberRequestedManifest->{}, availableManifest->{}", currentRegisteredSubscription, parcelManifest);
 //			LOG.trace(".getSubscriberList(): Checking subscriber->{}", currentRegisteredSubscription.getSubscriber());
 //			LOG.trace(".getSubscriberList(): Subscriber Manifest (container)->{}", subscriberRequestedManifest.getContainerDescriptor());
 //			LOG.trace(".getSubscriberList(): Publisher  Manifest (container)->{}", parcelManifest.getContainerDescriptor());
 //			LOG.trace(".getSubscriberList(): Subscriber Manifest (content)->{}", subscriberRequestedManifest.getContentDescriptor());
 //			LOG.trace(".getSubscriberList(): Publisher  Manifest (content)->{}", parcelManifest.getContentDescriptor());
 			boolean containerIsEqual = containerIsEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: containerIsEqual->{}",containerIsEqual);
 			boolean contentIsEqual = contentIsEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: contentIsEqual->{}",contentIsEqual);
 			boolean containerOnlyIsEqual = containerOnlyEqual(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: containerOnlyIsEqual->{}",containerOnlyIsEqual);
 			boolean matchedNormalisation = normalisationMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedNormalisation->{}",matchedNormalisation);
 			boolean matchedValidation = validationMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedValidation->{}",matchedValidation);
 			boolean matchedManifestType = manifestTypeMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedManifestType->{}",matchedManifestType);
 			boolean matchedSource = sourceSystemMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedSource->{}",matchedSource);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedSource->{}",matchedSource);
 			boolean matchedTarget = targetSystemMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedTarget->{}",matchedTarget);
 			boolean matchedPEPStatus = enforcementPointApprovalStatusMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedPEPStatus->{}",matchedPEPStatus);
 			boolean matchedDistributionStatus = isDistributableMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedDistributionStatus->{}",matchedDistributionStatus);
 			boolean matchedDirection = parcelFlowDirectionMatches(parcelManifest, subscriberRequestedManifest);
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: matchedDirection->{}",matchedDirection);
 			boolean goodEnoughMatch = containerIsEqual
 					&& contentIsEqual
 					&& matchedNormalisation
@@ -413,7 +413,7 @@ public class DataParcelSubscriptionMapDM {
 					&& matchedPEPStatus
 					&& matchedDirection
 					&& matchedDistributionStatus;
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: goodEnoughMatch->{}",goodEnoughMatch);
 			boolean containerBasedOKMatch = containerOnlyIsEqual
 					&& matchedNormalisation
 					&& matchedValidation
@@ -423,11 +423,11 @@ public class DataParcelSubscriptionMapDM {
 					&& matchedPEPStatus
 					&& matchedDirection
 					&& matchedDistributionStatus;
-			LOG.trace(".deriveSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
+			LOG.warn(".deriveSubscriberList(): Checking for equivalence/match: containerBasedOKMatch->{}",containerBasedOKMatch);
 			if(goodEnoughMatch || containerBasedOKMatch){
-				if(LOG.isInfoEnabled()) {
+				if(LOG.isWarnEnabled()) {
 					String subscriber = currentRegisteredSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier().toVersionBasedFDNToken().toTag();
-					LOG.info(".deriveSubscriberList(): subscriber->{}", subscriber);
+					LOG.warn(".deriveSubscriberList(): subscriber->{}", subscriber);
 				}
 				derivedSubscriberList.add(currentRegisteredSubscription.getSubscriber());
 			}

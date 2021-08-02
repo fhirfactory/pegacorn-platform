@@ -68,7 +68,7 @@ public class DataParcelSubscriptionMapIM {
      */
     @Transactional
     public void addTopicSubscriber(DataParcelManifest contentTopicID, PubSubParticipant subscriber) {
-        LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, subscriber --> {}", contentTopicID, subscriber);
+        LOG.warn(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, subscriber --> {}", contentTopicID, subscriber);
         if(contentTopicID == null || subscriber == null){
             LOG.debug(".addSubscriberToUoWContentTopic(): Exit, Either contentTopicID or subscriber is null!");
             return;
