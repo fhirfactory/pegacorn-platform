@@ -74,25 +74,16 @@ public class DistributedPubSubSubscriptionMapDM {
         InterSubsystemPubSubPublisherRegistration registration = new InterSubsystemPubSubPublisherRegistration();
         LOG.info(".registerPublisherInstance(): First, we check the content of the passed-in parameter");
         if(publisher == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_UTILISED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Detail (NULL)");
-            LOG.info("registerPublisherInstance(): Exit, publisher is null, registration->{}", registration);
-            return(registration);
+            LOG.info("registerPublisherInstance(): Exit, publisher is null, returning -null-");
+            return(null);
         }
         if(publisher.getEndpointID() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_UTILISED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher Detail (No Identifier)");
-            LOG.info("registerPublisherInstance(): Exit, publisher identifier is null, registration->{}", registration);
-            return(registration);
+            LOG.info("registerPublisherInstance(): Exit, publisher identifier is null, return -null");
+            return(null);
         }
         if(publisher.getEndpointServiceName() == null || publisher.getEndpointID().getEndpointName() == null){
-            registration.setPublisherStatus(InterSubsystemPubSubPublisherStatusEnum.PUBLISHER_NOT_UTILISED);
-            registration.setRegistrationDate(Date.from(Instant.now()));
-            registration.setRegistrationCommentary("Invalid Publisher SubsystemName or SubsystemInstanceName (== null)");
-            LOG.info("registerPublisherInstance(): Exit, publisher name or instance name is null, registration->{}", registration);
-            return(registration);
+            LOG.info("registerPublisherInstance(): Exit, publisher name or instance name is null, returning -null-");
+            return(null);
         }
         LOG.warn(".registerPublisherInstance(): Now, check to see if publisher (instance) is already cached and, if so, do nothing!");
         if(publisherMap.containsKey(publisher.getEndpointID().getEndpointName())){
