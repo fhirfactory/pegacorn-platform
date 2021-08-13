@@ -68,7 +68,7 @@ public class ResourceKey {
                 String keyAsString = mapper.writeValueAsString(getIdentifierTypeKey());
                 return(keyAsString);
             } catch (JsonProcessingException e) {
-                LOG.error("Ignoring exception " + e.getMessage() + " and returning Empty Identifier", e);
+                LOG.warn("Ignoring exception " + e.getMessage() + " and returning Empty Identifier", e);
                 return("Empty Identifier");
             }
         } else {

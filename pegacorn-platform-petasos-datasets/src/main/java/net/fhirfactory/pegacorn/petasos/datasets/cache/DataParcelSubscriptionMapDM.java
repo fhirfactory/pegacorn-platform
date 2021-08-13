@@ -339,7 +339,7 @@ public class DataParcelSubscriptionMapDM {
 		if(LOG.isInfoEnabled()){
 			if(parcelManifest.hasContentDescriptor()){
 				String messageToken = parcelManifest.getContentDescriptor().toFDN().getToken().toTag();
-				LOG.info(".deriveSubscriberList(): parcel.ContentDescriptor->{}", messageToken);
+				LOG.trace(".deriveSubscriberList(): parcel.ContentDescriptor->{}", messageToken);
 			}
 		}
 		DataParcelTypeDescriptor parcelContentDescriptor = parcelManifest.getContentDescriptor();
@@ -433,7 +433,7 @@ public class DataParcelSubscriptionMapDM {
 			if(goodEnoughMatch || containerBasedOKMatch){
 				if(LOG.isWarnEnabled()) {
 					String subscriber = currentRegisteredSubscription.getSubscriber().getIntraSubsystemParticipant().getIdentifier().toVersionBasedFDNToken().toTag();
-					LOG.info(".deriveSubscriberList(): subscriber->{}", subscriber);
+					LOG.trace(".deriveSubscriberList(): subscriber->{}", subscriber);
 				}
 				derivedSubscriberList.add(currentRegisteredSubscription.getSubscriber());
 			}

@@ -84,7 +84,7 @@ public class WUPContainerEgressGatekeeper {
         LOG.trace(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
         ArrayList<String> targetList = new ArrayList<String>();
         if(!transportPacket.hasCurrentJobCard()) {
-            LOG.error(".egressGatekeeper(): CurrentJobCard is null!");
+            LOG.warn(".egressGatekeeper(): CurrentJobCard is null!");
         }
         if (transportPacket.getCurrentJobCard().getIsToBeDiscarded()) {
             LOG.trace(".egressGatekeeper(): The isToBeDiscarded attribute is true, so we return null (and discard the packet");
