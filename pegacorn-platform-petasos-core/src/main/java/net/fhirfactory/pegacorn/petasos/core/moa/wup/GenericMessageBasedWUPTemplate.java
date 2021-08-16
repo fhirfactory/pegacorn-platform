@@ -128,6 +128,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         this.topicSubscriptionSet = specifySubscriptionTopics();
         getLogger().trace(".initialise(): Now call the WUP Framework constructure - which builds the Petasos framework around this WUP");
         buildWUPFramework(this.getContext());
+
+        registerCapabilities();
+
         getLogger().debug(".initialise(): Exit");
     }
     
@@ -137,6 +140,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     protected abstract WUPArchetypeEnum specifyWUPArchetype();
     protected abstract String specifyWUPInstanceName();
     protected abstract String specifyWUPInstanceVersion();
+
+    protected void registerCapabilities(){
+        // do nothing
+    }
 
     protected abstract WorkshopInterface specifyWorkshop();
     protected abstract MessageBasedWUPEndpoint specifyIngresEndpoint();
