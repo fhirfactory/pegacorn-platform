@@ -10,3 +10,11 @@ pegacorn-platform-petasos-audit/.factorypath
 pegacorn-platform-petasos/profiles.xml
 
 pegacorn-platform-petasos-caches/.factorypath
+
+.DS_Store
+
+pegacorn-platform-petasos-core/.factorypath
+
+pegacorn-platform-petasos-datasets/.factorypath
+
+pegacorn-platform-petasos-model/.factorypath
