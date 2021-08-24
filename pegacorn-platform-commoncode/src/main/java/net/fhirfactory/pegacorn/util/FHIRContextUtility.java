@@ -23,6 +23,8 @@ package net.fhirfactory.pegacorn.util;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
@@ -34,10 +36,10 @@ public class FHIRContextUtility {
     public FHIRContextUtility() {
         fhirContext = FhirContext.forR4();
     }
-    
+
     /**
      * NOTE: the result is thread safe.
-     * 
+     *
      * @see {FhirContext}
      */
     public FhirContext getFhirContext() {
@@ -46,11 +48,13 @@ public class FHIRContextUtility {
 
     /**
      * NOTE: the result is NOT thread safe.
-     * 
+     *
      * @see {IParser.newJsonParser()}
      */
     @Produces
     public IParser getJsonParser() {
         return getFhirContext().newJsonParser();
     }
+
+
 }
