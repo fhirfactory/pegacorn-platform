@@ -34,6 +34,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDef
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
@@ -43,6 +44,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementName
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -94,6 +96,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     @Inject
     private CamelContext camelContext;
+
+    @Inject
+    private FHIRContextUtility fhirContextUtility;
 
     public GenericMessageBasedWUPTemplate() {
         super();
@@ -235,6 +240,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return camelContext;
     }
 
+    protected FHIRContextUtility getFHIRContextUtility(){
+        return(this.fhirContextUtility);
+    }
+
     //
     // Routing Support Functions
     //
@@ -341,4 +350,5 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().debug(".getTopologyEndpoint(): Exit, Could not find node!");
         return(null);
     }
+
 }

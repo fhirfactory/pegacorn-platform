@@ -159,13 +159,6 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-buildingblocks-auditservices</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency>
 
         <!-- Infinispan -->
         <dependency>

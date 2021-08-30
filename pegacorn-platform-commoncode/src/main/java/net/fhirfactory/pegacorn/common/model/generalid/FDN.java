@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,8 @@ public class FDN implements Serializable {
     private String unqualifiedToken;
 
     private static final String RDN_TO_STRING_ENTRY_SEPERATOR = ".";
-    private static final String FDN_TO_STRING_PREFIX = "{FDN:";
-    private static final String FDN_TO_STRING_SUFFIX = "}";
+    private static final String FDN_TO_STRING_PREFIX = "FDN(";
+    private static final String FDN_TO_STRING_SUFFIX = ")";
 
     private static final String FDN_TOKEN_ID = "FDNToken";
 
@@ -85,8 +86,10 @@ public class FDN implements Serializable {
         if (otherRDNSet.size() != originalFDN.getRDNCount()) {
             throw (new IllegalArgumentException("Malformed FDN passed to copy Constructor"));
         }
-        for (int counter = 0; counter < this.getRDNCount(); counter++) {
-            this.rdnSet.add(counter, otherRDNSet.get(counter));
+        for (int counter = 0; counter < originalFDN.getRDNCount(); counter++) {
+            RDN currentRDN = otherRDNSet.get(counter);
+            RDN clonedRDN = SerializationUtils.clone(currentRDN);
+            this.rdnSet.add(counter, clonedRDN);
         }
         // We need to pre-build the toString() and getToken() content so we don't re-do it 
         // every time we do some comparison etc.
@@ -102,42 +105,59 @@ public class FDN implements Serializable {
      * @param token An FDNToken from which the FDN may be instantiated.
      */
     public FDN(FDNToken token) {
-        LOG.trace(".FDN( FDNToken token ): Constructor invoked, token --> {}", token);
+        LOG.debug(".FDN( FDNToken token ): Constructor invoked, token --> {}", token);
         if (token == null) {
             throw (new IllegalArgumentException("Empty parameter passed to Constructor"));
         }
         String tokenContent = token.getContent();
-        // The FDNToken is really just a JSONObject.toString() - so we should be able to re-create it from 
-        // that String
-        JSONObject tokenAsJSON;
-        try {
-            tokenAsJSON = new JSONObject(tokenContent);
-        } catch (Exception jsonTokenEx) {
-            throw (new IllegalArgumentException("Badly formed FDNToken passed to Constructor -->" + jsonTokenEx.getMessage()));
+        LOG.trace(".FDN( FDNToken token ): tokenContent --> {}", tokenContent);
+        String[] rdnStringEntries = tokenContent.split("><");
+        if(rdnStringEntries.length <= 0){
+            throw (new IllegalArgumentException("Badly formed FDNToken passed to Constructor, cannot parse -> " + token.getContent()));
         }
         LOG.trace(".FDN(FDNToken token): We have a valid JSONObject for the FDNToken!, now extract content & process");
-        try {
-            JSONObject tokenAsRDNSet = tokenAsJSON.getJSONObject(FDN_TOKEN_ID);
-            int setSize = tokenAsRDNSet.length();
-            LOG.trace(".FDN(FDNToken token): The number of RDN entries in the Token is --> {}", setSize);
-            this.rdnSet = new ArrayList<RDN>();
-            // We are going to take the content from the FDNToken, convert it to a JSONObject, and then
-            // iterate through the elements (the JSONObject will have values <counter, string> in it.
-            // We then take the string from the JSONObject, which is, in fact, an RDNToken and then
-            // instantiate an RDN(RDNToken). The resulting RDN is then added to the rdnSet map.
-            for (int counter = 0; counter < setSize; counter++) {
-                LOG.trace(".FDN( FDNToken token ): Iterating through the extracted Token JSONObject, attempting to extract RDN[{}]", counter);
-                String currentRDNTokenContent = tokenAsRDNSet.getString(Integer.toString(counter));
-                LOG.trace(".FDN( FDNToken token ): Iterating through the extracted Token JSONObject, extracted RDN Token Content --> {}", currentRDNTokenContent);
-                RDNToken currentRDNToken = new RDNToken(currentRDNTokenContent);
-                RDN currentRDN = new RDN(currentRDNToken);
-                LOG.trace(".FDN( FDNToken token ): Iterating through the extracted RDNs, current RDN --> {}", currentRDN);
-                this.rdnSet.add(counter, currentRDN);
+        this.rdnSet = new ArrayList<RDN>();
+        for (int counter = 0; counter < rdnStringEntries.length; counter++) {
+            LOG.trace(".FDN( FDNToken token ): Iterating through the extracted Token, attempting to extract RDN[{}]", counter);
+            String currentCounterEntry = null;
+            for(int loopCounter = 0; counter < rdnStringEntries.length; loopCounter += 1){
+                if(rdnStringEntries[loopCounter].startsWith("<"+counter+":")){
+                    currentCounterEntry = rdnStringEntries[loopCounter];
+                    break;
+                }
+                if(currentCounterEntry == null){
+                    if(rdnStringEntries[loopCounter].startsWith(counter+":")){
+                        currentCounterEntry = rdnStringEntries[loopCounter];
+                        break;
+                    }
+                }
             }
-        } catch (Exception jsonEx) {
-            throw (new IllegalArgumentException(jsonEx.getMessage()));
-
+            LOG.trace(".FDN( FDNToken token ): processing ->{}", currentCounterEntry);
+            // Extract the RDN Type/Qualifier
+            String rdnQualifierWorking = null;
+            if(currentCounterEntry.startsWith("<"+counter+":")){
+                rdnQualifierWorking = currentCounterEntry.replace("<"+counter+":", "");
+            } else if(currentCounterEntry.startsWith(counter+":")) {
+                rdnQualifierWorking = currentCounterEntry.replace(counter + ":", "");
+            }
+            int rdnQualifierEnd = rdnQualifierWorking.indexOf(">");
+            String rdnQualifier = rdnQualifierWorking.substring(0,rdnQualifierEnd);
+            // Extract the RDN Value
+            String rdnValueWorking = null;
+            if(currentCounterEntry.startsWith("<")) {
+                rdnValueWorking = currentCounterEntry.substring(1, currentCounterEntry.length() - 1);
+            } else {
+                rdnValueWorking = currentCounterEntry;
+            }
+            int startPoint = rdnValueWorking.indexOf(">");
+            int endPoint = rdnValueWorking.indexOf("<");
+            String rdnValue = rdnValueWorking.substring(startPoint+1, endPoint);
+            LOG.trace(".FDN( FDNToken token ): creating RDN, rdnQualifier->{}, rdnValue->{}", rdnQualifier, rdnValue);
+            RDN currentRDN = new RDN(rdnQualifier, rdnValue);
+            LOG.trace(".FDN( FDNToken token ): Iterating through the extracted RDNs, current RDN --> {}", currentRDN);
+            this.rdnSet.add(counter, currentRDN);
         }
+
         // We need to pre-build the toString() and getToken() content so we don't re-do it 
         // every time we do some comparison etc.
         generateToString();
@@ -182,7 +202,8 @@ public class FDN implements Serializable {
     private void generateToString() {
         LOG.trace(".generateToString(): Entry");
         String toString = FDN_TO_STRING_PREFIX;
-        toString = toString + rdnSet.toString();
+        generateToken();
+        toString = toString + getToken();
         toString = toString + FDN_TO_STRING_SUFFIX;
         this.fdnToString = toString;
         LOG.trace(".generateToString(): Exit");
@@ -252,16 +273,30 @@ public class FDN implements Serializable {
 
     private void generateToken() {
         LOG.trace(".generateToken(): Entry");
-        JSONObject newToken = new JSONObject();
+        StringBuilder tokenBuilder = new StringBuilder();
         for (int counter = 0; counter < this.getRDNCount(); counter++) {
             RDN currentRDN = this.rdnSet.get(counter);
-            newToken.put(Integer.toString(counter), currentRDN.getToken().getContent());
+            String currentEntry = pseudoXMLAttribute(counter, currentRDN.getQualifier(), currentRDN.getValue());
+            tokenBuilder.append(currentEntry);
         }
-        JSONObject newID = new JSONObject();
-        newID.put(FDN_TOKEN_ID, newToken);
-        String tokenString = newID.toString();
-        this.token = new FDNToken(tokenString);
+        this.token = new FDNToken(tokenBuilder.toString());
         LOG.trace(".generateToken(): Exit");
+    }
+
+    private String pseudoXMLAttribute(int order, String attributeName, String attributeValue){
+        StringBuilder xmlAttributeBuilder = new StringBuilder();
+        xmlAttributeBuilder.append("<");
+        xmlAttributeBuilder.append(order);
+        xmlAttributeBuilder.append(":");
+        xmlAttributeBuilder.append(attributeName);
+        xmlAttributeBuilder.append(">");
+        xmlAttributeBuilder.append(attributeValue);
+        xmlAttributeBuilder.append("</");
+        xmlAttributeBuilder.append(order);
+        xmlAttributeBuilder.append(":");
+        xmlAttributeBuilder.append(attributeName);
+        xmlAttributeBuilder.append(">");
+        return(xmlAttributeBuilder.toString());
     }
 
     private void generateUnqualifiedToken() {

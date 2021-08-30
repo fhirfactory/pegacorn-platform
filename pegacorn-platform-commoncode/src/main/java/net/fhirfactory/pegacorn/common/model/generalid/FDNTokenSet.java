@@ -22,11 +22,12 @@
 
 package net.fhirfactory.pegacorn.common.model.generalid;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class FDNTokenSet {
+public class FDNTokenSet implements Serializable {
 	private LinkedHashSet<FDNToken> elements;
 	private String fdnSetAsString;
 	private Object updateLock;

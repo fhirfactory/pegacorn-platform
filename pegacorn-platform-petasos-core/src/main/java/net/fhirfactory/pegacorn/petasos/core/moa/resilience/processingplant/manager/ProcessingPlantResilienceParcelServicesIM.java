@@ -54,10 +54,13 @@ public class ProcessingPlantResilienceParcelServicesIM {
 
     @Inject
     MOAServicesAuditBroker auditServicesBroker;
-    
 
-    @Transactional
-    public ResilienceParcel registerParcel(ActivityID activityID, UoW unitOfWork, boolean synchronousWriteToAudit) {
+    public ResilienceParcel registerParcel(ActivityID activityID, UoW unitOfWork, boolean synchronousWriteToAudit){
+        ResilienceParcel registeredParcel = registerParcel(activityID, unitOfWork, null, null, synchronousWriteToAudit);
+        return(registeredParcel);
+    }
+
+    public ResilienceParcel registerParcel(ActivityID activityID, UoW unitOfWork, String portType, String portValue, boolean synchronousWriteToAudit){
         LOG.debug(".registerParcel(): Entry"); 
         if ((unitOfWork == null) || (activityID == null)) {
             throw (new IllegalArgumentException("unitOfWork, wupTypeID or wupInstanceID are null in method invocation"));
@@ -97,6 +100,11 @@ public class ProcessingPlantResilienceParcelServicesIM {
         } else {
             LOG.trace(".registerParcel(): Attempted to retrieve existing ResilienceParcel, and there wasn't one, so let's create it!");
             parcelInstance = new ResilienceParcel(activityID, unitOfWork);
+            if(portType != null){
+                parcelInstance.setAnInteractWUP(true);
+                parcelInstance.setAssociatedPortType(portType);
+                parcelInstance.setAssociatedPortValue(portValue);
+            }
             parcelCacheDM.addParcel(parcelInstance);
             LOG.trace(".registerParcel(): Set the PresentParcelInstanceID in the ActivityID (ActivityID), ParcelInstanceID --> {}", parcelInstance.getIdentifier());
             activityID.setPresentParcelIdentifier(parcelInstance.getIdentifier());

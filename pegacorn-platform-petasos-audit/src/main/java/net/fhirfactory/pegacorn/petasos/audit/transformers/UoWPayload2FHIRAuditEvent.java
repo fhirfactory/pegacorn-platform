@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
@@ -39,8 +38,8 @@ import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRA
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
-import org.apache.commons.lang3.RegExUtils;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
@@ -48,11 +47,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @ApplicationScoped
-public class DefaultResilienceParcel2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultResilienceParcel2FHIRAuditEvent.class);
+public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
+    private static final Logger LOG = LoggerFactory.getLogger(UoWPayload2FHIRAuditEvent.class);
 
     ObjectMapper jsonMapper = null;
 
@@ -65,44 +66,52 @@ public class DefaultResilienceParcel2FHIRAuditEvent extends Pegacorn2FHIRAuditEv
     @Inject
     private ProcessingPlantInterface processingPlant;
 
-    public DefaultResilienceParcel2FHIRAuditEvent(){
+    public UoWPayload2FHIRAuditEvent(){
         jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 //        jsonMapper = new ObjectMapper();
     }
 
 
-    public AuditEvent transform(ResilienceParcel parcel){
+    public AuditEvent transform(ResilienceParcel parcel, UoW uow){
         if(parcel == null){
             return(null);
         }
 
-        UoW uow = parcel.getActualUoW();
         String auditEventEntityName = extractAuditEventEntityNameFromParcel(parcel);
 
-        String parcelAsString = null;
-
-        try {
-            parcelAsString = jsonMapper.writeValueAsString(parcel);
-        } catch (JsonProcessingException e) {
-            LOG.error(".transform(): Cannot convert UoW to string!!!",e);
-            return(null);
+        List<AuditEvent.AuditEventEntityDetailComponent> detailList = new ArrayList<>();
+        AuditEvent.AuditEventEntityDetailComponent ingresDetailComponent = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Ingress.Payload", uow.getIngresContent().getPayload());
+        detailList.add(ingresDetailComponent);
+        if(uow.hasEgressContent()) {
+            int counter = 0;
+            for (UoWPayload currentPayload : uow.getEgressContent().getPayloadElements()) {
+                AuditEvent.AuditEventEntityDetailComponent currentEgressDetail = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Egress.Payload[" + counter + "]", currentPayload.getPayload());
+                detailList.add(currentEgressDetail);
+                counter += 1;
+            }
         }
 
         AuditEvent.AuditEventEntityComponent auditEventEntityComponent = auditEventEntityFactory.newAuditEventEntity(
-                AuditEventEntityTypeEnum.HL7_SYSTEM_OBJECT,
+                AuditEventEntityTypeEnum.PEGACORN_MLLP_MSG,
                 AuditEventEntityRoleEnum.HL7_JOB,
                 AuditEventEntityLifecycleEnum.HL7_TRANSMIT,
-                parcel.getClass().getSimpleName(),
-                parcel.getClass().getSimpleName() + "(" + auditEventEntityName + " @ " + extractNiceNodeName(parcel) + ")",
-                parcel.getClass().getName(),
-                parcelAsString);
+                auditEventEntityName,
+                "Ingres and Egress content fromm UoW (Unit of Work) Processors",
+                detailList);
 
-
+        String portValue = parcel.getAssociatedPortValue();
+        String portType = parcel.getAssociatedPortType();
+        String sourceSite;
+        if(portValue != null && portType != null) {
+            sourceSite = processingPlant.getIPCServiceName() + ":" + portValue;
+        } else {
+            sourceSite = processingPlant.getIPCServiceName();
+        }
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
                 processingPlant.getSimpleInstanceName(),
                 processingPlant.getHostName(),
-                parcel.getAssociatedWUPIdentifier().getTokenValue(),
+                sourceSite,
                 null,
                 AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
                 extractAuditEventType(parcel),
@@ -113,6 +122,17 @@ public class DefaultResilienceParcel2FHIRAuditEvent extends Pegacorn2FHIRAuditEv
                 extractProcessingPeriod(parcel),
                 auditEventEntityComponent);
 
+        return(auditEvent);
+    }
+
+
+
+    //
+    //  To Do
+    //
+
+    public AuditEvent transform(PetasosParcelAuditTrailEntry parcel){
+        AuditEvent auditEvent = new AuditEvent();
         return(auditEvent);
     }
 }

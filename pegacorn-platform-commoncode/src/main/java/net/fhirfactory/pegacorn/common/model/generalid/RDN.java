@@ -27,11 +27,13 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Mark A. Hunter
  */
-public class RDN {
+public class RDN implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(RDN.class);
 
 	private String qualifier;
@@ -85,19 +87,14 @@ public class RDN {
 		if (token == null) {
 			throw (new IllegalArgumentException("null RDNToken passed to Constructor"));
 		}
-
-		try {
-			JSONObject jsonToken = new JSONObject(token.getContent());
-			LOG.trace(".RND(RDNToken): Converted Token into JSONObject --> {}", jsonToken);
-			if((!jsonToken.has(tokenEntryQualifierForQualifier)) || (!jsonToken.has(tokenEntryQualifierForValue)) ) {
-				throw (new IllegalArgumentException("invalid RDNToken passed to Constructor"));
-			}
-			LOG.trace(".RND(RDNToken): JSONObject has both Type and Value entries!");
-			this.qualifier = new String(jsonToken.getString(tokenEntryQualifierForQualifier));
-			this.value = new String(jsonToken.getString(tokenEntryQualifierForValue));
-		} catch (Exception jsonEx) {
-			throw (new IllegalArgumentException(jsonEx.getMessage()));
-		}
+		String tokenContent = token.getContent();
+		String[] tokenSplit = tokenContent.split("><");
+		String qualifierWorking = tokenSplit[0];
+		String qualifier = qualifierWorking.substring(1,qualifierWorking.length()-1);
+		setQualifier(qualifier);
+		String valueWorking = tokenSplit[1];
+		String value = valueWorking.substring(0, valueWorking.length()-2);
+		setValue(value);
 		LOG.trace(".RND(RDNToken): new RDN created, now building different String values!");
 		convertToString();
 		createToken();
@@ -139,10 +136,7 @@ public class RDN {
 
 	@JsonIgnore
 	private void createToken() {
-		JSONObject newToken = new JSONObject();
-		newToken.put(tokenEntryQualifierForQualifier, this.getQualifier());
-		newToken.put(tokenEntryQualifierForValue, this.getValue());
-		this.token = new RDNToken(newToken.toString());
+		this.token= new RDNToken(pseudoXMLAttribute(getQualifier(), getValue()));
 	}
 
 	@JsonIgnore
@@ -160,5 +154,17 @@ public class RDN {
 
 	public String getUnqualifiedValue(){
 		return(getValue());
+	}
+
+	private String pseudoXMLAttribute(String attributeName, String attributeValue){
+		StringBuilder xmlAttributeBuilder = new StringBuilder();
+		xmlAttributeBuilder.append("<");
+		xmlAttributeBuilder.append(attributeName);
+		xmlAttributeBuilder.append(">");
+		xmlAttributeBuilder.append(attributeValue);
+		xmlAttributeBuilder.append("</");
+		xmlAttributeBuilder.append(attributeName);
+		xmlAttributeBuilder.append(">");
+		return(xmlAttributeBuilder.toString());
 	}
 }

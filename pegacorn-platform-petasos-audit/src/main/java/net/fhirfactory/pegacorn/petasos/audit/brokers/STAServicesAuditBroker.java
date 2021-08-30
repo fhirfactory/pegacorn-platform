@@ -23,10 +23,10 @@ package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
 import net.fhirfactory.pegacorn.components.transaction.model.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
+import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
-import net.fhirfactory.pegacorn.services.audit.logger.StandardAuditEntryLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class STAServicesAuditBroker {
     private static final Logger LOG = LoggerFactory.getLogger(STAServicesAuditBroker.class);
 
     @Inject
-    StandardAuditEntryLoggerService auditWriter;
+    PetasosAuditWriterInterface auditWriter;
 
     @Inject
     DefaultResilienceParcel2FHIRAuditEvent parcel2auditevent;

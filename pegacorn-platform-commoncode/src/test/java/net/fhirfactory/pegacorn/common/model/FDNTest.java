@@ -120,10 +120,10 @@ class FDNTest {
 		}
 		// FDNToken Constructor
 		LOG.trace("basicConstructureSetTest(): FDNToken Constructor Test");
-		String fdnTokenString0 = "{FDNToken:{\"0\":\"{\\\"Qualifier\\\":\\\"TestType0\\\",\\\"Value\\\":\\\"TestValue0\\\"}\"}}";
-		String fdnTokenString1 = "{FDNToken:{\"0\":\"{\\\"Qualifier\\\":\\\"TestType0\\\",\\\"Value\\\":\\\"TestValue0\\\"}\","
-				+ "\"1\":\"{\\\"Qualifier\\\":\\\"TestType1\\\",\\\"Value\\\":\\\"TestValue1\\\"}\","
-				+ "\"2\":\"{\\\"Qualifier\\\":\\\"TestType2\\\",\\\"Value\\\":\\\"TestValue2\\\"}\"}}";
+		String fdnTokenString0 = "<0:TestType0>TestValue0</0:TestType0";
+		String fdnTokenString1 = "<0:TestType0>TestValue0</0:TestType0>"
+				+ "<1:TestType1>TestValue1</1:TestType1>"
+				+ "<2:TestType2>TestValue2</2:TestType2>";
 		FDNToken fdnToken0 = new FDNToken(fdnTokenString0);
 		FDNToken fdnToken1 = new FDNToken(fdnTokenString1);
 		LOG.trace(".basicConstructureSetTest(): fdnToken1 --> {}", fdnToken1);

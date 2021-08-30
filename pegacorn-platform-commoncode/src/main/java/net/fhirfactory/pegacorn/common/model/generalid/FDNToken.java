@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.common.model.generalid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class FDNToken implements Serializable {
     }
 
     public FDNToken(String tokenContent) {
-        this.content = new String(tokenContent);
+        this.content = SerializationUtils.clone(tokenContent);
     }
 
     public FDNToken(FDNToken originalToken) {
@@ -53,12 +54,14 @@ public class FDNToken implements Serializable {
 
     @Override
     public String toString() {
-        return (makeSimpleString());
+        return "FDNToken{" +
+                "content='" + content + '\'' +
+                '}';
     }
 
     private String makeSimpleString(){
         FDN tempFDN = new FDN(this);
-        String simpleString = "SimpleFDN=";
+        String simpleString = "UnqualifiedToken=";
         ArrayList<RDN> rdnSet = tempFDN.getRDNSet();
         int setSize = rdnSet.size();
         for (int counter = 0; counter < setSize; counter++) {
@@ -98,7 +101,7 @@ public class FDNToken implements Serializable {
     public String toTag(){
         String tag = new String();
         FDNToken tempToken = new FDNToken();
-        tempToken.setContent(this.getContent());
+        tempToken.setContent(SerializationUtils.clone(this.getContent()));
         FDN tempFDN = new FDN(tempToken);
         int setSize = tempFDN.getRDNSet().size();
         int counter = 0;

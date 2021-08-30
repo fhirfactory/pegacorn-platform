@@ -77,6 +77,10 @@ public class ResilienceParcel implements Serializable {
     private Date cancellationDate;
     private SerializableObject cancellationDateLock;
 
+    private boolean anInteractWUP;
+    private String associatedPortValue;
+    private String associatedPortType;
+
     //
     // Constructors
     //
@@ -95,6 +99,9 @@ public class ResilienceParcel implements Serializable {
         this.finalisationStatus = null;
         this.episodeIdentifier = null;
         this.cancellationDate = null;
+        this.anInteractWUP = false;
+        this.associatedPortType = null;
+        this.associatedPortValue = null;
         this.instanceIDLock = new SerializableObject();
         this.typeIDLock = new SerializableObject();
         this.episodeIdentifierLock = new SerializableObject();
@@ -135,6 +142,9 @@ public class ResilienceParcel implements Serializable {
         this.finalisationDate = null;
         this.episodeIdentifier = null;
         this.cancellationDate = null;
+        this.anInteractWUP = false;
+        this.associatedPortType = null;
+        this.associatedPortValue = null;
         this.instanceIDLock = new SerializableObject();
         this.typeIDLock = new SerializableObject();
         this.episodeIdentifierLock = new SerializableObject();
@@ -187,11 +197,54 @@ public class ResilienceParcel implements Serializable {
         if (originalParcel.hasEpisodeIdentifier()) {
             this.episodeIdentifier = originalParcel.getEpisodeIdentifier();
         }
+        if(originalParcel.hasAssociatedPortValue()){
+            this.associatedPortValue = originalParcel.getAssociatedPortValue();
+        }
+        if(originalParcel.hasAssociatedPortType()){
+            this.associatedPortType = originalParcel.getAssociatedPortType();
+        }
+        this.anInteractWUP = originalParcel.isAnInteractWUP();
     }
 
     //
     // Bean/Attribute Methods
     //
+
+
+    public boolean isAnInteractWUP() {
+        return anInteractWUP;
+    }
+
+    public void setAnInteractWUP(boolean anInteractWUP) {
+        this.anInteractWUP = anInteractWUP;
+    }
+
+    public boolean hasAssociatedPortValue(){
+        boolean hasValue = this.associatedPortValue != null;
+        return(hasValue);
+    }
+
+    public String getAssociatedPortValue() {
+        return associatedPortValue;
+    }
+
+    public void setAssociatedPortValue(String associatedPortValue) {
+        this.associatedPortValue = associatedPortValue;
+    }
+
+    public boolean hasAssociatedPortType(){
+        boolean hasValue = this.associatedPortType != null;
+        return(hasValue);
+    }
+
+    public String getAssociatedPortType() {
+        return associatedPortType;
+    }
+
+    public void setAssociatedPortType(String associatedPortType) {
+        this.associatedPortType = associatedPortType;
+    }
+
     // Helper methods for the this.cancellationDate attribute
     public boolean hasCancellationDate() {
         if (this.cancellationDate == null) {
@@ -464,112 +517,6 @@ public class ResilienceParcel implements Serializable {
         }
     }
 
-    // toString()
-    @Override
-    public String toString() {
-        String newString = new String("ResilienceParcel={");
-        String parcelInstanceIDString;
-        if (hasInstanceIdentifier()) {
-            parcelInstanceIDString = "(instanceID:" + identifier.toString() + ")";
-        } else {
-            parcelInstanceIDString = "(instanceID:null)";
-        }
-        String parcelTypeIDString;
-        if (hasTypeID()) {
-            parcelTypeIDString = "(typeID:" + typeID.toString() + ")";
-        } else {
-            parcelTypeIDString = "(typeID:null)";
-        }
-        String associatedWUPInstanceIDString;
-        if (hasAssociatedWUPIdentifier()) {
-            associatedWUPInstanceIDString = "(associatedWUPInstanceID=" + associatedWUPIdentifier.toString() + ")";
-        } else {
-            associatedWUPInstanceIDString = "(associatedWUPInstanceID=null)";
-        }
-        String upstreamParcelIDString;
-        if (hasUpstreamEpisodeIdentifier()) {
-            upstreamParcelIDString = "(upstreamEpisodeID:" + upstreamEpisodeIdentifier.toString() + ")";
-        } else {
-            upstreamParcelIDString = "(upstreamEpisodeID:null)";
-        }
-        String downstreamParcelIDSetString = new String();
-        if (hasDownstreamEpisodeIdentifierSet()) {
-            downstreamParcelIDSetString = "(downstreamEpisodeIDSet:" + this.downstreamEpisodeIdentifierSet.toString() + ")";
-        } else {
-            downstreamParcelIDSetString = "(downstreamEpisodeIDSet:null)";
-        }
-        String actualUoWString;
-        if (hasActualUoW()) {
-            actualUoWString = "(actualUoW:" + actualUoW.toString() + ")";
-        } else {
-            actualUoWString = "(actualUoW:null)";
-        }
-        String parcelRegistrationDateString;
-        if (hasRegistrationDate()) {
-            parcelRegistrationDateString = "(registrationDate:" + registrationDate.toString() + ")";
-        } else {
-            parcelRegistrationDateString = "(registrationDate:null)";
-        }
-        String parcelStartDateString;
-        if (hasStartDate()) {
-            parcelStartDateString = "(startDateString:" + startDate.toString() + ")";
-        } else {
-            parcelStartDateString = "(startDateString:null)";
-        }
-        String parcelFinishedDateString;
-        if (hasFinishedDate()) {
-            parcelFinishedDateString = "(finishedDate:" + finishedDate.toString() + ")";
-        } else {
-            parcelFinishedDateString = "(finishedDate:null)";
-        }
-        String parcelFinalisationDateString;
-        if (hasFinalisationDate()) {
-            parcelFinalisationDateString = "(finalisationDate:" + finalisationDate.toString() + ")";
-        } else {
-            parcelFinalisationDateString = "(finalisationDate:null)";
-        }
-        String parcelFinalisationStatusEnumString;
-        if (hasFinalisationStatus()) {
-            parcelFinalisationStatusEnumString = "(finalisationStatus:" + finalisationStatus.toString() + ")";
-        } else {
-            parcelFinalisationStatusEnumString = "(finalisationStatus:null)";
-        }
-        String parcelProcessingStatusEnumString;
-        if (hasProcessingStatus()) {
-            parcelProcessingStatusEnumString = "(processingStatus:" + processingStatus.toString() + ")";
-        } else {
-            parcelProcessingStatusEnumString = "(processingStatus:null)";
-        }
-        String parcelEpisodeString;
-        if (hasEpisodeIdentifier()) {
-            parcelEpisodeString = "(episodeID:" + episodeIdentifier.toString() + ")";
-        } else {
-            parcelEpisodeString = "(episodeID:null)";
-        }
-        String cancellationDateString;
-        if (hasCancellationDate()) {
-            cancellationDateString = "(cancellationDate:" + episodeIdentifier.toString() + ")";
-        } else {
-            cancellationDateString = "(cancellationDate:null)";
-        }
-        newString = newString
-                + parcelInstanceIDString + ","
-                + parcelEpisodeString + ","
-                + parcelTypeIDString + ","
-                + associatedWUPInstanceIDString + ","
-                + upstreamParcelIDString + ","
-                + downstreamParcelIDSetString + ","
-                + actualUoWString + ","
-                + parcelRegistrationDateString + ","
-                + parcelStartDateString + ","
-                + parcelFinishedDateString + ","
-                + parcelFinalisationDateString + ","
-                + parcelProcessingStatusEnumString + ","
-                + parcelFinalisationDateString + ","
-                + cancellationDateString + "}";
-        return (newString);
-    }
-
     public boolean hasEpisodeIdentifier() {
         if (this.episodeIdentifier == null) {
             return (false);
@@ -659,5 +606,28 @@ public class ResilienceParcel implements Serializable {
         newInstanceID.appendFDN(uowInstanceFDN);
         ResilienceParcelIdentifier parcelIdentifier = new ResilienceParcelIdentifier(newInstanceID.getToken());
         return (parcelIdentifier);
+    }
+
+    @Override
+    public String toString() {
+        return "ResilienceParcel{" +
+                "identifier=" + identifier +
+                ", typeID=" + typeID +
+                ", episodeIdentifier=" + episodeIdentifier +
+                ", actualUoW=" + actualUoW +
+                ", associatedWUPIdentifier=" + associatedWUPIdentifier +
+                ", downstreamEpisodeIdentifierSet=" + downstreamEpisodeIdentifierSet +
+                ", upstreamEpisodeIdentifier=" + upstreamEpisodeIdentifier +
+                ", finalisationStatus=" + finalisationStatus +
+                ", processingStatus=" + processingStatus +
+                ", registrationDate=" + registrationDate +
+                ", startDate=" + startDate +
+                ", finishedDate=" + finishedDate +
+                ", finalisationDate=" + finalisationDate +
+                ", cancellationDate=" + cancellationDate +
+                ", anInteractWUP=" + anInteractWUP +
+                ", associatedPortValue='" + associatedPortValue + '\'' +
+                ", associatedPortType='" + associatedPortType + '\'' +
+                '}';
     }
 }

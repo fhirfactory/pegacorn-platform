@@ -108,6 +108,16 @@ public class PetasosMOAServicesBroker {
         return (statusElement);
     }
 
+    public ParcelStatusElement registerSystemEdgeWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW, String portType, String portValue) {
+        if ((jobCard == null) || (initialUoW == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
+        }
+        ResilienceParcel newParcel = parcelServicesIM.registerParcel(jobCard.getActivityID(), initialUoW, portType, portValue, true);
+        jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());
+        ParcelStatusElement statusElement = rasController.registerNewWorkUnitActivity(jobCard);
+        return (statusElement);
+    }
+
     /**
      *
      * @param jobCard

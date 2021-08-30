@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,34 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package net.fhirfactory.pegacorn.petasos.model.audit;
 
-package net.fhirfactory.pegacorn.common.model.generalid;
+import org.hl7.fhir.r4.model.AuditEvent;
 
-import java.io.Serializable;
-
-public class RDNToken implements Serializable {
-	private String content;
-	
-	public RDNToken() {
-		content = new String();
-	}
-	
-	public RDNToken(String tokenContent) {
-		this.content = new String(tokenContent);
-	}
-	
-	public String getContent() {
-		return(this.content);
-	}
-	
-	public void setContent(String tokenContent) {
-		this.content = new String(tokenContent);
-	}
-
-	@Override
-	public String toString() {
-		return "RDNToken{" +
-				"content='" + content + '\'' +
-				'}';
-	}
+public interface PetasosAuditWriterInterface {
+    public AuditEvent logAuditEventAsynchronously(AuditEvent auditEvent);
+    public AuditEvent logAuditEventSynchronously(AuditEvent auditEvent);
 }

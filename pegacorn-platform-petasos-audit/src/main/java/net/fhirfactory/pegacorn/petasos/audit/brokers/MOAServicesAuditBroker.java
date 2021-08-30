@@ -22,9 +22,12 @@
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
 import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.UoWPayload2FHIRAuditEvent;
+import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.services.audit.logger.StandardAuditEntryLoggerService;
+import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,21 +39,29 @@ public class MOAServicesAuditBroker {
     private static final Logger LOG = LoggerFactory.getLogger(STAServicesAuditBroker.class);
 
     @Inject
-    StandardAuditEntryLoggerService auditWriter;
+    private PetasosAuditWriterInterface auditWriter;
 
     @Inject
     DefaultResilienceParcel2FHIRAuditEvent parcel2auditevent;
 
-    public PetasosParcelAuditTrailEntry logActivity(ResilienceParcel parcelInstance) {
-        PetasosParcelAuditTrailEntry entry = logActivity(parcelInstance, false);
+    @Inject
+    UoWPayload2FHIRAuditEvent uow2auditevent;
+
+    public AuditEvent logActivity(ResilienceParcel parcelInstance) {
+        AuditEvent entry = logActivity(parcelInstance, false);
 
         return(entry);
     }
 
-    public PetasosParcelAuditTrailEntry logActivity(ResilienceParcel parcelAuditInstance, boolean requiresSynchronousWrite){
-        PetasosParcelAuditTrailEntry entry = new PetasosParcelAuditTrailEntry();
-
-        return(entry);
+    public AuditEvent logActivity(ResilienceParcel parcelAuditInstance, boolean requiresSynchronousWrite){
+        AuditEvent parcelEntry = parcel2auditevent.transform(parcelAuditInstance);
+        AuditEvent resultParcelEntry;
+        if(requiresSynchronousWrite){
+            resultParcelEntry = auditWriter.logAuditEventSynchronously(parcelEntry);
+        } else {
+            resultParcelEntry = auditWriter.logAuditEventAsynchronously(parcelEntry);
+        }
+        return(resultParcelEntry);
     }
 
     public PetasosParcelAuditTrailEntry logActivity(PetasosParcelAuditTrailEntry parcelAuditInstance){
@@ -62,5 +73,17 @@ public class MOAServicesAuditBroker {
         PetasosParcelAuditTrailEntry entry = new PetasosParcelAuditTrailEntry();
 
         return(entry);
+    }
+
+    public void logMLLPTransactions(ResilienceParcel parcelAuditInstance, UoW uow, boolean requiresSynchronousWrite){
+        if(parcelAuditInstance.hasAssociatedPortType() && parcelAuditInstance.hasAssociatedPortValue()) {
+            AuditEvent uowEntry = uow2auditevent.transform(parcelAuditInstance, uow);
+            AuditEvent resultUoWEntry;
+            if (requiresSynchronousWrite) {
+                resultUoWEntry = auditWriter.logAuditEventSynchronously(uowEntry);
+            } else {
+                resultUoWEntry = auditWriter.logAuditEventAsynchronously(uowEntry);
+            }
+        }
     }
 }
