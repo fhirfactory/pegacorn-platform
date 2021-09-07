@@ -51,4 +51,13 @@ public class MessageBasedWUPEndpoint {
     public void setFrameworkEnabled(boolean frameworkEnabled) {
         this.frameworkEnabled = frameworkEnabled;
     }
+
+    @Override
+    public String toString() {
+        return "MessageBasedWUPEndpoint{" +
+                "endpointTopologyNode=" + endpointTopologyNode +
+                ", endpointSpecification='" + endpointSpecification + '\'' +
+                ", frameworkEnabled=" + frameworkEnabled +
+                '}';
+    }
 }

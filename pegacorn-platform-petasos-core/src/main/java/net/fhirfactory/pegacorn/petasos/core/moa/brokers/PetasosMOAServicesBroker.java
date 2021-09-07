@@ -229,8 +229,8 @@ public class PetasosMOAServicesBroker {
         LOG.debug(".registerWorkUnitProcessor(): Entry, newElement --> {}, payloadTopicSet --> {}", newElement,
                 payloadTopicSet);
         switch (wupNature) {
-            case WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR:
-            case WUP_NATURE_LAODN_STIMULI_TRIGGERED_BEHAVIOUR:
+            case WUP_NATURE_TIMER_TRIGGERED_WORKFLOW:
+            case WUP_NATURE_STIMULI_TRIGGERED_WORKFLOW:
                 // Do nothing, as the above WUPs are handled by their own specific frameworks.
                 break;
             case WUP_NATURE_LADON_BEHAVIOUR_WRAPPER:

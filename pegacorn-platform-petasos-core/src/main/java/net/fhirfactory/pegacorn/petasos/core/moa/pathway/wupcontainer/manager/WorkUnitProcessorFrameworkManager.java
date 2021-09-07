@@ -62,7 +62,7 @@ public class WorkUnitProcessorFrameworkManager {
         try {
             switch (wupArchetype) {
 
-                case WUP_NATURE_LAODN_STIMULI_TRIGGERED_BEHAVIOUR: {
+                case WUP_NATURE_STIMULI_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_STIMULI_TRIGGERED_BEHAVIOUR route");
                     StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, true);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
@@ -72,7 +72,7 @@ public class WorkUnitProcessorFrameworkManager {
                     LOG.trace(".buildWUPFramework(): Subscribed to Topics, work is done!");
                     break;
                 }
-                case WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR: {
+                case WUP_NATURE_TIMER_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR route");
                     ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode);
                     camelctx.addRoutes(ingresRoute);

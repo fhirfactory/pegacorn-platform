@@ -28,8 +28,8 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
  */
 public enum WUPArchetypeEnum {
     WUP_NATURE_MESSAGE_WORKER("pegacorn.petasos.wup.nature.message.worker"),
-    WUP_NATURE_LAODN_STIMULI_TRIGGERED_BEHAVIOUR("pegacorn.petasos.wup.nature.behaviour.ladon_stimuli_triggered"),
-    WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR("pegacorn.petasos.wup.nature.behaviour.ladon_timer_triggered"),
+    WUP_NATURE_STIMULI_TRIGGERED_WORKFLOW("pegacorn.petasos.wup.nature.workflow.stimuli_triggered"),
+    WUP_NATURE_TIMER_TRIGGERED_WORKFLOW("pegacorn.petasos.wup.nature.workflow.timer_triggered"),
     WUP_NATURE_LADON_STANDARD_MOA("pegacorn.petasos.wup.nature.behaviour.ladon_moa_triggered"),
     WUP_NATURE_LADON_BEHAVIOUR_WRAPPER("pegacorn.petasos.wup.nature.statespace.behaviour_wrapper"),
     WUP_NATURE_IRIS_MATRIXCONTROL_PATHWAY("pegacorn.petasos.wup.nature.iris.matrixcontrol.pathway"),
