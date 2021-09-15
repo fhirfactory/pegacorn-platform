@@ -85,10 +85,10 @@ public class DistributedPubSubSubscriptionMapDM {
             LOG.debug("registerPublisherInstance(): Exit, publisher name or instance name is null, returning -null-");
             return(null);
         }
-        LOG.warn(".registerPublisherInstance(): Now, check to see if publisher (instance) is already cached and, if so, do nothing!");
+        LOG.trace(".registerPublisherInstance(): Now, check to see if publisher (instance) is already cached and, if so, do nothing!");
         if(publisherMap.containsKey(publisher.getEndpointID().getEndpointName())){
             registration = publisherMap.get(publisher.getEndpointID().getEndpointName());
-            LOG.warn("registerPublisherInstance(): Exit, publisher already registered, registration->{}", registration);
+            LOG.debug("registerPublisherInstance(): Exit, publisher already registered, registration->{}", registration);
             return(registration);
         } else {
             LOG.trace(".registerPublisherInstance(): Publisher is not in Map, so add it!");
@@ -101,7 +101,7 @@ public class DistributedPubSubSubscriptionMapDM {
                 publisherMap.put(publisher.getEndpointID().getEndpointName(), registration);
             }
             addPublisherServiceProviderInstance(publisher);
-            LOG.warn(".registerPublisherInstance(): Exit, registration->{}", registration);
+            LOG.debug(".registerPublisherInstance(): Exit, registration->{}", registration);
             return (registration);
         }
     }
