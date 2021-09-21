@@ -117,6 +117,13 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-platform-petasos-itops</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
         <!-- Pegacorn Petasos DataSet (Topic) Map Servoces -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>

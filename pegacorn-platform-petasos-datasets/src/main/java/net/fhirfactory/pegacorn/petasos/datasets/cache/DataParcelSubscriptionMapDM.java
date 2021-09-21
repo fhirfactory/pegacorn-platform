@@ -685,4 +685,16 @@ public class DataParcelSubscriptionMapDM {
     	boolean directionMatches = testManifest.getDataParcelFlowDirection() == subscribedManifest.getDataParcelFlowDirection();
     	return(directionMatches);
 	}
+
+	public List<PubSubSubscription> getAllSubscriptions(){
+    	List<PubSubSubscription> subscriptionList = new ArrayList<>();
+		synchronized (this.distributionListUpdateLock){
+			for(List<PubSubSubscription> currentSubscriptionSet: this.distributionList.values()) {
+				for (PubSubSubscription currenSubscription : currentSubscriptionSet) {
+					subscriptionList.add(currenSubscription);
+				}
+			}
+		}
+		return(subscriptionList);
+	}
 }

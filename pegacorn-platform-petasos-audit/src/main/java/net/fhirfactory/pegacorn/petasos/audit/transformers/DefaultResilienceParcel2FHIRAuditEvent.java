@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.audit.transformers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
@@ -67,6 +68,8 @@ public class DefaultResilienceParcel2FHIRAuditEvent extends Pegacorn2FHIRAuditEv
 
     public DefaultResilienceParcel2FHIRAuditEvent(){
         jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
 //        jsonMapper = new ObjectMapper();
     }
 

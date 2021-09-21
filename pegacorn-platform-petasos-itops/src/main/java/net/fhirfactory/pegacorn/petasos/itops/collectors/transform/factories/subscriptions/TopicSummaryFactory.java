@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 MAHun
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,28 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package net.fhirfactory.pegacorn.petasos.itops.collectors.transform.factories.subscriptions;
 
-package net.fhirfactory.pegacorn.petasos.model.itops;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 
-import java.util.Date;
+import javax.enterprise.context.ApplicationScoped;
 
-/**
- * <b> Pegacorn System Component Hierarchy </b>
- * PegacornSubsytem contains PegacornService(s)
- * PegacornService contains ProcessingFactory(ies)
- * ProcessingFactory contains ProcessingPlant(s)
- * ProcessingPlant contains ProcessingEngines
- * --> A WUP is an instance of a ProcessingEngine
- * 
- * All the above components include this class as an attribute.
- * 
- * @author Mark A. Hunter
- *
- */
-public class PegacornCIMetrics {
-	private Date startupDate;
-	private Date lastActivityDate;
-	private Date lastHeartbeatDate;
-	private PegacornCIStatusEnum lastStatus;
+@ApplicationScoped
+public class TopicSummaryFactory {
 
+    public String transformToSimpleTopicName(DataParcelManifest manifest){
+        if(manifest == null){
+            return(null);
+        }
+        return(manifest.toString());
+    }
 }

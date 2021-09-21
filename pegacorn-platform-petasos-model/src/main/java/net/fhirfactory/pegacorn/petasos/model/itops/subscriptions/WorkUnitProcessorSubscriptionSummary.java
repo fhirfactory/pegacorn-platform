@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,37 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.model.itops;
+package net.fhirfactory.pegacorn.petasos.model.itops.subscriptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class WorkUnitProcessorSubscriptionSummary extends PublisherSubscriptionSummary{
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-
-/**
- *
- * @author ACT Health (Mark A. Hunter)
- */
-public class PegacornCI {
-	private static final Logger LOG = LoggerFactory.getLogger(PegacornCI.class);
-
-    private FDN instanceID;
-    private FDN typeID;
-    private PegacornCIStatus status;
-    private PegacornCIMetrics metrics;
-  
-
-    /**
-     * @return the componentInstanceFDN
-     */
-    public FDN getInstanceID() {
-        return(this.instanceID);
+    @Override
+    public String toString() {
+        return "WorkUnitProcessorSubscriptionSummary{" +
+                "subscriber='" + getSubscriber() + '\'' +
+                ", subscriberServiceName='" + getSubscriberServiceName() + '\'' +
+                ", componentID='" + getComponentID() + '\'' +
+                ", subscribedTopics=" + getSubscribedTopics() +
+                ", summaryType=" + getSummaryType() +
+                ", timestamp=" + getTimestamp() +
+                '}';
     }
-    /**
-     * @param componentInstanceFDN the componentInstanceFDN to set
-     */
-    public void setInstanceID(FDN componentID) {
-        this.instanceID = componentID;
-    }
-
 }

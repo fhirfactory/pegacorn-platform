@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DistributedPubSubSubscriptionMapDM;
+import net.fhirfactory.pegacorn.petasos.model.itops.interfaces.ITOpsPubSubCollectionAgentInterface;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherRegistration;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.InterSubsystemPubSubPublisherSubscriptionRegistration;
@@ -39,6 +40,9 @@ public class DistributedPubSubSubscriptionMapIM {
 
     @Inject
     private DistributedPubSubSubscriptionMapDM registrationMapDM;
+
+    @Inject
+    private ITOpsPubSubCollectionAgentInterface itopsCollectionAgent;
 
     /**
      * @param publisher
