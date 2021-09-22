@@ -59,6 +59,7 @@ public class ITOpsMonitoredProcessingPlantFactory extends ITOpsMonitoredNodeFact
         processingPlant.setActualHostIP(topologyNode.getActualHostIP());
         processingPlant.setActualPodIP(topologyNode.getActualPodIP());
         TopologyNodeFDN nodeFDN = topologyNode.getNodeFDN();
+        processingPlant.setTopologyNodeFDN(nodeFDN);
         String platformNodeName = "Unknown";
         for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
             if(currentRDN.getNodeType().equals(TopologyNodeTypeEnum.PLATFORM)){

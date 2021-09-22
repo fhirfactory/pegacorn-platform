@@ -21,15 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.itops.subscriptions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ITOpsPubSubReport implements Serializable {
     private Instant timestamp;

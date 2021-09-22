@@ -83,4 +83,13 @@ public class ProcessingPlantSubscriptionSummary implements Serializable {
     public void setComponentID(String componentID) {
         this.componentID = componentID;
     }
+
+    @Override
+    public String toString() {
+        return "ProcessingPlantSubscriptionSummary{" +
+                "asSubscriber=" + asSubscriber +
+                ", asPublisher=" + asPublisher +
+                ", componentID='" + componentID + '\'' +
+                '}';
+    }
 }

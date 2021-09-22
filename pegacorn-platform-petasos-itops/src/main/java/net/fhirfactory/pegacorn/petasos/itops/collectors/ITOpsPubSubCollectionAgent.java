@@ -67,34 +67,42 @@ public class ITOpsPubSubCollectionAgent implements ITOpsPubSubCollectionAgentInt
 
     @Override
     public void refreshLocalProcessingPlantPubSubMap(){
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Entry");
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Get all InterSubsystemPubSubPublisherSubscriptionRegistration(s)");
+        LOG.debug(".refreshLocalProcessingPlantPubSubMap(): Entry");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Get all InterSubsystemPubSubPublisherSubscriptionRegistration(s)");
         List<InterSubsystemPubSubPublisherSubscriptionRegistration> allPublisherServiceSubscriptions = distributedSubscriptionMapIM.getAllPublisherServiceSubscriptions();
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Create a ProcessingPlantSubscriptionSummary skeleton");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Create a ProcessingPlantSubscriptionSummary skeleton");
         ProcessingPlantSubscriptionSummary processingPlantSubscriptionSummary = new ProcessingPlantSubscriptionSummary();
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Assign the ProcessintPlant ComponentID (processingPlantNode->{})", processingPlant.getProcessingPlantNode());
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Assign the ProcessintPlant ComponentID (processingPlantNode->{})", processingPlant.getProcessingPlantNode());
         processingPlantSubscriptionSummary.setComponentID(processingPlant.getProcessingPlantNode().getComponentID());
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Check if there are any subscriptions, if not, exit out");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Check if there are any subscriptions, if not, exit out");
         if(allPublisherServiceSubscriptions.isEmpty()){
-            LOG.info(".refreshLocalProcessingPlantPubSubMap(): Exit, publisher service subscriptions is empty");
+            LOG.debug(".refreshLocalProcessingPlantPubSubMap(): Exit, publisher service subscriptions is empty");
             return;
         }
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Iterate Through Registrations");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): There are subscriptions, so processing them.");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterate Through Registrations");
         for(InterSubsystemPubSubPublisherSubscriptionRegistration currentRegistration: allPublisherServiceSubscriptions){
-            List<InterSubsystemPubSubPublisherRegistration> publisherServiceProviderInstanceRegistrations = distributedSubscriptionMapIM.getPublisherServiceProviderInstanceRegistrations(currentRegistration.getPublisherServiceName());
+            String publisherServiceName = currentRegistration.getPublisherServiceName();
+            LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For Service Name->{}", publisherServiceName);
+            List<InterSubsystemPubSubPublisherRegistration> publisherServiceProviderInstanceRegistrations = distributedSubscriptionMapIM.getPublisherServiceProviderInstanceRegistrations(publisherServiceName);
             for(InterSubsystemPubSubPublisherRegistration currentPublisherRegistration: publisherServiceProviderInstanceRegistrations) {
+                String processingPlantComponentID = currentPublisherRegistration.getPublisher().getEndpointID().getProcessingPlantComponentID();
+                LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Registrations For ProcessingPlant Name->{}", processingPlantComponentID);
                 SubscriberSubscriptionSummary publisherSubscriptionSummary = new SubscriberSubscriptionSummary();
-                publisherSubscriptionSummary.setPublisherServiceName(currentRegistration.getPublisherServiceName());
+                publisherSubscriptionSummary.setPublisherServiceName(publisherServiceName);
                 publisherSubscriptionSummary.setTimestamp(Instant.from(currentRegistration.getRegistrationDate().toInstant()));
                 publisherSubscriptionSummary.setSummaryType(SubscriptionSummaryType.PROCESSING_PLANT_SUBSCRIPTION_SUMMARY);
-                publisherSubscriptionSummary.setPublisher(currentPublisherRegistration.getPublisher().getEndpointID().getProcessingPlantComponentID());
+                publisherSubscriptionSummary.setPublisher(processingPlantComponentID);
                 for(DataParcelManifest currentManifest: currentRegistration.getSubscriptionList()){
-                    publisherSubscriptionSummary.getSubscribedTopics().add(topicSummaryFactory.transformToSimpleTopicName(currentManifest));
+                    String simpleTopicName = topicSummaryFactory.transformToSimpleTopicName(currentManifest);
+                    LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding Topic->{}", simpleTopicName);
+                    publisherSubscriptionSummary.getSubscribedTopics().add(simpleTopicName);
                 }
+                LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Iterating:: Adding to SubscriberSummary List");
                 processingPlantSubscriptionSummary.addSubscriberSummary(publisherSubscriptionSummary);
             }
         }
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Create Summary Set");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Create Summary Set");
         List<PubSubSubscription> allSubscriptions = subscriptionMapIM.getAllSubscriptions();
         for(PubSubSubscription currentSubscription: allSubscriptions){
             if(currentSubscription.getSubscriber().getInterSubsystemParticipant() != null){
@@ -113,14 +121,14 @@ public class ITOpsPubSubCollectionAgent implements ITOpsPubSubCollectionAgentInt
                 }
             }
         }
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Add Summary Set to the ProcessingPlant cache");
+        LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Add Summary Set to the ProcessingPlant cache");
         itopsPubSubMapDM.addProcessingPlantSubscriptionSummary(processingPlantSubscriptionSummary);
-        LOG.info(".refreshLocalProcessingPlantPubSubMap(): Exit");
+        LOG.debug(".refreshLocalProcessingPlantPubSubMap(): Exit");
     }
 
     @Override
     public void refreshWorkUnitProcessorPubSubMap(){
-        LOG.info(".refreshWorkUnitProcessorPubSubMap(): Entry");
+        LOG.debug(".refreshWorkUnitProcessorPubSubMap(): Entry");
         List<PubSubSubscription> allSubscriptions = subscriptionMapIM.getAllSubscriptions();
         Map<String, WorkUnitProcessorSubscriptionSummary> summaries = new HashMap<>();
         for(PubSubSubscription currentSubscription: allSubscriptions){
@@ -142,6 +150,6 @@ public class ITOpsPubSubCollectionAgent implements ITOpsPubSubCollectionAgentInt
                 itopsPubSubMapDM.addWorkUnitProcessorSubscriptionSummary(currentSummary);
             }
         }
-        LOG.info(".refreshWorkUnitProcessorPubSubMap(): Exit");
+        LOG.debug(".refreshWorkUnitProcessorPubSubMap(): Exit");
     }
 }
