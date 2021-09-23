@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.common.PetasosEndpointStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -29,11 +30,11 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -50,11 +51,32 @@ import java.util.concurrent.ConcurrentHashMap;
 @ApplicationScoped
 public class ProcessingPlantParcelCacheDM {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantParcelCacheDM.class);
+    private boolean initialised;
+    private static long CLEAN_UP_SERVICE_PERIOD = 60000L; // in milliseconds (1 minute)
+    private static long CACHE_PARCEL_MAXIMUM_AGE = 600000L; // in milliseconds (10 minutes)
 
     private ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel> petasosParcelCache;
+    private Object cacheLock;
 
     public ProcessingPlantParcelCacheDM() {
         petasosParcelCache = new ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel>();
+        this.initialised = false;
+        cacheLock = new Object();
+    }
+    
+    @PostConstruct
+    public void initialise(){
+        LOG.debug(".initialised(): Entry");
+        if(!this.initialised){
+            LOG.info(".initialise(): Initialising....");
+            LOG.info(".initialise(): [Cache CleanUP Agent Task Scheduling] Start");
+            scheduleCleanUpAgent();
+            LOG.info(".initialise(): [Cache CleanUp Agent Task Scheduling] Finish");
+            LOG.info(".initialise(): Done.");
+        } else {
+            LOG.debug(".initialised(): Already initialised, nothing to do!");
+        }
+        LOG.debug(".initialise(): Exit");
     }
 
     /**
@@ -72,10 +94,12 @@ public class ProcessingPlantParcelCacheDM {
             return;
         }
         ResilienceParcelIdentifier parcelInstanceID = parcel.getIdentifier();
-        if(petasosParcelCache.containsKey(parcelInstanceID)){
-            petasosParcelCache.remove(parcelInstanceID);
+        synchronized (cacheLock) {
+            if (petasosParcelCache.containsKey(parcelInstanceID)) {
+                petasosParcelCache.remove(parcelInstanceID);
+            }
+            petasosParcelCache.put(parcelInstanceID, parcel);
         }
-        petasosParcelCache.put(parcelInstanceID, parcel);
     }
 
     /**
@@ -104,8 +128,10 @@ public class ProcessingPlantParcelCacheDM {
         if (!parcel.hasInstanceIdentifier()) {
             return;
         }
-        if(petasosParcelCache.containsKey(parcel.getIdentifier())) {
-            petasosParcelCache.remove(parcel.getIdentifier());
+        synchronized (cacheLock) {
+            if (petasosParcelCache.containsKey(parcel.getIdentifier())) {
+                petasosParcelCache.remove(parcel.getIdentifier());
+            }
         }
     }
 
@@ -119,8 +145,10 @@ public class ProcessingPlantParcelCacheDM {
         if (parcelInstanceID == null) {
             return;
         }
-        if(petasosParcelCache.containsKey(parcelInstanceID)) {
-            petasosParcelCache.remove(parcelInstanceID);
+        synchronized (cacheLock) {
+            if (petasosParcelCache.containsKey(parcelInstanceID)) {
+                petasosParcelCache.remove(parcelInstanceID);
+            }
         }
     }
 
@@ -135,10 +163,12 @@ public class ProcessingPlantParcelCacheDM {
         if (newParcel == null) {
             throw (new IllegalArgumentException("newParcel is null"));
         }
-        if (petasosParcelCache.containsKey(newParcel.getIdentifier())) {
-            petasosParcelCache.remove(newParcel.getIdentifier());
+        synchronized (cacheLock) {
+            if (petasosParcelCache.containsKey(newParcel.getIdentifier())) {
+                petasosParcelCache.remove(newParcel.getIdentifier());
+            }
+            petasosParcelCache.put(newParcel.getIdentifier(), newParcel);
         }
-        petasosParcelCache.put(newParcel.getIdentifier(), newParcel);
     }
 
     /**
@@ -148,19 +178,23 @@ public class ProcessingPlantParcelCacheDM {
     public List<ResilienceParcel> getParcelSet() {
         LOG.debug(".getParcelSet(): Entry");
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        petasosParcelCache.entrySet().forEach(entry -> parcelList.add(entry.getValue()));
+        synchronized (cacheLock) {
+            petasosParcelCache.entrySet().forEach(entry -> parcelList.add(entry.getValue()));
+        }
         return (parcelList);
     }
 
     public List<ResilienceParcel> getParcelSetByState(ResilienceParcelProcessingStatusEnum status) {
         LOG.debug(".getParcelSet(): Entry, status --> {}", status);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasProcessingStatus()) {
-                if (currentParcel.getProcessingStatus() == status) {
-                    parcelList.add(currentParcel);
+        synchronized (cacheLock) {
+            Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
+            while (parcelListIterator.hasNext()) {
+                ResilienceParcel currentParcel = parcelListIterator.next();
+                if (currentParcel.hasProcessingStatus()) {
+                    if (currentParcel.getProcessingStatus() == status) {
+                        parcelList.add(currentParcel);
+                    }
                 }
             }
         }
@@ -195,11 +229,13 @@ public class ProcessingPlantParcelCacheDM {
         LOG.debug(".getInProgressParcelSet(): Entry, parcelTypeID --> {}" + parcelTypeID);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
         Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasEpisodeIdentifier()) {
-                if (currentParcel.getEpisodeIdentifier().equals(parcelTypeID)) {
-                    parcelList.add(currentParcel);
+        synchronized (cacheLock) {
+            while (parcelListIterator.hasNext()) {
+                ResilienceParcel currentParcel = parcelListIterator.next();
+                if (currentParcel.hasEpisodeIdentifier()) {
+                    if (currentParcel.getEpisodeIdentifier().equals(parcelTypeID)) {
+                        parcelList.add(currentParcel);
+                    }
                 }
             }
         }
@@ -212,13 +248,15 @@ public class ProcessingPlantParcelCacheDM {
         LOG.debug(".getCurrentParcel(): Entry, wupInstanceID --> {}" + wupInstanceID);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
         Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasAssociatedWUPIdentifier()) {
-                if (currentParcel.getAssociatedWUPIdentifier().equals(wupInstanceID)) {
-                    if (currentParcel.hasActualUoW()) {
-                        if (currentParcel.getActualUoW().getInstanceID().equals(uowInstanceID)) {
-                            return (currentParcel);
+        synchronized (cacheLock) {
+            while (parcelListIterator.hasNext()) {
+                ResilienceParcel currentParcel = parcelListIterator.next();
+                if (currentParcel.hasAssociatedWUPIdentifier()) {
+                    if (currentParcel.getAssociatedWUPIdentifier().equals(wupInstanceID)) {
+                        if (currentParcel.hasActualUoW()) {
+                            if (currentParcel.getActualUoW().getInstanceID().equals(uowInstanceID)) {
+                                return (currentParcel);
+                            }
                         }
                     }
                 }
@@ -227,4 +265,77 @@ public class ProcessingPlantParcelCacheDM {
         return (null);
     }
 
+    public int getCacheSize(){
+        return(this.petasosParcelCache.size());
+    }
+
+    //
+    // Cleanup Agent
+    //
+
+    private void scheduleCleanUpAgent() {
+        LOG.debug(".scheduleCleanUpAgent(): Entry");
+        TimerTask cleanupAgentTask = new TimerTask() {
+            public void run() {
+                LOG.debug(".cleanupAgentTask(): Entry");
+                cleanUpAgentActivity();
+                LOG.debug(".cleanupAgentTask(): Exit");
+            }
+        };
+        Timer timer = new Timer("PetasosParcelCacheCleanUpAgentTask");
+        timer.schedule(cleanupAgentTask, CLEAN_UP_SERVICE_PERIOD, CLEAN_UP_SERVICE_PERIOD);
+        LOG.debug(".scheduleCleanUpAgent(): Exit");
+    }
+
+    public void cleanUpAgentActivity(){
+        if(this.petasosParcelCache.isEmpty()){
+            return;
+        }
+        Long currentTimeInMilliseconds = Date.from(Instant.now()).getTime();
+        synchronized (cacheLock) {
+            Enumeration<ResilienceParcelIdentifier> parcelIdentifierEnumeration = this.petasosParcelCache.keys();
+            List<ResilienceParcelIdentifier> listOfParcelsToBePurged = new ArrayList<>();
+            while (parcelIdentifierEnumeration.hasMoreElements()) {
+                ResilienceParcelIdentifier currentIdentifier = parcelIdentifierEnumeration.nextElement();
+                ResilienceParcel currentResilienceParcel = this.petasosParcelCache.get(currentIdentifier);
+                switch (currentResilienceParcel.getProcessingStatus()) {
+                    case PARCEL_STATUS_REGISTERED:
+                    case PARCEL_STATUS_INITIATED:
+                    case PARCEL_STATUS_ACTIVE:
+                    case PARCEL_STATUS_ACTIVE_ELSEWHERE:
+                        break;
+                    case PARCEL_STATUS_FINISHED:
+                    case PARCEL_STATUS_FINALISED:
+                    case PARCEL_STATUS_FAILED:
+                    case PARCEL_STATUS_FINISHED_ELSEWHERE:
+                    case PARCEL_STATUS_FINALISED_ELSEWHERE:
+                    case PARCEL_STATUS_CANCELLED:
+                    default: {
+                        Date endDateOfInterest = null;
+                        if (currentResilienceParcel.hasFinalisationDate()) {
+                            endDateOfInterest = currentResilienceParcel.getFinalisationDate();
+                        } else if (currentResilienceParcel.hasCancellationDate()) {
+                            endDateOfInterest = currentResilienceParcel.getCancellationDate();
+                        } else if (currentResilienceParcel.hasFinishedDate()) {
+                            endDateOfInterest = currentResilienceParcel.getFinishedDate();
+                        } else {
+                            currentResilienceParcel.setCancellationDate(Date.from(Instant.now()));
+                        }
+                        if (endDateOfInterest != null) {
+                            Long endDateOfInterestInMilliseconds = endDateOfInterest.getTime();
+                            Long age = currentTimeInMilliseconds - endDateOfInterestInMilliseconds;
+                            if (age > CACHE_PARCEL_MAXIMUM_AGE) {
+                                listOfParcelsToBePurged.add(currentIdentifier);
+                            }
+                        }
+                    }
+                }
+            }
+            if (!listOfParcelsToBePurged.isEmpty()) {
+                for(ResilienceParcelIdentifier currentIdentifier: listOfParcelsToBePurged){
+                    this.petasosParcelCache.remove(currentIdentifier);
+                }
+            }
+        }
+    }
 }
