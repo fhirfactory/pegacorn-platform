@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnu
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
@@ -62,6 +63,9 @@ public class WUPContainerIngresProcessor {
 
     @Inject
     PetasosMOAServicesBroker petasosMOAServicesBroker;
+
+    @Inject
+    private ITOpsMetricsCollectionAgent metricsAgent;
 
     @Inject
     TopologyIM topologyProxy;
@@ -111,6 +115,9 @@ public class WUPContainerIngresProcessor {
         boolean waitState = true;
         WUPJobCard jobCard = newTransportPacket.getCurrentJobCard();
         ParcelStatusElement statusElement = newTransportPacket.getCurrentParcelStatus();
+        metricsAgent.updateLastActivityInstant(node.getComponentID());
+        metricsAgent.updatePresentEpisodeID(node.getComponentID(), statusElement.getActivityID().getPresentEpisodeIdentifier().toString());
+        metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(),jobCard.getCurrentStatus().toString());
         while (waitState) {
             switch (jobCard.getCurrentStatus()) {
                 case WUP_ACTIVITY_STATUS_WAITING:
@@ -148,6 +155,8 @@ public class WUPContainerIngresProcessor {
             ParcelStatusElement currentParcelStatus = newTransportPacket.getCurrentParcelStatus();
             currentParcelStatus.setRequiresRetry(true);
             currentParcelStatus.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
+            metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(),WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED.toString());
+            metricsAgent.updateLastActivitySuccess(node.getComponentID(), false);
         }
         LOG.debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", newTransportPacket);
         return (newTransportPacket);

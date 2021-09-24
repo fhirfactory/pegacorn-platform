@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.keys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 import org.slf4j.Logger;
@@ -64,6 +65,8 @@ public class ResourceKey {
     public String toString(){
         if(hasIdentifierTypeKey()) {
             ObjectMapper mapper = new ObjectMapper();
+            JavaTimeModule module = new JavaTimeModule();
+            mapper.registerModule(module);
             try {
                 String keyAsString = mapper.writeValueAsString(getIdentifierTypeKey());
                 return(keyAsString);

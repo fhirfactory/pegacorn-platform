@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 MAHun
+ * Copyright (c) 2021 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,26 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.model.itops;
+package net.fhirfactory.pegacorn.petasos.model.itops.topology.common;
 
-/**
- *
- * @author ACT Health (Mark A. Hunter)
- */
-public enum PegacornCIStatusEnum {
-    COMPONENT_STATUS_ACTIVE("pegacorn.component.watchdog.state.active"),
-    COMPONENT_STATUS_IDLE("pegacorn.component.watchdog.state.idle"),
-    COMPONENT_STATUS_UNRESPONSIVE("pegacorn.component.watchdog.state.unresponsive"),
-    COMPONENT_STATUS_FAILED("pegacorn.component.watchdog.state.failed");
-    
-    private String componentWatchdogState;
-    
-    private PegacornCIStatusEnum(String componentWatchdogState ){
-        this.componentWatchdogState = componentWatchdogState;
+import net.fhirfactory.pegacorn.components.transaction.model.SimpleTransactionOutcome;
+
+public class ITOpsTransactionOutcome extends SimpleTransactionOutcome {
+    private ITOpsMonitoredNode resource;
+
+    public ITOpsMonitoredNode getResource() {
+        return resource;
     }
-    
-    public String getComponentWatchdogState(){
-        return(this.componentWatchdogState);
+
+    public void setResource(ITOpsMonitoredNode resource) {
+        this.resource = resource;
     }
-    
+
+    @Override
+    public String toString() {
+        return "ITOpsTransactionOutcome{" +
+                "resourceID=" + getResourceID() +
+                ", transactionStatus=" + getTransactionStatus() +
+                ", reason='" + getReason() + '\'' +
+                ", transactionSuccessful=" + isTransactionSuccessful() +
+                ", transactionType=" + getTransactionType() +
+                ", resource=" + resource +
+                '}';
+    }
 }

@@ -82,6 +82,7 @@ public class TopologyNodeFDN implements Serializable {
         }
     }
 
+    @JsonIgnore
     public TopologyNodeRDN getLeafRDN(){
         int size = getHierarchicalNameSet().size();
         if(size <= 0){

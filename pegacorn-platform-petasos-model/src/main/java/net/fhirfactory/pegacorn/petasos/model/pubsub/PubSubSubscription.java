@@ -24,11 +24,13 @@ package net.fhirfactory.pegacorn.petasos.model.pubsub;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 public class PubSubSubscription implements Serializable {
     private DataParcelManifest parcelManifest;
     private PubSubParticipant subscriber;
+    private Instant registrationInstant;
 
     public PubSubSubscription(){
         this.subscriber = null;
@@ -38,6 +40,7 @@ public class PubSubSubscription implements Serializable {
     public PubSubSubscription(DataParcelManifest parcelManifest, PubSubParticipant subscriber){
         this.subscriber = subscriber;
         this.parcelManifest = parcelManifest;
+        this.registrationInstant = Instant.now();
     }
 
     public DataParcelManifest getParcelManifest() {
@@ -56,11 +59,20 @@ public class PubSubSubscription implements Serializable {
         this.subscriber = subscriber;
     }
 
+    public Instant getRegistrationInstant() {
+        return registrationInstant;
+    }
+
+    public void setRegistrationInstant(Instant registrationInstant) {
+        this.registrationInstant = registrationInstant;
+    }
+
     @Override
     public String toString() {
         return "PubSubSubscription{" +
                 "parcelManifest=" + parcelManifest +
                 ", subscriber=" + subscriber +
+                ", registrationInstant=" + registrationInstant +
                 '}';
     }
 

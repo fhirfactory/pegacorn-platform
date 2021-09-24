@@ -23,7 +23,9 @@ package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DataParcelSubscriptionMapDM;
+import net.fhirfactory.pegacorn.petasos.model.itops.interfaces.ITOpsPubSubCollectionAgentInterface;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +34,6 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.List;
 
-/**
- * This class WILL do more in the future, but it is for now just a proxy to the
- TopicCacheDM.
- */
 @ApplicationScoped
 public class DataParcelSubscriptionMapIM {
 
@@ -43,6 +41,10 @@ public class DataParcelSubscriptionMapIM {
 
     @Inject
     DataParcelSubscriptionMapDM subscriptionCache;
+
+    @Inject
+    private ITOpsPubSubCollectionAgentInterface itopsCollectionAgent;
+
 
     /**
      * This function retrieves the list (FDNTokenSet) of WUPs that are
@@ -74,6 +76,7 @@ public class DataParcelSubscriptionMapIM {
             return;
         }
         subscriptionCache.addSubscriber(contentTopicID, subscriber);
+        itopsCollectionAgent.refreshWorkUnitProcessorPubSubMap();
         LOG.debug(".addSubscriberToUoWContentTopic(): Exit");
     }
 
@@ -81,6 +84,14 @@ public class DataParcelSubscriptionMapIM {
     public void removeSubscriber(DataParcelManifest contentTopicID, PubSubParticipant interestedNode) {
         LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
+        itopsCollectionAgent.refreshWorkUnitProcessorPubSubMap();
         LOG.debug(".removeSubscriber(): Exit");
+    }
+
+    public List<PubSubSubscription> getAllSubscriptions(){
+        LOG.debug(".getAllSubscriptions(): Entry");
+        List<PubSubSubscription> subscriptions = subscriptionCache.getAllSubscriptions();
+        LOG.debug(".getAllSubscriptions(): Exit");
+        return(subscriptions);
     }
 }

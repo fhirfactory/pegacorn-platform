@@ -28,12 +28,14 @@ import java.util.Objects;
 
 public class IntraSubsystemPubSubParticipant implements Serializable {
     private IntraSubsystemPubSubParticipantIdentifier identifier;
+    private String componentID;
 
     //
     // Constructors
     //
     public IntraSubsystemPubSubParticipant(){
         this.identifier = null;
+        this.componentID = null;
     }
 
     public IntraSubsystemPubSubParticipant(IntraSubsystemPubSubParticipantIdentifier identifier){
@@ -44,6 +46,11 @@ public class IntraSubsystemPubSubParticipant implements Serializable {
         this.identifier = new IntraSubsystemPubSubParticipantIdentifier(wupToken);
     }
 
+    public IntraSubsystemPubSubParticipant(TopologyNodeFDNToken wupToken, String componentID){
+        this.identifier = new IntraSubsystemPubSubParticipantIdentifier(wupToken);
+        this.componentID = componentID;
+    }
+
     public IntraSubsystemPubSubParticipant(IntraSubsystemPubSubParticipant ori){
         this.identifier = ori.getIdentifier();
     }
@@ -51,6 +58,15 @@ public class IntraSubsystemPubSubParticipant implements Serializable {
     //
     // Getters and Setters
     //
+
+
+    public String getComponentID() {
+        return componentID;
+    }
+
+    public void setComponentID(String componentID) {
+        this.componentID = componentID;
+    }
 
     public IntraSubsystemPubSubParticipantIdentifier getIdentifier() {
         return identifier;

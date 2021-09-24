@@ -153,6 +153,7 @@ public class WorkUnitProcessorFrameworkManager {
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
         IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
         localSubscriber.setIdentifier(identifier);
+        localSubscriber.setComponentID(wupNode.getComponentID());
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         return(subscriber);
     }

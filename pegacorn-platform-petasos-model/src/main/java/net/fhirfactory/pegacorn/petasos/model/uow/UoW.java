@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
@@ -288,6 +289,8 @@ public class UoW implements Serializable {
 
     public String toJSONString() {
         ObjectMapper jsonMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        jsonMapper.registerModule(module);
         try {
             String jsonString = jsonMapper.writeValueAsString(this);
             return (jsonString);

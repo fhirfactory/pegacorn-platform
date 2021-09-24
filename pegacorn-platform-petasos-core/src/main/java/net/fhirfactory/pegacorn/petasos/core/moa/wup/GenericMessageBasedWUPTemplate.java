@@ -41,7 +41,11 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetric;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetricsSet;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.valuesets.ITOpsMetricNameEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
@@ -53,6 +57,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,6 +104,9 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     @Inject
     private FHIRContextUtility fhirContextUtility;
+
+    @Inject
+    private ITOpsTopologyCollectionAgent itopsCollectionAgent;
 
     public GenericMessageBasedWUPTemplate() {
         super();
@@ -344,11 +352,14 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             if(endpointTopologyNode.getName().contentEquals(topologyEndpointName)){
                 getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);
+                endpointTopologyNode.setImplementingWUP(getAssociatedTopologyNode().getNodeFDN());
+                getAssociatedTopologyNode().getEndpoints().add(endpointTopologyNode.getNodeFDN());
                 return(endpointTopologyNode);
             }
         }
         getLogger().debug(".getTopologyEndpoint(): Exit, Could not find node!");
         return(null);
     }
+
 
 }
