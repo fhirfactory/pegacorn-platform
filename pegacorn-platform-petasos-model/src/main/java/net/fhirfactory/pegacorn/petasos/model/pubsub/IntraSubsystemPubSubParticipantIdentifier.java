@@ -42,7 +42,7 @@ public class IntraSubsystemPubSubParticipantIdentifier extends TopologyNodeFDNTo
     @Override
     public String toString() {
         return "LocalPubSubParticipantIdentifier{" +
-                "tokenValue='" + getTokenValue() + '\'' +
+                "tokenValue=" + getTokenValue() +
                 '}';
     }
 }

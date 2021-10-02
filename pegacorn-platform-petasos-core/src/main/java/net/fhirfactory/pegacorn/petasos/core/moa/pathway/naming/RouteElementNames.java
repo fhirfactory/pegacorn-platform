@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
  */
 public class RouteElementNames {
     private static final Logger LOG = LoggerFactory.getLogger(RouteElementNames.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     private TopologyNodeFDNToken nodeFDNToken;
     private boolean mustBeDirect;
@@ -44,33 +47,33 @@ public class RouteElementNames {
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
 
     public RouteElementNames(TopologyNodeFDNToken functionToken, boolean mustBeDirect){
-        LOG.debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
+        getLogger().debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
         this.nodeFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
     }
 
     public RouteElementNames(TopologyNodeFDNToken functionToken){
-        LOG.debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
+        getLogger().debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
         this.nodeFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
     }
 
     public String simplifyName(){
-        LOG.debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFDNToken);
+        getLogger().debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFDNToken);
         TopologyNodeFDN wupFunctionFDN = new TopologyNodeFDN(this.nodeFDNToken);
-        LOG.trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
+        getLogger().trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
         TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
-        LOG.trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
+        getLogger().trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
         TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
-        LOG.trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
+        getLogger().trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
         TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WUP);
-        LOG.trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
+        getLogger().trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
         String nodeVersion = wupFunctionRDN.getNodeVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");
         String wupName = processingPlantRDN.getNodeName()+"."+workshopRDN.getNodeName()+"."+wupFunctionRDN.getNodeName()+"."+nodeVersionSimplified;
-        LOG.trace(".simplifyName(): wupName (String) --> {}", wupName);
+        getLogger().trace(".simplifyName(): wupName (String) --> {}", wupName);
         return(wupName);
     }
 
@@ -83,7 +86,7 @@ public class RouteElementNames {
     }
 
     public String getEndPointWUPContainerIngresProcessorIngres() {
-        LOG.debug(".getEndPointWUPContainerIngresProcessorIngres(): Entry");
+        getLogger().debug(".getEndPointWUPContainerIngresProcessorIngres(): Entry");
         String endpointName;
         if(this.mustBeDirect){
             endpointName = DIRECT_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres";
@@ -94,151 +97,151 @@ public class RouteElementNames {
     }
 
     public String getEndPointWUPContainerIngresProcessorEgress() {
-        LOG.debug(".getEndPointWUPContainerIngresProcessorEgress(): Entry");
+        getLogger().debug(".getEndPointWUPContainerIngresProcessorEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Egress";
         return(endpointName);
     }
 
     public String getEndPointWUPContainerIngresGatekeeperIngres() {
-        LOG.debug(".getEndPointWUPContainerIngresGatekeeperIngres(): Entry");
+        getLogger().debug(".getEndPointWUPContainerIngresGatekeeperIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresGatekeeper.Ingres";
         return(endpointName);
     }
 
     public String getEndPointWUPIngresConduitIngres() {
-        LOG.debug(".getEndPointWUPIngresConduitIngres(): Entry");
+        getLogger().debug(".getEndPointWUPIngresConduitIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUP.IngresConduit.Ingres";
         return(endpointName);
     }
 
     public String getEndPointWUPIngres() {
-        LOG.debug(".getEndPointWUPIngres(): Entry");
+        getLogger().debug(".getEndPointWUPIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUP.Ingres";
         return(endpointName);
     }
 
     public String getEndPointWUPEgress() {
-        LOG.debug(".getEndPointWUPEgress(): Entry");
+        getLogger().debug(".getEndPointWUPEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUP.Egress";
         return(endpointName);
     }
 
     public String getEndPointWUPEgressConduitEgress() {
-        LOG.debug(".getEndPointWUPEgressConduitEgress(): Entry");
+        getLogger().debug(".getEndPointWUPEgressConduitEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUP.EgressConduit.Egress";
         return(endpointName);
     }
 
     public String getEndPointWUPContainerEgressGatekeeperIngres() {
-        LOG.debug(".getEndPointWUPContainerEgressGatekeeperIngres(): Entry");
+        getLogger().debug(".getEndPointWUPContainerEgressGatekeeperIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.EgressGatekeeper.Ingres";
         return(endpointName);
     }
 
     public String getEndPointWUPContainerEgressProcessorIngres() {
-        LOG.debug(".getEndPointWUPContainerEgressProcessorIngres(): Entry");
+        getLogger().debug(".getEndPointWUPContainerEgressProcessorIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.EgressProcessor.Ingres";
         return(endpointName);
     }
 
     public String getEndPointWUPContainerEgressProcessorEgress() {
-        LOG.debug(".getEndPointWUPContainerEgressProcessorEgress(): Entry");
+        getLogger().debug(".getEndPointWUPContainerEgressProcessorEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.EgressProcessor.Egress";
         return(endpointName);
     }
 
     public String getEndPointInterchangePayloadTransformerIngres() {
-        LOG.debug(".getEndPointInterchangePayloadTransformerIngres(): Entry");
+        getLogger().debug(".getEndPointInterchangePayloadTransformerIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres";
         return(endpointName);
     }
 
     public String getEndPointInterchangePayloadTransformerEgress() {
-        LOG.debug(".getEndPointInterchangePayloadTransformerEgress(): Entry");
+        getLogger().debug(".getEndPointInterchangePayloadTransformerEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Egress";
         return(endpointName);
     }
 
     public String getEndPointInterchangeRouterIngres() {
-        LOG.debug(".getEndPointInterchangeRouterIngres(): Entry");
+        getLogger().debug(".getEndPointInterchangeRouterIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.Router.Ingres";
         return(endpointName);
     }
 
     public String getEndPointInterchangeRouterEgress() {
-        LOG.debug(".getEndPointInterchangeRouterEgress(): Entry");
+        getLogger().debug(".getEndPointInterchangeRouterEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.Router.Egress";
         return(endpointName);
     }
 
     public String getRouteIngresProcessorEgress2IngresGatekeeperIngres() {
-        LOG.debug(".getRouteIngresProcessorEgress2IngresGatekeeperIngres(): Entry");
+        getLogger().debug(".getRouteIngresProcessorEgress2IngresGatekeeperIngres(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUPC.IP.E-To-" + wupTypeName +".WUPC.IG.I" ;
         return(endpointName);
     }
 
     public String getRouteIngresConduitIngres2WUPIngres() {
-        LOG.debug(".getRouteIngresConduitIngres2WUPIngres(): Entry");
+        getLogger().debug(".getRouteIngresConduitIngres2WUPIngres(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUP.IC.I-To-" + wupTypeName +".WUP.I" ;
         return(endpointName);
     }
 
     public String getRouteWUPEgress2WUPEgressConduitEgress() {
-        LOG.debug(".getRouteWUPEgress2WUPEgressConduitEgress(): Entry");
+        getLogger().debug(".getRouteWUPEgress2WUPEgressConduitEgress(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUP.E-To-" + wupTypeName +".WUP.EC.E" ;
         return(endpointName);
     }
 
     public String getRouteWUPEgressConduitEgress2WUPEgressProcessorIngres() {
-        LOG.debug(".getRouteWUPEgressConduitEgress2WUPEgressProcessorIngres(): Entry");
+        getLogger().debug(".getRouteWUPEgressConduitEgress2WUPEgressProcessorIngres(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUP.EC.E-To-" + wupTypeName +".WUPC.EP.I" ;
         return(endpointName);
     }
 
     public String getRouteWUPEgressProcessorEgress2WUPEgressGatekeeperIngres() {
-        LOG.debug(".getRouteWUPEgressProcessorEgress2WUPEgressGatekeeperIngres(): Entry");
+        getLogger().debug(".getRouteWUPEgressProcessorEgress2WUPEgressGatekeeperIngres(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUP.EP.E-To-" + wupTypeName +".WUPC.EG.I" ;
         return(endpointName);
     }
 
     public String getRouteInterchangePayloadTransformerEgress2InterchangePayloadRouterIngres() {
-        LOG.debug(".getRouteInterchangePayloadTransformerEgress2InterchangePayloadRouterIngres(): Entry");
+        getLogger().debug(".getRouteInterchangePayloadTransformerEgress2InterchangePayloadRouterIngres(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".IC.PT.E-To-" + wupTypeName +".IC.R.I" ;
         return(endpointName);
     }
 
     public String getRouteWUPContainerIngressProcessor() {
-        LOG.debug(".getRouteWUPContainerIngressProcessor(): Entry");
+        getLogger().debug(".getRouteWUPContainerIngressProcessor(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUPC.IP.I-To-" + wupTypeName +".WUPC.IP.E" ;
         return(endpointName);
     }
 
     public String getRouteWUPContainerIngresGateway() {
-        LOG.debug(".getRouteWUPContainerIngresGateway(): Entry");
+        getLogger().debug(".getRouteWUPContainerIngresGateway(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUPC.IG.I-To-" + wupTypeName +".WUPC.IG.E" ;
         return(endpointName);
     }
 
     public String getRouteWUPContainerEgressGateway() {
-        LOG.debug(".getRouteWUPContainerEgressGateway(): Entry");
+        getLogger().debug(".getRouteWUPContainerEgressGateway(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUPC.EG.I-To-" + wupTypeName +".WUPC.EG.E" ;
         return(endpointName);
     }
 
     public String getRouteWUPContainerEgressProcessor() {
-        LOG.debug(".getRouteWUPContainerEgressProcessor(): Entry");
+        getLogger().debug(".getRouteWUPContainerEgressProcessor(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUPC.EP.I-To-" + wupTypeName +".WUPC.EP.E" ;
         return(endpointName);
     }
 
     public String getRouteInterchangePayloadTransformer(){
-        LOG.debug(".getRouteInterchangePayloadTransformer(): Entry");
+        getLogger().debug(".getRouteInterchangePayloadTransformer(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".IC.PT.I-To-" + wupTypeName +".IC.PT.E" ;
         return(endpointName);
     }
 
     public String getRouteInterchangeRouter(){
-        LOG.debug(".getRouteInterchangeRouter(): Entry");
+        getLogger().debug(".getRouteInterchangeRouter(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".IC.R.I-To-" + wupTypeName +".IC.R.E" ;
         return(endpointName);
     }

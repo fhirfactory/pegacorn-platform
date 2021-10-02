@@ -29,9 +29,12 @@ import org.slf4j.LoggerFactory;
 public class SimpleValidatorForPractitionerRole extends SimpleValidatorBase{
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorForPractitionerRole.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public boolean isSimplyValid(PractitionerRole pPractitionerRole) {
-        LOG.debug("isSimplyValid(PractitionerRole p): Entry");
+        getLogger().debug("isSimplyValid(PractitionerRole p): Entry");
 
         return (false);
     }

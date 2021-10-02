@@ -51,6 +51,9 @@ import java.util.Date;
 @Dependent
 public class WUPEgressConduit {
     private static final Logger LOG = LoggerFactory.getLogger(WUPEgressConduit.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
     
     @Inject
     TopologyIM topologyProxy;
@@ -67,15 +70,15 @@ public class WUPEgressConduit {
      * @return A WorkUnitTransportPacket object for relay to the other
      */
     public WorkUnitTransportPacket receiveFromWUP(UoW incomingUoW, Exchange camelExchange) {
-        LOG.debug(".receiveFromWUP(): Entry, incomingUoW->{}", incomingUoW);
+        getLogger().debug(".receiveFromWUP(): Entry, incomingUoW->{}", incomingUoW);
         // Get my Petasos Context
         if( topologyProxy == null ) {
-        	LOG.error(".receiveFromWUP(): Guru Software Meditation Error: topologyProxy is null");
+        	getLogger().error(".receiveFromWUP(): Guru Software Meditation Error: topologyProxy is null");
         }
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        LOG.trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
+        getLogger().trace(".receiveFromWUP(): Node Element retrieved --> {}", node);
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
-        LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
+        getLogger().trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
         // Now, continue with business logic
         RouteElementNames elementNames = new RouteElementNames(node.getNodeFDN().getToken());
         // Retrieve the information from the CamelExchange
@@ -83,18 +86,18 @@ public class WUPEgressConduit {
         ParcelStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
         // Now process incoming content
         WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(jobCard.getActivityID(), Date.from(Instant.now()), incomingUoW);
-        LOG.trace(".receiveFromWUP(): We only want to check if the UoW was successful and modify the JobCard/StatusElement accordingly.");
-        LOG.trace(".receiveFromWUP(): All detailed checking of the Cluster/SiteWide details is done in the WUPContainerEgressProcessor");
+        getLogger().trace(".receiveFromWUP(): We only want to check if the UoW was successful and modify the JobCard/StatusElement accordingly.");
+        getLogger().trace(".receiveFromWUP(): All detailed checking of the Cluster/SiteWide details is done in the WUPContainerEgressProcessor");
         switch (incomingUoW.getProcessingOutcome()) {
             case UOW_OUTCOME_SUCCESS:
-                LOG.trace(".receiveFromWUP(): UoW was processed successfully - updating JobCard/StatusElement to FINISHED!");
+                getLogger().trace(".receiveFromWUP(): UoW was processed successfully - updating JobCard/StatusElement to FINISHED!");
                 jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 statusElement.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
                 statusElement.setEntryDate(Date.from(Instant.now()));
                 break;
             case UOW_OUTCOME_NO_PROCESSING_REQUIRED:
-                LOG.trace(".receiveFromWUP(): UoW was processed with no actions required - updating JobCard/StatusElement to FINISHED!");
+                getLogger().trace(".receiveFromWUP(): UoW was processed with no actions required - updating JobCard/StatusElement to FINISHED!");
                 jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 jobCard.setIsToBeDiscarded(true);
@@ -105,7 +108,7 @@ public class WUPEgressConduit {
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_FAILED:
             default:
-                LOG.trace(".receiveFromWUP(): UoW was not processed or processing failed - updating JobCard/StatusElement to FAILED!");
+                getLogger().trace(".receiveFromWUP(): UoW was not processed or processing failed - updating JobCard/StatusElement to FAILED!");
                 jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
                 jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
                 statusElement.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);

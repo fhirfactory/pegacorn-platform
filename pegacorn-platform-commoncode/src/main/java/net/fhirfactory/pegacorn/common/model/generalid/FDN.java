@@ -43,6 +43,9 @@ import org.slf4j.LoggerFactory;
 public class FDN implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(FDN.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
     private ArrayList<RDN> rdnSet;
     private String FDNType;
     private FDNToken token;
@@ -59,9 +62,9 @@ public class FDN implements Serializable {
      * Default Constructor
      */
     public FDN() {
-        LOG.trace(".FDN(): Default constructor invoked.");
+        getLogger().trace(".FDN(): Default constructor invoked.");
         this.rdnSet = new ArrayList<RDN>();
-        LOG.trace(".FDN(): this.rdnElementSet intialised.");
+        getLogger().trace(".FDN(): this.rdnElementSet intialised.");
         this.token = new FDNToken();
         this.fdnToString = new String();
         this.unqualifiedToken = new String();
@@ -74,7 +77,7 @@ public class FDN implements Serializable {
      * @param originalFDN The original FDN
      */
     public FDN(FDN originalFDN) {
-        LOG.trace(".FDN( FDN originalFDN ): Constructor invoked, originalFDN --> {}", originalFDN);
+        getLogger().trace(".FDN( FDN originalFDN ): Constructor invoked, originalFDN --> {}", originalFDN);
         if (originalFDN == null) {
             throw (new IllegalArgumentException("Empty FDN passed to copy Constructor"));
         }
@@ -96,7 +99,7 @@ public class FDN implements Serializable {
         generateToString();
         generateToken();
         generateUnqualifiedToken();
-        LOG.trace(".FDN( FDN originalFDN ): generatedFDN = {}", this.fdnToString);
+        getLogger().trace(".FDN( FDN originalFDN ): generatedFDN = {}", this.fdnToString);
     }
 
     /**
@@ -105,20 +108,20 @@ public class FDN implements Serializable {
      * @param token An FDNToken from which the FDN may be instantiated.
      */
     public FDN(FDNToken token) {
-        LOG.debug(".FDN( FDNToken token ): Constructor invoked, token --> {}", token);
+        getLogger().debug(".FDN( FDNToken token ): Constructor invoked, token --> {}", token);
         if (token == null) {
             throw (new IllegalArgumentException("Empty parameter passed to Constructor"));
         }
         String tokenContent = token.getContent();
-        LOG.trace(".FDN( FDNToken token ): tokenContent --> {}", tokenContent);
+        getLogger().trace(".FDN( FDNToken token ): tokenContent --> {}", tokenContent);
         String[] rdnStringEntries = tokenContent.split("><");
         if(rdnStringEntries.length <= 0){
             throw (new IllegalArgumentException("Badly formed FDNToken passed to Constructor, cannot parse -> " + token.getContent()));
         }
-        LOG.trace(".FDN(FDNToken token): We have a valid JSONObject for the FDNToken!, now extract content & process");
+        getLogger().trace(".FDN(FDNToken token): We have a valid JSONObject for the FDNToken!, now extract content & process");
         this.rdnSet = new ArrayList<RDN>();
         for (int counter = 0; counter < rdnStringEntries.length; counter++) {
-            LOG.trace(".FDN( FDNToken token ): Iterating through the extracted Token, attempting to extract RDN[{}]", counter);
+            getLogger().trace(".FDN( FDNToken token ): Iterating through the extracted Token, attempting to extract RDN[{}]", counter);
             String currentCounterEntry = null;
             for(int loopCounter = 0; counter < rdnStringEntries.length; loopCounter += 1){
                 if(rdnStringEntries[loopCounter].startsWith("<"+counter+":")){
@@ -132,7 +135,7 @@ public class FDN implements Serializable {
                     }
                 }
             }
-            LOG.trace(".FDN( FDNToken token ): processing ->{}", currentCounterEntry);
+            getLogger().trace(".FDN( FDNToken token ): processing ->{}", currentCounterEntry);
             // Extract the RDN Type/Qualifier
             String rdnQualifierWorking = null;
             if(currentCounterEntry.startsWith("<"+counter+":")){
@@ -152,9 +155,9 @@ public class FDN implements Serializable {
             int startPoint = rdnValueWorking.indexOf(">");
             int endPoint = rdnValueWorking.indexOf("<");
             String rdnValue = rdnValueWorking.substring(startPoint+1, endPoint);
-            LOG.trace(".FDN( FDNToken token ): creating RDN, rdnQualifier->{}, rdnValue->{}", rdnQualifier, rdnValue);
+            getLogger().trace(".FDN( FDNToken token ): creating RDN, rdnQualifier->{}, rdnValue->{}", rdnQualifier, rdnValue);
             RDN currentRDN = new RDN(rdnQualifier, rdnValue);
-            LOG.trace(".FDN( FDNToken token ): Iterating through the extracted RDNs, current RDN --> {}", currentRDN);
+            getLogger().trace(".FDN( FDNToken token ): Iterating through the extracted RDNs, current RDN --> {}", currentRDN);
             this.rdnSet.add(counter, currentRDN);
         }
 
@@ -173,7 +176,7 @@ public class FDN implements Serializable {
      * "Least Significant" member of the FDN.
      */
     public void appendRDN(RDN toBeAddedRDN) {
-        LOG.trace(".appendRDN(): Entry, toBeAddedRDN --> {}", toBeAddedRDN);
+        getLogger().trace(".appendRDN(): Entry, toBeAddedRDN --> {}", toBeAddedRDN);
         if (toBeAddedRDN == null) {
             throw (new IllegalArgumentException("Empty RDN passed to appendRDN"));
         }
@@ -185,12 +188,12 @@ public class FDN implements Serializable {
         generateToString();
         generateToken();
         generateUnqualifiedToken();
-        LOG.trace(".appendRDN(): Exit");
+        getLogger().trace(".appendRDN(): Exit");
     }
 
     @Override
     public String toString() {
-        LOG.trace(".toString(): Entry/Exit");
+        getLogger().trace(".toString(): Entry/Exit");
         return (this.fdnToString);
     }
 
@@ -200,13 +203,13 @@ public class FDN implements Serializable {
      * made available only for the purposes of documentation and/or reporting.
      */
     private void generateToString() {
-        LOG.trace(".generateToString(): Entry");
+        getLogger().trace(".generateToString(): Entry");
         String toString = FDN_TO_STRING_PREFIX;
         generateToken();
         toString = toString + getToken();
         toString = toString + FDN_TO_STRING_SUFFIX;
         this.fdnToString = toString;
-        LOG.trace(".generateToString(): Exit");
+        getLogger().trace(".generateToString(): Exit");
     }
 
     /**
@@ -221,7 +224,7 @@ public class FDN implements Serializable {
      * that has the current "Least Significant" member removed from it.
      */
     public FDN getParentFDN() {
-        LOG.trace(".getParentFDN(): Entry");
+        getLogger().trace(".getParentFDN(): Entry");
         if (this.getRDNCount() <= 1) {
             return null;
         }
@@ -230,49 +233,49 @@ public class FDN implements Serializable {
             RDN currentRDN = this.rdnSet.get(counter);
             newParentFDN.appendRDN(currentRDN);
         }
-        LOG.trace(".getParentFDN(): Exit");
+        getLogger().trace(".getParentFDN(): Exit");
         return (newParentFDN);
     }
 
     public RDN getUnqualifiedRDN() {
-        LOG.trace(".getUnqualifiedRDN(): Entry");
+        getLogger().trace(".getUnqualifiedRDN(): Entry");
         if (this.getRDNCount() <= 0) {
-            LOG.trace(".getUnqualifiedRDN(): Exit, no RDNs");
+            getLogger().trace(".getUnqualifiedRDN(): Exit, no RDNs");
             return (null);
         }
         RDN leastSignificantRDN = this.rdnSet.get((this.getRDNCount() - 1));
-        LOG.trace(".getUnqualifiedRDN(): Exit, least signifcant RDN --> {}", leastSignificantRDN);
+        getLogger().trace(".getUnqualifiedRDN(): Exit, least signifcant RDN --> {}", leastSignificantRDN);
         return (leastSignificantRDN);
     }
 
     public boolean isEmpty() {
-        LOG.trace(".isEmpty(): Entry");
+        getLogger().trace(".isEmpty(): Entry");
         if (this.getRDNCount() <= 0) {
-            LOG.trace(".isEmpty(): Exit, returned --> true");
+            getLogger().trace(".isEmpty(): Exit, returned --> true");
             return (true);
         } else {
-            LOG.trace(".isEmpty(): Exit, returned --> false");
+            getLogger().trace(".isEmpty(): Exit, returned --> false");
             return (false);
         }
     }
 
     public ArrayList<RDN> getRDNSet() {
-        LOG.trace(".getRDNSet(): Entry/Exit");
+        getLogger().trace(".getRDNSet(): Entry/Exit");
         return (this.rdnSet);
     }
 
     public int getRDNCount() {
-        LOG.trace(".getRDNCount(): Entry/Exit");
+        getLogger().trace(".getRDNCount(): Entry/Exit");
         return (this.rdnSet.size());
     }
 
     public FDNToken getToken() {
-        LOG.trace(".getToken(): Entry/Exit");
+        getLogger().trace(".getToken(): Entry/Exit");
         return (this.token);
     }
 
     private void generateToken() {
-        LOG.trace(".generateToken(): Entry");
+        getLogger().trace(".generateToken(): Entry");
         StringBuilder tokenBuilder = new StringBuilder();
         for (int counter = 0; counter < this.getRDNCount(); counter++) {
             RDN currentRDN = this.rdnSet.get(counter);
@@ -280,7 +283,7 @@ public class FDN implements Serializable {
             tokenBuilder.append(currentEntry);
         }
         this.token = new FDNToken(tokenBuilder.toString());
-        LOG.trace(".generateToken(): Exit");
+        getLogger().trace(".generateToken(): Exit");
     }
 
     private String pseudoXMLAttribute(int order, String attributeName, String attributeValue){
@@ -300,7 +303,7 @@ public class FDN implements Serializable {
     }
 
     private void generateUnqualifiedToken() {
-        LOG.trace(".generateUnqualifiedToken(): Entry");
+        getLogger().trace(".generateUnqualifiedToken(): Entry");
         String newUnqualifiedToken = new String();
         for (int counter = 0; counter < this.getRDNCount(); counter++) {
             RDN currentRDN = this.rdnSet.get(counter);
@@ -311,11 +314,11 @@ public class FDN implements Serializable {
             }
         }
         this.unqualifiedToken = newUnqualifiedToken;
-        LOG.trace(".generateUnqualifiedToken(): Exit");
+        getLogger().trace(".generateUnqualifiedToken(): Exit");
     }
     
     public String getID() {
-        LOG.trace(".getID(): Entry");
+        getLogger().trace(".getID(): Entry");
         String id = new String();
         int depthCount = this.getRDNCount();
         for (int counter = 0; counter < depthCount; counter++) {
@@ -325,29 +328,29 @@ public class FDN implements Serializable {
             	id = id + ".";
             }
         }
-        LOG.trace(".generateUnqualifiedToken(): Exit, Id --> {}", id);
+        getLogger().trace(".generateUnqualifiedToken(): Exit, Id --> {}", id);
         return(id);
     }
 
     public String getUnqualifiedToken() {
-        LOG.trace(".getUnqualifiedToken(): Entry/Exit");
+        getLogger().trace(".getUnqualifiedToken(): Entry/Exit");
         return unqualifiedToken;
     }
 
     public String getFDNType() {
-        LOG.trace(".getFDNType(): Entry/Exit");
+        getLogger().trace(".getFDNType(): Entry/Exit");
         return FDNType;
     }
 
     public void setFDNType(String FDNType) {
-        LOG.trace(".setFDNType(): Entry/Exit");
+        getLogger().trace(".setFDNType(): Entry/Exit");
         this.FDNType = FDNType;
     }
 
     public void appendFDN(FDN additionalFDN) {
-        LOG.trace(".appendFDN(): Entry, additionalFDN --> {}", additionalFDN );
+        getLogger().trace(".appendFDN(): Entry, additionalFDN --> {}", additionalFDN );
         if (additionalFDN == null) {
-            LOG.trace(".appendFDN(): Exit, nothing to add, additionFDN is null");
+            getLogger().trace(".appendFDN(): Exit, nothing to add, additionFDN is null");
             return;
         }
         int additionalFDNSize = additionalFDN.getRDNCount();
@@ -358,11 +361,11 @@ public class FDN implements Serializable {
         generateToString();
         generateToken();
         generateUnqualifiedToken();
-        LOG.trace(".appendFDN: Exit");
+        getLogger().trace(".appendFDN: Exit");
     }
     
     public RDN extractRDNViaQualifier(String qualifier){
-        LOG.trace(".extractRDNViaQualifier(): Entry, qualifier --> {}",qualifier );
+        getLogger().trace(".extractRDNViaQualifier(): Entry, qualifier --> {}",qualifier );
         for (RDN currentRDN: this.rdnSet) {
             boolean matches = currentRDN.getQualifier().contentEquals(qualifier);
             if(matches){

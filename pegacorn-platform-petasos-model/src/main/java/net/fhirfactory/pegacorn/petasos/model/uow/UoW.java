@@ -45,6 +45,9 @@ import org.slf4j.LoggerFactory;
 public class UoW implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(UoW.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public static final String HASH_ATTRIBUTE = "InstanceQualifier";
     /**
@@ -88,27 +91,27 @@ public class UoW implements Serializable {
     }
 
     public UoW(UoWPayload inputPayload) {
-        LOG.debug(".UoW(): Constructor: inputPayload -->{}", inputPayload);
-        LOG.trace(".UoW(): Clone the ingressContent and assign it");
+        getLogger().debug(".UoW(): Constructor: inputPayload -->{}", inputPayload);
+        getLogger().trace(".UoW(): Clone the ingressContent and assign it");
         this.ingresContent = SerializationUtils.clone(inputPayload);
-        LOG.trace(".UoW(): ingressContent cloned and assigned");
-        LOG.trace(".UoW(): create an empty UoWPayloadSet and assign it to the egressContent");
+        getLogger().trace(".UoW(): ingressContent cloned and assigned");
+        getLogger().trace(".UoW(): create an empty UoWPayloadSet and assign it to the egressContent");
         this.egressContent = new UoWPayloadSet();
-        LOG.trace(".UoW(): egressContent created and assigned");
+        getLogger().trace(".UoW(): egressContent created and assigned");
         this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
-        LOG.trace(".UoW(): Creating the typeID, first extract inputPayload manifest");
+        getLogger().trace(".UoW(): Creating the typeID, first extract inputPayload manifest");
         FDN contentFDN = inputPayload.getPayloadManifest().getContentDescriptor().toFDN();
-        LOG.trace(".UoW(): Creating the typeID, now convert to an FDNToken");
+        getLogger().trace(".UoW(): Creating the typeID, now convert to an FDNToken");
         FDNToken contentFDNToken = contentFDN.getToken();
-        LOG.trace(".UoW(): Creating the typeID, now clone it and assign it to the typeID of this UoW");
+        getLogger().trace(".UoW(): Creating the typeID, now clone it and assign it to the typeID of this UoW");
         this.typeID = SerializationUtils.clone(contentFDNToken);
-        LOG.trace(".UoW(): typeID --> {}", this.typeID);
+        getLogger().trace(".UoW(): typeID --> {}", this.typeID);
         this.failureDescription = null;
-        LOG.trace(".UoW(): Now generating instanceID");
+        getLogger().trace(".UoW(): Now generating instanceID");
         generateInstanceID();
-        LOG.trace(".UoW(): instanceID generated");
-        if (LOG.isTraceEnabled()) {
-            LOG.trace(".UoW(FDN, UoWPayloadSet): this.typeID --> {}, this.instanceID --> {}", this.typeID, this.instanceID);
+        getLogger().trace(".UoW(): instanceID generated");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace(".UoW(FDN, UoWPayloadSet): this.typeID --> {}, this.instanceID --> {}", this.typeID, this.instanceID);
         }
     }
 
@@ -125,14 +128,14 @@ public class UoW implements Serializable {
     }
 
     private void generateInstanceID() {
-        LOG.debug(".generateInstanceID(): Entry");
-        LOG.trace(".generateInstanceID(): generating an instance id based on Timestamp");
+        getLogger().debug(".generateInstanceID(): Entry");
+        getLogger().trace(".generateInstanceID(): generating an instance id based on Timestamp");
         String generatedInstanceValue = Long.toString(Instant.now().getNano());
         FDN instanceFDN = new FDN(this.typeID);
         RDN newRDN = new RDN(HASH_ATTRIBUTE, generatedInstanceValue);
         instanceFDN.appendRDN(newRDN);
         this.instanceID = new UoWIdentifier(instanceFDN.getToken());
-        LOG.debug(".generateInstanceID(): Exit");
+        getLogger().debug(".generateInstanceID(): Exit");
     }
 
     // instanceID Helper/Bean methods
@@ -250,7 +253,7 @@ public class UoW implements Serializable {
 
     @Override
     public String toString() {
-        LOG.debug("toString(): Entry");
+        getLogger().debug("toString(): Entry");
 
         String uowToString = "UoW={";
         if (hasInstanceID()) {

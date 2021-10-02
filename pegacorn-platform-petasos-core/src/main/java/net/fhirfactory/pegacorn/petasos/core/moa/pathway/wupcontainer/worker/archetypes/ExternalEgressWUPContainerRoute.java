@@ -42,26 +42,29 @@ import org.slf4j.LoggerFactory;
 
 public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(ExternalEgressWUPContainerRoute.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
 	private WorkUnitProcessorTopologyNode wupTopologyNode;
 	private RouteElementNames nameSet;
 
 	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode) {
 		super(camelCTX);
-		LOG.debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
+		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
 		nameSet = new RouteElementNames(wupNode.getNodeFDN().getToken());
 	}
 
 	@Override
 	public void configure() {
-		LOG.debug(".configure(): Entry!, for wupNode --> {}", this.wupTopologyNode);
-		LOG.info("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorIngres --> {}", nameSet.getEndPointWUPContainerIngresProcessorIngres());
-		LOG.info("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorEgress --> {}", nameSet.getEndPointWUPContainerIngresProcessorEgress());
-		LOG.info("StandardWUPContainerRoute :: EndPointWUPContainerIngresGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerIngresGatekeeperIngres());
-		LOG.info("StandardWUPContainerRoute :: EndPointWUPIngresConduitIngres --> {}", nameSet.getEndPointWUPIngresConduitIngres());
-		LOG.info("StandardWUPContainerRoute :: EndPointWUPIngres --> {}", nameSet.getEndPointWUPIngres());
-		LOG.info("StandardWUPContainerRoute :: EndPointWUPEgress --> {}", nameSet.getEndPointWUPEgress());
+		getLogger().debug(".configure(): Entry!, for wupNode --> {}", this.wupTopologyNode);
+		getLogger().info("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorIngres --> {}", nameSet.getEndPointWUPContainerIngresProcessorIngres());
+		getLogger().info("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorEgress --> {}", nameSet.getEndPointWUPContainerIngresProcessorEgress());
+		getLogger().info("StandardWUPContainerRoute :: EndPointWUPContainerIngresGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerIngresGatekeeperIngres());
+		getLogger().info("StandardWUPContainerRoute :: EndPointWUPIngresConduitIngres --> {}", nameSet.getEndPointWUPIngresConduitIngres());
+		getLogger().info("StandardWUPContainerRoute :: EndPointWUPIngres --> {}", nameSet.getEndPointWUPIngres());
+		getLogger().info("StandardWUPContainerRoute :: EndPointWUPEgress --> {}", nameSet.getEndPointWUPEgress());
 
 		ExternalEgressWUPContainerRoute.NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 
@@ -90,7 +93,7 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 	protected class NodeDetailInjector implements Processor {
 		@Override
 		public void process(Exchange exchange) throws Exception {
-			LOG.debug("NodeDetailInjector.process(): Entry");
+			getLogger().debug("NodeDetailInjector.process(): Entry");
 			boolean alreadyInPlace = false;
 			if(exchange.hasProperties()) {
 				WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);

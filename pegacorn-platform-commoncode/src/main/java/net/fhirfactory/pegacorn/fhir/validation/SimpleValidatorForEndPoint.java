@@ -29,9 +29,12 @@ import org.slf4j.LoggerFactory;
 public class SimpleValidatorForEndPoint extends SimpleValidatorBase{
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorForEndPoint.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public boolean isSimplyValid(EndPoint pEndPoint) {
-        LOG.debug("isSimplyValid(EndPoint p): Entry");
+        getLogger().debug("isSimplyValid(EndPoint p): Entry");
 
         return (false);
     }

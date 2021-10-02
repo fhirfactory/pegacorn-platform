@@ -29,9 +29,12 @@ import org.slf4j.LoggerFactory;
 public class SimpleValidatorForCareTeam extends SimpleValidatorBase{
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorForCareTeam.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public boolean isSimplyValid(CareTeam pCareTeam) {
-        LOG.debug("isSimplyValid(CareTeam p): Entry");
+        getLogger().debug("isSimplyValid(CareTeam p): Entry");
 
         return (false);
     }

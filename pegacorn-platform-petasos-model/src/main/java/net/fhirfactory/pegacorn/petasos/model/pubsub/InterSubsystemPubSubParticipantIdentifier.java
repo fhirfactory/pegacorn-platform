@@ -64,8 +64,8 @@ public class InterSubsystemPubSubParticipantIdentifier implements Serializable {
     @Override
     public String toString() {
         return "PubSubMemberIdentifier{" +
-                "subsystemName='" + serviceName + '\'' +
-                ", subsystemInstanceName='" + petasosEndpointName + '\'' +
+                "subsystemName=" + serviceName +
+                ", subsystemInstanceName=" + petasosEndpointName +
                 '}';
     }
 

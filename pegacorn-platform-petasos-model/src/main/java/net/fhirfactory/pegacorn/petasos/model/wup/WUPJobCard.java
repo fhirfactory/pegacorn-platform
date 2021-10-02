@@ -34,6 +34,9 @@ import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 
 public class WUPJobCard {
     private static final Logger LOG = LoggerFactory.getLogger(WUPJobCard.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     private ActivityID activityID;
     private Object activityIDLock;
@@ -62,7 +65,7 @@ public class WUPJobCard {
             ConcurrencyModeEnum clusterMode, 
             ResilienceModeEnum systemMode, 
             Date updateDate) {
-        LOG.debug(".WUPJobCard(): activityID, currentStatus, requestedStatus, clusterMode, systemMode, updateDate");
+        getLogger().debug(".WUPJobCard(): activityID, currentStatus, requestedStatus, clusterMode, systemMode, updateDate");
         this.activityID = null;
         this.updateDate = null;
         this.currentStatus = null;

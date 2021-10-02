@@ -55,7 +55,7 @@ public class FDNToken implements Serializable {
     @Override
     public String toString() {
         return "FDNToken{" +
-                "content='" + content + '\'' +
+                "content=" + content +
                 '}';
     }
 

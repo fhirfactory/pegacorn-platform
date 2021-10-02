@@ -44,6 +44,10 @@ public class WUPIngresConduit {
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
 
     private static final Logger LOG = LoggerFactory.getLogger(WUPIngresConduit.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
     /**
      * This function strips the WUPJobCard and ParcelStatusElement from the ingresParcel, and injects them into the
      * Camel Exchange element for extraction by the WUPEgressConduit module. It then extracts the actual UoW and
@@ -55,7 +59,7 @@ public class WUPIngresConduit {
      * @return A UoW (Unit of Work) object for injection into the WUP for processing by the Business Logic
      */
     public UoW forwardIntoWUP(WorkUnitTransportPacket ingresPacket, Exchange camelExchange){
-        LOG.debug(".forwardIntoWUP(): Entry, ingresParcel->{}", ingresPacket);
+        getLogger().debug(".forwardIntoWUP(): Entry, ingresParcel->{}", ingresPacket);
         UoW theUoW = ingresPacket.getPayload();
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentJobCard());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentParcelStatus());
@@ -64,12 +68,12 @@ public class WUPIngresConduit {
         // Because auditing is not running yet
         // Remove once Auditing is in place
         //
-        LOG.trace("ProcessingMessage->{}", theUoW.getIngresContent().getPayload());
+        getLogger().trace("ProcessingMessage->{}", theUoW.getIngresContent().getPayload());
         //
         //
         //
 
-        LOG.debug(".forwardIntoWUP(): Exit, returning the UoW --> {}", theUoW);
+        getLogger().debug(".forwardIntoWUP(): Exit, returning the UoW --> {}", theUoW);
         return(theUoW);
     }
 }

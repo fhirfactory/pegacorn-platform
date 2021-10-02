@@ -75,8 +75,8 @@ public class TopologyNodeRDN implements Serializable {
     @Override
     public String toString() {
         return "TopologyNodeRDN{" +
-                "nodeName='" + nodeName + '\'' +
-                ", nodeVersion='" + nodeVersion + '\'' +
+                "nodeName=" + nodeName +
+                ", nodeVersion=" + nodeVersion +
                 ", nodeType=" + nodeType +
                 '}';
     }

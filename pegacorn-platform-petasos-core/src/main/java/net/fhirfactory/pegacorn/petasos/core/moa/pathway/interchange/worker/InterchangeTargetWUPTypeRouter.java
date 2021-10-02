@@ -54,6 +54,9 @@ import java.util.Set;
 public class InterchangeTargetWUPTypeRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeTargetWUPTypeRouter.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     @Inject
     DataParcelSubscriptionMapIM topicServer;
@@ -82,40 +85,40 @@ public class InterchangeTargetWUPTypeRouter {
      */
     @RecipientList
     public List<String> forwardUoW2WUPs(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
-        LOG.debug(".forwardUoW2WUPs(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
+        getLogger().debug(".forwardUoW2WUPs(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
 
         // Get my Petasos Context
-        LOG.trace(".forwardUoW2WUPs(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        getLogger().trace(".forwardUoW2WUPs(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         DataParcelManifest uowTopicID = null;
         if (ingresPacket.getPayload().hasIngresContent()) {
             uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadManifest();
-            LOG.trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
+            getLogger().trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
         } else {
-            LOG.debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
+            getLogger().debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
             return (new ArrayList<String>());
         }
-        LOG.trace(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
-        LOG.trace(".forwardUoW2WUPs(): Looking for Subscribers To->{}:", uowTopicID);
+        getLogger().trace(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
+        getLogger().trace(".forwardUoW2WUPs(): Looking for Subscribers To->{}:", uowTopicID);
         List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
-        LOG.trace(".forwardUoW2WUPs(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
+        getLogger().trace(".forwardUoW2WUPs(): Before we do a general routing attempt, let's see if the message is directed somewhere specific");
         //
         // Because auditing is not running yet
         // Remove once Auditing is in place
         //
-        if(LOG.isWarnEnabled()) {
+        if(getLogger().isWarnEnabled()) {
             int subscriberSetSize = 0;
             if (subscriberSet != null) {
                 subscriberSetSize = subscriberSet.size();
             }
-            LOG.warn("Number of Subscribers->{}", subscriberSetSize);
+            getLogger().warn("Number of Subscribers->{}", subscriberSetSize);
         }
         //
         //
         //
         String alreadySentTo = "";
         if(!StringUtils.isEmpty(uowTopicID.getIntendedTargetSystem())){
-            LOG.trace(".forwardUoW2WUPs(): It's not empty, so let's see if the appropriate downstream system is registered");
+            getLogger().trace(".forwardUoW2WUPs(): It's not empty, so let's see if the appropriate downstream system is registered");
             for(PubSubParticipant currentSubscriber: subscriberSet){
                 if(hasRemoteServiceName(currentSubscriber)) {
                     String subscriberName = currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName();
@@ -127,30 +130,30 @@ public class InterchangeTargetWUPTypeRouter {
             }
         }
 
-        LOG.trace(".forwardUoW2WUPs(): Iterate through the subscribers");
-        if(LOG.isDebugEnabled()){
-            LOG.debug(".forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
+        getLogger().trace(".forwardUoW2WUPs(): Iterate through the subscribers");
+        if(getLogger().isDebugEnabled()){
+            getLogger().debug(".forwardUoW2WUPs(): number of subscribers to this UoW->{}", subscriberSet.size());
         }
         if (subscriberSet != null) {
             if(!subscriberSet.isEmpty()) {
-                LOG.trace(".forwardUoW2WUPs(): Iterating through....");
+                getLogger().trace(".forwardUoW2WUPs(): Iterating through....");
                 for (PubSubParticipant currentSubscriber : subscriberSet) {
-                    LOG.trace(".forwardUoW2WUPs(): Iterating, currentSubscriber->{}", currentSubscriber);
+                    getLogger().trace(".forwardUoW2WUPs(): Iterating, currentSubscriber->{}", currentSubscriber);
                     boolean dontSendAgain = false;
                     if (hasRemoteServiceName(currentSubscriber)) {
-                        LOG.trace(".forwardUoW2WUPs(): has Inter-Subsystem element");
+                        getLogger().trace(".forwardUoW2WUPs(): has Inter-Subsystem element");
                         if (currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName().contentEquals(alreadySentTo)) {
                             dontSendAgain = true;
                         }
                     }
                     if (!dontSendAgain) {
-                        LOG.trace(".forwardUoW2WUPs(): does not have Inter-Subsystem element");
+                        getLogger().trace(".forwardUoW2WUPs(): does not have Inter-Subsystem element");
                         forwardPacket(currentSubscriber, ingresPacket);
                     }
                 }
             }
         }
-        LOG.debug(".forwardUoW2WUPs(): Exiting");
+        getLogger().debug(".forwardUoW2WUPs(): Exiting");
         List<String> targetSubscriberSet = new ArrayList<String>();
         return (targetSubscriberSet);
     }
@@ -182,19 +185,19 @@ public class InterchangeTargetWUPTypeRouter {
     }
 
     private void forwardPacket(PubSubParticipant subscriber, WorkUnitTransportPacket packet){
-        LOG.debug(".forwardUoW2WUPs(): Subscriber --> {}", subscriber);
+        getLogger().debug(".forwardUoW2WUPs(): Subscriber --> {}", subscriber);
         IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
-        LOG.trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
+        getLogger().trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
         WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
-        LOG.trace(".forwardUoW2WUPs(): The TopologyNode for the target subscriber->{}", currentNodeElement);
+        getLogger().trace(".forwardUoW2WUPs(): The TopologyNode for the target subscriber->{}", currentNodeElement);
         TopologyNodeFDNToken currentNodeToken = currentNodeElement.getNodeFDN().getToken();
-        LOG.trace(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", currentNodeElement);
+        getLogger().trace(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", currentNodeElement);
         RouteElementNames routeName = new RouteElementNames(currentNodeToken);
         // Clone and Inject Message into Target Route
         WorkUnitTransportPacket clonedPacket = packet.deepClone();
         // Now check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
         if(hasRemoteServiceName(subscriber)){
-            LOG.trace(".forwardPacket(): Has Remote Service as Target");
+            getLogger().trace(".forwardPacket(): Has Remote Service as Target");
             DataParcelManifest payloadTopicID = packet.getPayload().getPayloadTopicID();
             boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
             boolean hasWildcardTarget = false;
@@ -202,10 +205,10 @@ public class InterchangeTargetWUPTypeRouter {
                 hasWildcardTarget = payloadTopicID.getIntendedTargetSystem().contentEquals(DataParcelManifest.WILDCARD_CHARACTER);
             }
             boolean hasRemoteElement = hasRemoteServiceName(subscriber);
-            LOG.trace(".forwardPacket(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
+            getLogger().trace(".forwardPacket(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
             if((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement){
                 clonedPacket.getPayload().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getEndpointServiceName());
-                LOG.trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getEndpointServiceName());
+                getLogger().trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getEndpointServiceName());
             }
         }
         template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
@@ -216,10 +219,10 @@ public class InterchangeTargetWUPTypeRouter {
     }
 
     private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorTopologyNode> wupSet) {
-        LOG.trace(".tracePrintSubscribedWUPSet(): Subscribed WUP Set --> {}", wupSet.size());
+        getLogger().trace(".tracePrintSubscribedWUPSet(): Subscribed WUP Set --> {}", wupSet.size());
         Iterator<WorkUnitProcessorTopologyNode> tokenIterator = wupSet.iterator();
         while (tokenIterator.hasNext()) {
-            LOG.trace(".forwardUoW2WUPs(): Subscribed WUP Ingres Point --> {}", tokenIterator.next());
+            getLogger().trace(".forwardUoW2WUPs(): Subscribed WUP Ingres Point --> {}", tokenIterator.next());
         }
     }
 

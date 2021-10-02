@@ -43,13 +43,16 @@ public class InterchangeRouteMap {
     private static final String ROUTE_ENTRY_SEPERATOR = " ---> ";
     private LinkedHashMap<FDN, Tree<FDN>> producingWUPInterchangeRouteSet;
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeRouteMap.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public InterchangeRouteMap() {
         producingWUPInterchangeRouteSet = new LinkedHashMap<FDN, Tree<FDN>>();
     }
 
     public void addProducingWUP(FDN producingWUPFDN) {
-        LOG.debug("addProducingWUP(): Entry, producingWUPFDN --> {}", producingWUPFDN);
+        getLogger().debug("addProducingWUP(): Entry, producingWUPFDN --> {}", producingWUPFDN);
         if (producingWUPFDN == null) {
             return;
         }
@@ -62,11 +65,11 @@ public class InterchangeRouteMap {
         TreeNode<FDN> newTreeRoot = new TreeNode<FDN>(producingWUPFDN);
         Tree tempParcelConsumerTree = new Tree(newTreeRoot);
         this.producingWUPInterchangeRouteSet.put(producingWUPFDN, tempParcelConsumerTree);
-        LOG.debug("addProducingWUP(): Exit, producingWUPFDN --> {}", producingWUPFDN);
+        getLogger().debug("addProducingWUP(): Exit, producingWUPFDN --> {}", producingWUPFDN);
     }
 
     public void linkOutboundUoWType2ProducingWUP(FDN producingWUPFDN, FDN outboundUoWTypeFDN) {
-        LOG.debug("linkOutboundUoWType2ProducingWUP(): Entry, producingWUPFDN --> {}, outboundUoWTypeFDN --> {}", producingWUPFDN, outboundUoWTypeFDN);
+        getLogger().debug("linkOutboundUoWType2ProducingWUP(): Entry, producingWUPFDN --> {}, outboundUoWTypeFDN --> {}", producingWUPFDN, outboundUoWTypeFDN);
         if (producingWUPFDN == null || outboundUoWTypeFDN == null) {
             return;
         }
@@ -90,12 +93,12 @@ public class InterchangeRouteMap {
         }
         TreeNode<FDN> newChildTreeNode = new TreeNode<FDN>(outboundUoWTypeFDN);
         tempTreeRootNode.addChild(newChildTreeNode);
-        LOG.debug("linkOutboundUoWType2ProducingWUP(): Exit, TreeNode added onto TreeRoot --> {}, TreeNode (Leaf) --> {}", producingWUPFDN, outboundUoWTypeFDN);
+        getLogger().debug("linkOutboundUoWType2ProducingWUP(): Exit, TreeNode added onto TreeRoot --> {}, TreeNode (Leaf) --> {}", producingWUPFDN, outboundUoWTypeFDN);
 
     }
 
     public void linkConsumingWUP2OutboundUoWType2ProducingWUP(FDN producingWUPFDN, FDN outboundUoWTypeFDN, FDN consumingWUPFDN) {
-        LOG.debug("linkConsumingWUP2OutboundUoWType2ProducingWUP(): Entry, producingWUPFDN --> {}, egresUoWTypeFDN --> {}, consumingWUPFDN --> {}", producingWUPFDN, outboundUoWTypeFDN, consumingWUPFDN);
+        getLogger().debug("linkConsumingWUP2OutboundUoWType2ProducingWUP(): Entry, producingWUPFDN --> {}, egresUoWTypeFDN --> {}, consumingWUPFDN --> {}", producingWUPFDN, outboundUoWTypeFDN, consumingWUPFDN);
         if (producingWUPFDN == null || outboundUoWTypeFDN == null || consumingWUPFDN == null) {
             return;
         }
@@ -120,11 +123,11 @@ public class InterchangeRouteMap {
             TreeNode<FDN> newEgressUoWNode = new TreeNode<FDN>(consumingWUPFDN);
             tmpChildNode.addChild(newEgressUoWNode);
         }
-        LOG.debug("linkConsumingWUP2OutboundUoWType2ProducingWUP(): Exit, TreeNode added onto TreeRoot --> {}, TreeNode (Leaf) --> {}", producingWUPFDN, consumingWUPFDN);
+        getLogger().debug("linkConsumingWUP2OutboundUoWType2ProducingWUP(): Exit, TreeNode added onto TreeRoot --> {}, TreeNode (Leaf) --> {}", producingWUPFDN, consumingWUPFDN);
     }
 
     public Set<InterchangeRoute> getInterchangeRouteSet() {
-        LOG.debug("getInterchangeRouteSet(): Entry");
+        getLogger().debug("getInterchangeRouteSet(): Entry");
         LinkedHashSet<InterchangeRoute> routeSet = new LinkedHashSet<InterchangeRoute>();
         if (producingWUPInterchangeRouteSet.isEmpty()) {
             return (routeSet);
@@ -149,15 +152,15 @@ public class InterchangeRouteMap {
 
             }
         }
-        if (LOG.isDebugEnabled()) {
+        if (getLogger().isDebugEnabled()) {
             if (routeSet.isEmpty()) {
-                LOG.debug("getInterchangeRouteSet(): Route Set is Empty!");
+                getLogger().debug("getInterchangeRouteSet(): Route Set is Empty!");
             } else {
                 Iterator<InterchangeRoute> trailSetIterator = routeSet.iterator();
                 int counter = 0;
                 while (trailSetIterator.hasNext()) {
                     String trailSetEntry = trailSetIterator.next().toString();
-                    LOG.debug("getInterchangeRouteSet(): TrailSet Entry {} --> {}", counter, trailSetEntry);
+                    getLogger().debug("getInterchangeRouteSet(): TrailSet Entry {} --> {}", counter, trailSetEntry);
                     counter += 1;
                 }
             }

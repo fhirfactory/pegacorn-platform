@@ -131,7 +131,7 @@ public class TransactionStatusElement {
                 ", unitOfWork=" + unitOfWork +
                 ", transactionStatus=" + transactionStatus +
                 ", transactionType=" + transactionType +
-                ", transactionStatusCommentary='" + transactionStatusCommentary + '\'' +
+                ", transactionStatusCommentary=" + transactionStatusCommentary +
                 ", transactionStartTime=" + transactionStartTime +
                 ", transactionFinishedTime=" + transactionFinishedTime +
                 ", transactionFinalisedTime=" + transactionFinalisedTime +

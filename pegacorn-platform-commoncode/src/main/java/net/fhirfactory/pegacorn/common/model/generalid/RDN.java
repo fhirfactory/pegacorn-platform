@@ -35,6 +35,9 @@ import java.io.Serializable;
  */
 public class RDN implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(RDN.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
 	private String qualifier;
 	private String value;
@@ -55,7 +58,7 @@ public class RDN implements Serializable {
 
 	@JsonIgnore
 	public RDN(String qualifier, String value) {
-		LOG.debug(".RND(String, String): Entry, Qualifier --> {}, Value --> {}", qualifier, value);
+		getLogger().debug(".RND(String, String): Entry, Qualifier --> {}, Value --> {}", qualifier, value);
 		if ((qualifier == null) || (value == null)) {
 			throw (new IllegalArgumentException("null name or nameValue passed to Constructor"));
 		}
@@ -83,7 +86,7 @@ public class RDN implements Serializable {
 
 	@JsonIgnore
 	public RDN(RDNToken token) {
-		LOG.debug(".RND(RDNToken): Entry, token --> {}", token);
+		getLogger().debug(".RND(RDNToken): Entry, token --> {}", token);
 		if (token == null) {
 			throw (new IllegalArgumentException("null RDNToken passed to Constructor"));
 		}
@@ -95,11 +98,11 @@ public class RDN implements Serializable {
 		String valueWorking = tokenSplit[1];
 		String value = valueWorking.substring(0, valueWorking.length()-2);
 		setValue(value);
-		LOG.trace(".RND(RDNToken): new RDN created, now building different String values!");
+		getLogger().trace(".RND(RDNToken): new RDN created, now building different String values!");
 		convertToString();
 		createToken();
 		convertToConciseString();
-		LOG.trace(".RND(RDNToken): new RDN --> {}", this.rdnToString);
+		getLogger().trace(".RND(RDNToken): new RDN --> {}", this.rdnToString);
 	}
 
 	public String getValue() {
