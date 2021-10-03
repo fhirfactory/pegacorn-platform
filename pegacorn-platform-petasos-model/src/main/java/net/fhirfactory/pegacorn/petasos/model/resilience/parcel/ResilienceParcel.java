@@ -21,57 +21,65 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
-import java.time.Instant;
-import java.util.*;
-
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Mark A. Hunter
  * @author Scott Yeadon
  */
-public class ResilienceParcel {
+public class ResilienceParcel implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResilienceParcel.class);
 
     private ResilienceParcelIdentifier identifier;
-    private Object instanceIDLock;
+    private SerializableObject instanceIDLock;
     private FDNToken typeID;
-    private Object typeIDLock;
-    private EpisodeIdentifier episodeIdentifier;
-    private Object episodeIdentifierLock;
+    private SerializableObject typeIDLock;
+    private PetasosEpisodeIdentifier episodeIdentifier;
+    private SerializableObject episodeIdentifierLock;
     private UoW actualUoW;
-    private Object actualUoWLock;
+    private SerializableObject actualUoWLock;
     private WUPIdentifier associatedWUPIdentifier;
-    private Object associatedWUPIdentifierLock;
-    private HashSet<EpisodeIdentifier> downstreamEpisodeIdentifierSet;
-    private Object downstreamEpisodeIdentifierSetLock;
-    private EpisodeIdentifier upstreamEpisodeIdentifier;
-    private Object upstreamEpisodeIdentifierLock;
+    private SerializableObject associatedWUPIdentifierLock;
+    private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
+    private SerializableObject downstreamEpisodeIdentifierSetLock;
+    private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
+    private SerializableObject upstreamEpisodeIdentifierLock;
     private final static String INSTANCE_QUALIFIER_TYPE = "ParcelInstance";
     private final static String TYPE_QUALIFIER_TYPE = "ParcelType";
     private ResilienceParcelFinalisationStatusEnum finalisationStatus;
-    private Object finalisationStatusLock;
+    private SerializableObject finalisationStatusLock;
     private ResilienceParcelProcessingStatusEnum processingStatus;
-    private Object processingStatusLock;
+    private SerializableObject processingStatusLock;
     private Date registrationDate;
-    private Object registrationDateLock;
+    private SerializableObject registrationDateLock;
     private Date startDate;
-    private Object startDateLock;
+    private SerializableObject startDateLock;
     private Date finishedDate;
-    private Object finishedDateLock;
+    private SerializableObject finishedDateLock;
     private Date finalisationDate;
-    private Object finalisationDateLock;
+    private SerializableObject finalisationDateLock;
     private Date cancellationDate;
-    private Object cancellationDateLock;
+    private SerializableObject cancellationDateLock;
+
+    private boolean anInteractWUP;
+    private String associatedPortValue;
+    private String associatedPortType;
 
     //
     // Constructors
@@ -91,27 +99,30 @@ public class ResilienceParcel {
         this.finalisationStatus = null;
         this.episodeIdentifier = null;
         this.cancellationDate = null;
-        this.instanceIDLock = new Object();
-        this.typeIDLock = new Object();
-        this.episodeIdentifierLock = new Object();
-        this.actualUoWLock = new Object();
-        this.associatedWUPIdentifierLock = new Object();
-        this.downstreamEpisodeIdentifierSetLock = new Object();
-        this.upstreamEpisodeIdentifierLock = new Object();
-        this.finalisationStatusLock = new Object();
-        this.processingStatusLock = new Object();
-        this.registrationDateLock = new Object();
-        this.startDateLock = new Object();
-        this.finishedDateLock = new Object();
-        this.finalisationDateLock = new Object();
-        this.cancellationDateLock = new Object();
+        this.anInteractWUP = false;
+        this.associatedPortType = null;
+        this.associatedPortValue = null;
+        this.instanceIDLock = new SerializableObject();
+        this.typeIDLock = new SerializableObject();
+        this.episodeIdentifierLock = new SerializableObject();
+        this.actualUoWLock = new SerializableObject();
+        this.associatedWUPIdentifierLock = new SerializableObject();
+        this.downstreamEpisodeIdentifierSetLock = new SerializableObject();
+        this.upstreamEpisodeIdentifierLock = new SerializableObject();
+        this.finalisationStatusLock = new SerializableObject();
+        this.processingStatusLock = new SerializableObject();
+        this.registrationDateLock = new SerializableObject();
+        this.startDateLock = new SerializableObject();
+        this.finishedDateLock = new SerializableObject();
+        this.finalisationDateLock = new SerializableObject();
+        this.cancellationDateLock = new SerializableObject();
         // Now, add what we have been supplied
         this.associatedWUPIdentifier = activityID.getPresentWUPIdentifier();
         this.episodeIdentifier = this.buildEpisodeID(activityID, theUoW);
         this.typeID = this.buildParcelTypeID(activityID, theUoW);
         this.identifier = this.buildParcelInstanceIdentifier(activityID, theUoW);
         this.actualUoW = theUoW;
-        this.downstreamEpisodeIdentifierSet = new HashSet<EpisodeIdentifier>();
+        this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
         this.upstreamEpisodeIdentifier = activityID.getPreviousEpisodeIdentifier();
         this.registrationDate = Date.from(Instant.now());
         this.finalisationStatus = ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED;
@@ -131,20 +142,23 @@ public class ResilienceParcel {
         this.finalisationDate = null;
         this.episodeIdentifier = null;
         this.cancellationDate = null;
-        this.instanceIDLock = new Object();
-        this.typeIDLock = new Object();
-        this.episodeIdentifierLock = new Object();
-        this.actualUoWLock = new Object();
-        this.associatedWUPIdentifierLock = new Object();
-        this.downstreamEpisodeIdentifierSetLock = new Object();
-        this.upstreamEpisodeIdentifierLock = new Object();
-        this.finalisationStatusLock = new Object();
-        this.processingStatusLock = new Object();
-        this.registrationDateLock = new Object();
-        this.startDateLock = new Object();
-        this.finishedDateLock = new Object();
-        this.finalisationDateLock = new Object();
-        this.cancellationDateLock = new Object();
+        this.anInteractWUP = false;
+        this.associatedPortType = null;
+        this.associatedPortValue = null;
+        this.instanceIDLock = new SerializableObject();
+        this.typeIDLock = new SerializableObject();
+        this.episodeIdentifierLock = new SerializableObject();
+        this.actualUoWLock = new SerializableObject();
+        this.associatedWUPIdentifierLock = new SerializableObject();
+        this.downstreamEpisodeIdentifierSetLock = new SerializableObject();
+        this.upstreamEpisodeIdentifierLock = new SerializableObject();
+        this.finalisationStatusLock = new SerializableObject();
+        this.processingStatusLock = new SerializableObject();
+        this.registrationDateLock = new SerializableObject();
+        this.startDateLock = new SerializableObject();
+        this.finishedDateLock = new SerializableObject();
+        this.finalisationDateLock = new SerializableObject();
+        this.cancellationDateLock = new SerializableObject();
         // Now, add what we have been supplied
         if (originalParcel.hasCancellationDate()) {
             this.cancellationDate = originalParcel.getCancellationDate();
@@ -177,17 +191,60 @@ public class ResilienceParcel {
             this.upstreamEpisodeIdentifier = originalParcel.getUpstreamEpisodeIdentifier();
         }
         if (originalParcel.hasDownstreamEpisodeIdentifierSet()) {
-            this.downstreamEpisodeIdentifierSet = new HashSet<EpisodeIdentifier>();
+            this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
             this.downstreamEpisodeIdentifierSet.addAll(originalParcel.getDownstreamEpisodeIdentifierSet());
         }
         if (originalParcel.hasEpisodeIdentifier()) {
             this.episodeIdentifier = originalParcel.getEpisodeIdentifier();
         }
+        if(originalParcel.hasAssociatedPortValue()){
+            this.associatedPortValue = originalParcel.getAssociatedPortValue();
+        }
+        if(originalParcel.hasAssociatedPortType()){
+            this.associatedPortType = originalParcel.getAssociatedPortType();
+        }
+        this.anInteractWUP = originalParcel.isAnInteractWUP();
     }
 
     //
     // Bean/Attribute Methods
     //
+
+
+    public boolean isAnInteractWUP() {
+        return anInteractWUP;
+    }
+
+    public void setAnInteractWUP(boolean anInteractWUP) {
+        this.anInteractWUP = anInteractWUP;
+    }
+
+    public boolean hasAssociatedPortValue(){
+        boolean hasValue = this.associatedPortValue != null;
+        return(hasValue);
+    }
+
+    public String getAssociatedPortValue() {
+        return associatedPortValue;
+    }
+
+    public void setAssociatedPortValue(String associatedPortValue) {
+        this.associatedPortValue = associatedPortValue;
+    }
+
+    public boolean hasAssociatedPortType(){
+        boolean hasValue = this.associatedPortType != null;
+        return(hasValue);
+    }
+
+    public String getAssociatedPortType() {
+        return associatedPortType;
+    }
+
+    public void setAssociatedPortType(String associatedPortType) {
+        this.associatedPortType = associatedPortType;
+    }
+
     // Helper methods for the this.cancellationDate attribute
     public boolean hasCancellationDate() {
         if (this.cancellationDate == null) {
@@ -246,7 +303,7 @@ public class ResilienceParcel {
     /**
      * @return the downstreamParcelIDSet
      */
-    public Set<EpisodeIdentifier> getDownstreamEpisodeIdentifierSet() {
+    public Set<PetasosEpisodeIdentifier> getDownstreamEpisodeIdentifierSet() {
         if (this.downstreamEpisodeIdentifierSet == null) {
             return (null);
         } else {
@@ -258,10 +315,10 @@ public class ResilienceParcel {
      * @param downstreamEpisodeIdentifierSet the Parcels that continue on the work from
      * this Parcel
      */
-    public void setDownstreamEpisodeIdentifierSet(HashSet<EpisodeIdentifier> downstreamEpisodeIdentifierSet) {
+    public void setDownstreamEpisodeIdentifierSet(HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet) {
         synchronized (downstreamEpisodeIdentifierSetLock) {
             if (downstreamEpisodeIdentifierSet == null) {
-                this.downstreamEpisodeIdentifierSet = new HashSet<EpisodeIdentifier>();
+                this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
             }
         }
     }
@@ -277,7 +334,7 @@ public class ResilienceParcel {
     /**
      * @return the upstreamParcelInstanceID
      */
-    public EpisodeIdentifier getUpstreamEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getUpstreamEpisodeIdentifier() {
 
         return this.upstreamEpisodeIdentifier;
 
@@ -286,7 +343,7 @@ public class ResilienceParcel {
     /**
      * @param upstreamEpisodeIdentifier the "Upstream" or "Precursor" Parcel to set
      */
-    public void setUpstreamEpisodeIdentifier(EpisodeIdentifier upstreamEpisodeIdentifier) {
+    public void setUpstreamEpisodeIdentifier(PetasosEpisodeIdentifier upstreamEpisodeIdentifier) {
         synchronized (upstreamEpisodeIdentifierLock) {
             this.upstreamEpisodeIdentifier = upstreamEpisodeIdentifier;
         }
@@ -460,112 +517,6 @@ public class ResilienceParcel {
         }
     }
 
-    // toString()
-    @Override
-    public String toString() {
-        String newString = new String("ResilienceParcel={");
-        String parcelInstanceIDString;
-        if (hasInstanceIdentifier()) {
-            parcelInstanceIDString = "(instanceID:" + identifier.toString() + ")";
-        } else {
-            parcelInstanceIDString = "(instanceID:null)";
-        }
-        String parcelTypeIDString;
-        if (hasTypeID()) {
-            parcelTypeIDString = "(typeID:" + typeID.toString() + ")";
-        } else {
-            parcelTypeIDString = "(typeID:null)";
-        }
-        String associatedWUPInstanceIDString;
-        if (hasAssociatedWUPIdentifier()) {
-            associatedWUPInstanceIDString = "(associatedWUPInstanceID=" + associatedWUPIdentifier.toString() + ")";
-        } else {
-            associatedWUPInstanceIDString = "(associatedWUPInstanceID=null)";
-        }
-        String upstreamParcelIDString;
-        if (hasUpstreamEpisodeIdentifier()) {
-            upstreamParcelIDString = "(upstreamEpisodeID:" + upstreamEpisodeIdentifier.toString() + ")";
-        } else {
-            upstreamParcelIDString = "(upstreamEpisodeID:null)";
-        }
-        String downstreamParcelIDSetString = new String();
-        if (hasDownstreamEpisodeIdentifierSet()) {
-            downstreamParcelIDSetString = "(downstreamEpisodeIDSet:" + this.downstreamEpisodeIdentifierSet.toString() + ")";
-        } else {
-            downstreamParcelIDSetString = "(downstreamEpisodeIDSet:null)";
-        }
-        String actualUoWString;
-        if (hasActualUoW()) {
-            actualUoWString = "(actualUoW:" + actualUoW.toString() + ")";
-        } else {
-            actualUoWString = "(actualUoW:null)";
-        }
-        String parcelRegistrationDateString;
-        if (hasRegistrationDate()) {
-            parcelRegistrationDateString = "(registrationDate:" + registrationDate.toString() + ")";
-        } else {
-            parcelRegistrationDateString = "(registrationDate:null)";
-        }
-        String parcelStartDateString;
-        if (hasStartDate()) {
-            parcelStartDateString = "(startDateString:" + startDate.toString() + ")";
-        } else {
-            parcelStartDateString = "(startDateString:null)";
-        }
-        String parcelFinishedDateString;
-        if (hasFinishedDate()) {
-            parcelFinishedDateString = "(finishedDate:" + finishedDate.toString() + ")";
-        } else {
-            parcelFinishedDateString = "(finishedDate:null)";
-        }
-        String parcelFinalisationDateString;
-        if (hasFinalisationDate()) {
-            parcelFinalisationDateString = "(finalisationDate:" + finalisationDate.toString() + ")";
-        } else {
-            parcelFinalisationDateString = "(finalisationDate:null)";
-        }
-        String parcelFinalisationStatusEnumString;
-        if (hasFinalisationStatus()) {
-            parcelFinalisationStatusEnumString = "(finalisationStatus:" + finalisationStatus.toString() + ")";
-        } else {
-            parcelFinalisationStatusEnumString = "(finalisationStatus:null)";
-        }
-        String parcelProcessingStatusEnumString;
-        if (hasProcessingStatus()) {
-            parcelProcessingStatusEnumString = "(processingStatus:" + processingStatus.toString() + ")";
-        } else {
-            parcelProcessingStatusEnumString = "(processingStatus:null)";
-        }
-        String parcelEpisodeString;
-        if (hasEpisodeIdentifier()) {
-            parcelEpisodeString = "(episodeID:" + episodeIdentifier.toString() + ")";
-        } else {
-            parcelEpisodeString = "(episodeID:null)";
-        }
-        String cancellationDateString;
-        if (hasCancellationDate()) {
-            cancellationDateString = "(cancellationDate:" + episodeIdentifier.toString() + ")";
-        } else {
-            cancellationDateString = "(cancellationDate:null)";
-        }
-        newString = newString
-                + parcelInstanceIDString + ","
-                + parcelEpisodeString + ","
-                + parcelTypeIDString + ","
-                + associatedWUPInstanceIDString + ","
-                + upstreamParcelIDString + ","
-                + downstreamParcelIDSetString + ","
-                + actualUoWString + ","
-                + parcelRegistrationDateString + ","
-                + parcelStartDateString + ","
-                + parcelFinishedDateString + ","
-                + parcelFinalisationDateString + ","
-                + parcelProcessingStatusEnumString + ","
-                + parcelFinalisationDateString + ","
-                + cancellationDateString + "}";
-        return (newString);
-    }
-
     public boolean hasEpisodeIdentifier() {
         if (this.episodeIdentifier == null) {
             return (false);
@@ -574,17 +525,17 @@ public class ResilienceParcel {
         }
     }
 
-    public EpisodeIdentifier getEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getEpisodeIdentifier() {
         return this.episodeIdentifier;
     }
 
-    public void setEpisodeIdentifier(EpisodeIdentifier episodeIdentifier) {
+    public void setEpisodeIdentifier(PetasosEpisodeIdentifier episodeIdentifier) {
         synchronized (episodeIdentifierLock) {
             this.episodeIdentifier = episodeIdentifier;
         }
     }
 
-    public EpisodeIdentifier buildEpisodeID(ActivityID activityID, UoW theUoW) {
+    public PetasosEpisodeIdentifier buildEpisodeID(ActivityID activityID, UoW theUoW) {
         if (theUoW == null) {
             throw (new IllegalArgumentException(".buildEpisodeID(): null UoW passed as parameter"));
         }
@@ -599,12 +550,13 @@ public class ResilienceParcel {
         }
         FDN newEpisodeID;
         if (activityID.hasPresentWUPFunctionToken()) {
-            newEpisodeID = new FDN(activityID.getPresentWUPFunctionToken().getAsSingleFDNToken());
+            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            newEpisodeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
         newEpisodeID.appendFDN(uowInstanceFDN);
-        EpisodeIdentifier episodeId = new EpisodeIdentifier(newEpisodeID.getToken());
+        PetasosEpisodeIdentifier episodeId = new PetasosEpisodeIdentifier(newEpisodeID.getToken());
         return (episodeId);
     }
 
@@ -623,7 +575,8 @@ public class ResilienceParcel {
         }
         FDN newTypeID;
         if (activityID.hasPresentWUPFunctionToken()) {
-            newTypeID = new FDN(activityID.getPresentWUPFunctionToken().getAsSingleFDNToken());
+            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            newTypeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
         }
@@ -646,12 +599,35 @@ public class ResilienceParcel {
         }
         FDN newInstanceID;
         if (activityID.hasPresentWUPIdentifier()) {
-            newInstanceID = new FDN(activityID.getPresentWUPIdentifier());
+            newInstanceID = new FDN(activityID.getPresentWUPIdentifier().toTypeBasedFDNToken());
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPInstanceID value, bad parameter"));
         }
         newInstanceID.appendFDN(uowInstanceFDN);
         ResilienceParcelIdentifier parcelIdentifier = new ResilienceParcelIdentifier(newInstanceID.getToken());
         return (parcelIdentifier);
+    }
+
+    @Override
+    public String toString() {
+        return "ResilienceParcel{" +
+                "identifier=" + identifier +
+                ", typeID=" + typeID +
+                ", episodeIdentifier=" + episodeIdentifier +
+                ", actualUoW=" + actualUoW +
+                ", associatedWUPIdentifier=" + associatedWUPIdentifier +
+                ", downstreamEpisodeIdentifierSet=" + downstreamEpisodeIdentifierSet +
+                ", upstreamEpisodeIdentifier=" + upstreamEpisodeIdentifier +
+                ", finalisationStatus=" + finalisationStatus +
+                ", processingStatus=" + processingStatus +
+                ", registrationDate=" + registrationDate +
+                ", startDate=" + startDate +
+                ", finishedDate=" + finishedDate +
+                ", finalisationDate=" + finalisationDate +
+                ", cancellationDate=" + cancellationDate +
+                ", anInteractWUP=" + anInteractWUP +
+                ", associatedPortValue=" + associatedPortValue +
+                ", associatedPortType=" + associatedPortType +
+                '}';
     }
 }

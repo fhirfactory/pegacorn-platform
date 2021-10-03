@@ -84,14 +84,6 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Customised Resources
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-fhir-r4-model</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency> -->
         <!-- Pegacorn Petasos Information Model -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
@@ -166,6 +158,21 @@
             <scope>test</scope>
         </dependency>
 
+        <!--         -->
+        <!-- Logging -->
+        <!--         -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

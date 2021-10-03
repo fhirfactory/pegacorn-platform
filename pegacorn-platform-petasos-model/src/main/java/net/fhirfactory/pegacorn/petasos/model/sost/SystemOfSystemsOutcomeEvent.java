@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.model.sost;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 
 public class SystemOfSystemsOutcomeEvent extends SystemOfSystemsEvent {
 

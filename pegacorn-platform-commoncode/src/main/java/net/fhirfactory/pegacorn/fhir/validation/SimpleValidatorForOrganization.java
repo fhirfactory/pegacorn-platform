@@ -29,9 +29,12 @@ import org.slf4j.LoggerFactory;
 public class SimpleValidatorForOrganization extends SimpleValidatorBase{
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorForOrganization.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public boolean isSimplyValid(Organization pOrganization) {
-        LOG.debug("isSimplyValid(Organization p): Entry");
+        getLogger().debug("isSimplyValid(Organization p): Entry");
 
         return (false);
     }

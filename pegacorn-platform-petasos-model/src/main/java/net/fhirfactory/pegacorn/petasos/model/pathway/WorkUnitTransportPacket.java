@@ -23,33 +23,36 @@
 package net.fhirfactory.pegacorn.petasos.model.pathway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkUnitTransportPacket {
+public class WorkUnitTransportPacket implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitTransportPacket.class);
 
     private ActivityID packetID;
-    private Object packetIDLock;
+    private SerializableObject packetIDLock;
     private Date senderSendDate;
-    private Object senderSendDateLock;
+    private SerializableObject senderSendDateLock;
     private boolean isARetry;
-    private Object isARetryLock;
+    private SerializableObject isARetryLock;
     private WUPJobCard currentJobCard;
-    private Object currentJobCardLock;
+    private SerializableObject currentJobCardLock;
     private ParcelStatusElement currentParcelStatus;
-    private Object currentParcelStatusLock;
+    private SerializableObject currentParcelStatusLock;
     private UoW payload;
-    private Object payloadLock;
+    private SerializableObject payloadLock;
     private String generatedString;
-    private Object generatedStringLock;
+    private SerializableObject generatedStringLock;
     
     public WorkUnitTransportPacket(ActivityID newPacketID, Date senderSendDate, UoW payload) {
         this.senderSendDate = senderSendDate;
@@ -59,13 +62,13 @@ public class WorkUnitTransportPacket {
         this.currentJobCard = null;
         this.currentParcelStatus = null;
         this.generatedString = null;
-        this.senderSendDateLock = new Object();
-        this.payloadLock = new Object();
-        this.isARetryLock = new Object();
-        this.currentJobCardLock = new Object();
-        this.currentParcelStatusLock = new Object();
-        this.generatedStringLock = new Object();
-        this.packetIDLock = new Object();
+        this.senderSendDateLock = new SerializableObject();
+        this.payloadLock = new SerializableObject();
+        this.isARetryLock = new SerializableObject();
+        this.currentJobCardLock = new SerializableObject();
+        this.currentParcelStatusLock = new SerializableObject();
+        this.generatedStringLock = new SerializableObject();
+        this.packetIDLock = new SerializableObject();
         generateString();
     }
 
@@ -77,13 +80,13 @@ public class WorkUnitTransportPacket {
         this.currentJobCard = null;
         this.currentParcelStatus = null;
         this.generatedString = null;
-        this.senderSendDateLock = new Object();
-        this.payloadLock = new Object();
-        this.isARetryLock = new Object();
-        this.currentJobCardLock = new Object();
-        this.currentParcelStatusLock = new Object();
-        this.generatedStringLock = new Object();
-        this.packetIDLock = new Object();
+        this.senderSendDateLock = new SerializableObject();
+        this.payloadLock = new SerializableObject();
+        this.isARetryLock = new SerializableObject();
+        this.currentJobCardLock = new SerializableObject();
+        this.currentParcelStatusLock = new SerializableObject();
+        this.generatedStringLock = new SerializableObject();
+        this.packetIDLock = new SerializableObject();
         // Assign values if available
         if(originalPacket.hasPacketID()) {
             this.packetID = originalPacket.getPacketID();
@@ -291,22 +294,7 @@ public class WorkUnitTransportPacket {
     }
 
     public WorkUnitTransportPacket deepClone(){
-        WorkUnitTransportPacket newPacket = new WorkUnitTransportPacket();
-        ObjectMapper objectMapper = new ObjectMapper();
-        if(hasSenderSendDate()) {
-            newPacket.setSenderSendDate(getSenderSendDate());
-        }
-        if(hasPayload()){
-            newPacket.setPayload(new UoW(getPayload()));
-        }
-        if(hasPacketID()) {
-            newPacket.setPacketID(new ActivityID(getPacketID()));
-        }
-        newPacket.setRetryCount(getIsARetry());
-        if(hasCurrentJobCard()) {
-            newPacket.setCurrentJobCard(new WUPJobCard(getCurrentJobCard()));
-        }
-        newPacket.setCurrentParcelStatus(getCurrentParcelStatus());
+        WorkUnitTransportPacket newPacket = (WorkUnitTransportPacket) SerializationUtils.clone(this);
         newPacket.generateString();
         return(newPacket);
     }
@@ -319,12 +307,12 @@ public class WorkUnitTransportPacket {
         this.currentJobCard = null;
         this.currentParcelStatus = null;
         this.generatedString = null;
-        this.senderSendDateLock = new Object();
-        this.payloadLock = new Object();
-        this.isARetryLock = new Object();
-        this.currentJobCardLock = new Object();
-        this.currentParcelStatusLock = new Object();
-        this.generatedStringLock = new Object();
-        this.packetIDLock = new Object();
+        this.senderSendDateLock = new SerializableObject();
+        this.payloadLock = new SerializableObject();
+        this.isARetryLock = new SerializableObject();
+        this.currentJobCardLock = new SerializableObject();
+        this.currentParcelStatusLock = new SerializableObject();
+        this.generatedStringLock = new SerializableObject();
+        this.packetIDLock = new SerializableObject();
     }
 }

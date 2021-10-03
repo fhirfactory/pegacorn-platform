@@ -59,4 +59,13 @@ public final class PetasosPropertyConstants {
     // How long should a WUP sleep between scans for activity?
     public final static long WUP_SLEEP_INTERVAL_MILLISECONDS = 250;
 
+    public final static String WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME = "WUPTopologyNode";
+    public final static String WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME = "WUPJobCard";
+    public final static String WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME = "WUPPetasosParcel";
+    public final static String WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME = "WUPCurrentUnitOfWork";
+
+    public final static String WUP_INTERACT_INGRES_SOURCE_SYSTEM_NAME = "WUPInteractIngresSourceSystemName";
+    public final static String WUP_INTERACT_PORT_VALUE = "WUPInteractIngresPortValue";
+    public final static String WUP_INTERACT_PORT_TYPE = "WUPInteractIngresPortType";
+
 }

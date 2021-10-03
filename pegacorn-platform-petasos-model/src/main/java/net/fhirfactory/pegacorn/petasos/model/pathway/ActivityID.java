@@ -21,43 +21,46 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pathway;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
 /**
  *
  * @author Mark A. Hunter
  */
-public class ActivityID {
+public class ActivityID implements Serializable {
 
-    private ResilienceParcelIdentifier previousParcelIdenifier;
-    private Object previousParcelIdentifierLock;
-    private EpisodeIdentifier previousEpisodeIdentifier;
-    private Object previousEpisodeIdentifierLock;
+    private ResilienceParcelIdentifier previousParcelIdentifier;
+    private SerializableObject previousParcelIdentifierLock;
+    private PetasosEpisodeIdentifier previousEpisodeIdentifier;
+    private SerializableObject previousEpisodeIdentifierLock;
     private ResilienceParcelIdentifier presentParcelIdentifier;
-    private Object presentParcelIdenifierLock;
-    private EpisodeIdentifier presentEpisodeIdentifier;
-    private Object presentEpisodeIdentifierLock;
+    private SerializableObject presentParcelIdenifierLock;
+    private PetasosEpisodeIdentifier presentEpisodeIdentifier;
+    private SerializableObject presentEpisodeIdentifierLock;
     private WUPIdentifier previousWUPIdentifier;
-    private Object previousWUPIdentifierLock;
-    private NodeElementFunctionToken previousWUPFunctionToken;
-    private Object previousWUPFunctionTokenLock;
+    private SerializableObject previousWUPIdentifierLock;
+    private TopologyNodeFunctionFDNToken previousWUPFunctionToken;
+    private SerializableObject previousWUPFunctionTokenLock;
     private WUPIdentifier presentWUPIdentifier;
-    private Object presentWUPIdentifierLock;
-    private NodeElementFunctionToken presentWUPFunctionToken;
-    private Object presentWUPFunctionTokenLock;
+    private SerializableObject presentWUPIdentifierLock;
+    private TopologyNodeFunctionFDNToken presentWUPFunctionToken;
+    private SerializableObject presentWUPFunctionTokenLock;
     private Date creationDate;
-    private Object creationDateLock;
+    private SerializableObject creationDateLock;
+    private boolean resilientActivity;
+    private SerializableObject resilientActivityLock;
 
     public ActivityID(ResilienceParcelIdentifier previousParcelInstanceID, ResilienceParcelIdentifier presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID, Date creationDate) {
         // Clear the deck
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -66,25 +69,28 @@ public class ActivityID {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
+
+        this.creationDateLock = new SerializableObject();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
         // Set Values
-        this.previousParcelIdenifier = previousParcelInstanceID;
+        this.previousParcelIdentifier = previousParcelInstanceID;
         this.presentParcelIdentifier = presentParcelInstanceID;
         this.previousWUPIdentifier = previousWUPInstanceID;
         this.presentWUPIdentifier = presentWUPInstanceID;
         this.creationDate = creationDate;
+
     }
 
     public ActivityID(ResilienceParcelIdentifier previousParcelInstanceID, ResilienceParcelIdentifier presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID) {
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -93,25 +99,27 @@ public class ActivityID {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
+        this.creationDateLock = new SerializableObject();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
         // Set Values
-        this.previousParcelIdenifier = previousParcelInstanceID;
+        this.previousParcelIdentifier = previousParcelInstanceID;
         this.presentParcelIdentifier = presentParcelInstanceID;
         this.previousWUPIdentifier = previousWUPInstanceID;
         this.presentWUPIdentifier = presentWUPInstanceID;
         this.creationDate = Date.from(Instant.now());
+        this.resilientActivity = false;
     }
 
     public ActivityID() {
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -120,19 +128,21 @@ public class ActivityID {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = Date.from(Instant.now());
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
+        this.creationDateLock = new SerializableObject();
+        this.resilientActivity = false;
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
     }
 
     public ActivityID(ActivityID originalRecord) {
-        this.previousParcelIdenifier = null;
+        this.previousParcelIdentifier = null;
         this.previousEpisodeIdentifier = null;
         this.presentParcelIdentifier = null;
         this.presentEpisodeIdentifier = null;
@@ -141,15 +151,16 @@ public class ActivityID {
         this.presentWUPIdentifier = null;
         this.presentWUPFunctionToken = null;
         this.creationDate = null;
-        this.creationDateLock = new Object();
-        this.presentParcelIdenifierLock = new Object();
-        this.presentEpisodeIdentifierLock = new Object();
-        this.presentWUPFunctionTokenLock = new Object();
-        this.presentWUPIdentifierLock = new Object();
-        this.previousParcelIdentifierLock = new Object();
-        this.previousEpisodeIdentifierLock = new Object();
-        this.previousWUPFunctionTokenLock = new Object();
-        this.previousWUPIdentifierLock = new Object();
+        this.creationDateLock = new SerializableObject();
+        this.presentParcelIdenifierLock = new SerializableObject();
+        this.presentEpisodeIdentifierLock = new SerializableObject();
+        this.presentWUPFunctionTokenLock = new SerializableObject();
+        this.presentWUPIdentifierLock = new SerializableObject();
+        this.previousParcelIdentifierLock = new SerializableObject();
+        this.previousEpisodeIdentifierLock = new SerializableObject();
+        this.previousWUPFunctionTokenLock = new SerializableObject();
+        this.previousWUPIdentifierLock = new SerializableObject();
+        this.resilientActivityLock = new SerializableObject();
         // Set Values
         if (originalRecord.hasCreationDate()) {
             this.creationDate = originalRecord.getCreationDate();
@@ -158,30 +169,31 @@ public class ActivityID {
             this.presentParcelIdentifier = new ResilienceParcelIdentifier(originalRecord.getPresentParcelIdentifier());
         }
         if (originalRecord.hasPresentEpisodeIdentifier()) {
-            this.presentEpisodeIdentifier = new EpisodeIdentifier(originalRecord.getPresentEpisodeIdentifier());
+            this.presentEpisodeIdentifier = new PetasosEpisodeIdentifier(originalRecord.getPresentEpisodeIdentifier());
         }
         if (originalRecord.hasPresentWUPIdentifier()) {
             this.presentWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
         }
         if (originalRecord.hasPresentWUPFunctionToken()) {
-            this.presentWUPFunctionToken = new NodeElementFunctionToken(originalRecord.getPresentWUPFunctionToken());
+            this.presentWUPFunctionToken = new TopologyNodeFunctionFDNToken(originalRecord.getPresentWUPFunctionToken());
         }
         if (originalRecord.hasPreviousParcelIdentifier()) {
-            this.previousParcelIdenifier = new ResilienceParcelIdentifier(originalRecord.getPreviousParcelIdentifier());
+            this.previousParcelIdentifier = new ResilienceParcelIdentifier(originalRecord.getPreviousParcelIdentifier());
         }
         if (originalRecord.hasPreviousEpisodeIdentifier()) {
-            this.previousEpisodeIdentifier = new EpisodeIdentifier(originalRecord.getPreviousEpisodeIdentifier());
+            this.previousEpisodeIdentifier = new PetasosEpisodeIdentifier(originalRecord.getPreviousEpisodeIdentifier());
         }
         if (originalRecord.hasPreviousWUPIdentifier()) {
             this.previousWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
         }
         if (originalRecord.hasPreviousWUPFunctionToken()) {
-            this.previousWUPFunctionToken = new WUPFunctionToken(originalRecord.getPresentWUPFunctionToken());
+            this.previousWUPFunctionToken = new TopologyNodeFunctionFDNToken(originalRecord.getPresentWUPFunctionToken());
         }
+        this.resilientActivity = originalRecord.isResilientActivity();
     }
 
     public boolean hasPreviousParcelIdentifier() {
-        if (this.previousParcelIdenifier == null) {
+        if (this.previousParcelIdentifier == null) {
             return (false);
         } else {
             return (true);
@@ -189,12 +201,12 @@ public class ActivityID {
     }
 
     public ResilienceParcelIdentifier getPreviousParcelIdentifier() {
-        return previousParcelIdenifier;
+        return previousParcelIdentifier;
     }
 
     public void setPreviousParcelIdentifier(ResilienceParcelIdentifier previousParcelID) {
         synchronized (previousParcelIdentifierLock) {
-            this.previousParcelIdenifier = previousParcelID;
+            this.previousParcelIdentifier = previousParcelID;
         }
     }
 
@@ -278,11 +290,11 @@ public class ActivityID {
         }
     }
 
-    public EpisodeIdentifier getPreviousEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getPreviousEpisodeIdentifier() {
         return previousEpisodeIdentifier;
     }
 
-    public void setPreviousEpisodeIdentifier(EpisodeIdentifier previousWUAEpisodeID) {
+    public void setPreviousEpisodeIdentifier(PetasosEpisodeIdentifier previousWUAEpisodeID) {
         synchronized (previousEpisodeIdentifierLock) {
             this.previousEpisodeIdentifier = previousWUAEpisodeID;
         }
@@ -296,11 +308,11 @@ public class ActivityID {
         }
     }
 
-    public EpisodeIdentifier getPresentEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getPresentEpisodeIdentifier() {
         return presentEpisodeIdentifier;
     }
 
-    public void setPresentEpisodeIdentifier(EpisodeIdentifier presentWUAEpisodeID) {
+    public void setPresentEpisodeIdentifier(PetasosEpisodeIdentifier presentWUAEpisodeID) {
         synchronized (presentEpisodeIdentifierLock) {
             this.presentEpisodeIdentifier = presentWUAEpisodeID;
         }
@@ -314,11 +326,11 @@ public class ActivityID {
         }
     }
 
-    public NodeElementFunctionToken getPreviousWUPFunctionToken() {
+    public TopologyNodeFunctionFDNToken getPreviousWUPFunctionToken() {
         return previousWUPFunctionToken;
     }
 
-    public void setPreviousWUPFunctionToken(NodeElementFunctionToken previousWUPFunctionToken) {
+    public void setPreviousWUPFunctionToken(TopologyNodeFunctionFDNToken previousWUPFunctionToken) {
         synchronized (previousWUPFunctionTokenLock) {
             this.previousWUPFunctionToken = previousWUPFunctionToken;
         }
@@ -332,21 +344,29 @@ public class ActivityID {
         }
     }
 
-    public NodeElementFunctionToken getPresentWUPFunctionToken() {
+    public TopologyNodeFunctionFDNToken getPresentWUPFunctionToken() {
         return presentWUPFunctionToken;
     }
 
-    public void setPresentWUPFunctionToken(NodeElementFunctionToken presentWUPFunctionToken) {
+    public void setPresentWUPFunctionToken(TopologyNodeFunctionFDNToken presentWUPFunctionToken) {
         synchronized (presentWUPFunctionTokenLock) {
             this.presentWUPFunctionToken = presentWUPFunctionToken;
         }
+    }
+
+    public boolean isResilientActivity() {
+        return resilientActivity;
+    }
+
+    public void setResilientActivity(boolean resilientActivity) {
+        this.resilientActivity = resilientActivity;
     }
 
     @Override
     public String toString() {
         String previousResilienceParcelInstanceIDString;
         if (hasPreviousParcelIdentifier()) {
-            previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:" + this.previousParcelIdenifier.toString() + ")";
+            previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:" + this.previousParcelIdentifier.toString() + ")";
         } else {
             previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:null)";
         }

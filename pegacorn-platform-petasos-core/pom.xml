@@ -99,6 +99,8 @@
             <version>${version-org.json}</version>
             <scope>compile</scope>
         </dependency>
+
+
         <!-- Pegacorn Common Code -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
@@ -107,26 +109,10 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
-        <!-- Pegacorn Customised Resources
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-fhir-r4-model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency> -->
         <!-- Pegacorn Petasos Information Model -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-platform-petasos-model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency>
-        <!-- Pegacorn Petasos Topology Servoces -->
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-platform-petasos-topology</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
             <type>jar</type>
@@ -139,7 +125,18 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
-
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-deployment-properties</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
             <artifactId>pegacorn-deployment-datasets</artifactId>
@@ -154,8 +151,28 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-datamodels-components</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-buildingblocks-datamodels-fhir</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
 
-		
+        <dependency>
+            <groupId>net.fhirfactory.pegacorn</groupId>
+            <artifactId>pegacorn-platform-petasos-audit</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
         <!-- Infinispan -->
         <dependency>
             <groupId>org.infinispan</groupId>
@@ -176,11 +193,20 @@
             <version>${version-org.jgroups-jgroups}</version>
         </dependency>
 
-        <!-- logging -->
+        <!--         -->
+        <!-- Logging -->
+        <!--         -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
         </dependency>
 		
         <!-- Test Dependencies -->
@@ -200,33 +226,7 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-netty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-netty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-netty</artifactId>
-        </dependency>
     </dependencies>
-
-
 
     <build>
         <plugins>
@@ -245,10 +245,10 @@
                 <version>${version-org.apache.maven-surefire-plugin}</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${version-org.apache.maven-failsafe-plugin}</version>
             </plugin>
         </plugins>
     </build>
-
 </project>

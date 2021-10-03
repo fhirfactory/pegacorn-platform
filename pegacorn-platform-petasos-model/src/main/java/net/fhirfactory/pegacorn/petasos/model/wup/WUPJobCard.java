@@ -23,15 +23,20 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
 
 import java.util.Date;
 
+import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ResilienceModeEnum;
+
 
 public class WUPJobCard {
     private static final Logger LOG = LoggerFactory.getLogger(WUPJobCard.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     private ActivityID activityID;
     private Object activityIDLock;
@@ -60,7 +65,7 @@ public class WUPJobCard {
             ConcurrencyModeEnum clusterMode, 
             ResilienceModeEnum systemMode, 
             Date updateDate) {
-        LOG.debug(".WUPJobCard(): activityID, currentStatus, requestedStatus, clusterMode, systemMode, updateDate");
+        getLogger().debug(".WUPJobCard(): activityID, currentStatus, requestedStatus, clusterMode, systemMode, updateDate");
         this.activityID = null;
         this.updateDate = null;
         this.currentStatus = null;
@@ -84,7 +89,7 @@ public class WUPJobCard {
         this.updateDate = updateDate;
         this.currentStatus = currentStatus;
         this.clusterMode = clusterMode;
-        this.activityID = new ActivityID(activityID);
+        this.activityID = SerializationUtils.clone(activityID);
         this.requestedStatus = requestedStatus;
         this.systemMode = systemMode;
         this.isToBeDiscarded = false;

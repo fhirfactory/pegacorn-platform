@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 
 public class ResourceKey {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceKey.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
     
     IdType idTypeKey;
     Identifier identifierTypeKey;
@@ -68,7 +71,7 @@ public class ResourceKey {
                 String keyAsString = mapper.writeValueAsString(getIdentifierTypeKey());
                 return(keyAsString);
             } catch (JsonProcessingException e) {
-                LOG.error("Ignoring exception " + e.getMessage() + " and returning Empty Identifier", e);
+                getLogger().warn("Ignoring exception " + e.getMessage() + " and returning Empty Identifier", e);
                 return("Empty Identifier");
             }
         } else {

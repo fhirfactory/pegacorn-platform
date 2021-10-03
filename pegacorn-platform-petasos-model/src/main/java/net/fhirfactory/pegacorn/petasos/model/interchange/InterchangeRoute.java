@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.interchange;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 
 import java.time.Instant;
 

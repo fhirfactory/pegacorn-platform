@@ -21,25 +21,24 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager;
 
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.StandardWUPContainerRoute;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * @author Mark A. Hunter
@@ -50,20 +49,20 @@ public class WorkUnitProcessorFrameworkManager {
     private static final Logger LOG = LoggerFactory.getLogger(WorkUnitProcessorFrameworkManager.class);
 
     @Inject
-    CamelContext camelctx;
+    private CamelContext camelctx;
 
     @Inject
-    DeploymentTopologyIM topologyServer;
+    private DataParcelSubscriptionMapIM topicServer;
 
     @Inject
-    TopicIM topicServer;
+    private ProcessingPlantInterface processingPlant;
 
-    public void buildWUPFramework(NodeElement wupNode, Set<TopicToken> subscribedTopics, WUPArchetypeEnum wupArchetype) {
+    public void buildWUPFramework(WorkUnitProcessorTopologyNode wupNode, List<DataParcelManifest> subscribedTopics, WUPArchetypeEnum wupArchetype) {
         LOG.debug(".buildWUPFramework(): Entry, wupNode --> {}, subscribedTopics --> {}, wupArchetype --> {}", wupNode, subscribedTopics, wupArchetype);
         try {
             switch (wupArchetype) {
 
-                case WUP_NATURE_LAODN_STIMULI_TRIGGERED_BEHAVIOUR: {
+                case WUP_NATURE_STIMULI_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_STIMULI_TRIGGERED_BEHAVIOUR route");
                     StandardWUPContainerRoute standardWUPRoute = new StandardWUPContainerRoute(camelctx, wupNode, true);
                     LOG.trace(".buildWUPFramework(): Route created, now adding it to he CamelContext!");
@@ -73,7 +72,7 @@ public class WorkUnitProcessorFrameworkManager {
                     LOG.trace(".buildWUPFramework(): Subscribed to Topics, work is done!");
                     break;
                 }
-                case WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR: {
+                case WUP_NATURE_TIMER_TRIGGERED_WORKFLOW: {
                     LOG.trace(".buildWUPFramework(): Building a WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR route");
                     ExternalIngresWUPContainerRoute ingresRoute = new ExternalIngresWUPContainerRoute(camelctx, wupNode);
                     camelctx.addRoutes(ingresRoute);
@@ -133,24 +132,28 @@ public class WorkUnitProcessorFrameworkManager {
         } catch (Exception Ex) {
             // TODO We really must handle this exception, either by cancelling the whole Processing Plant or, at least, raising an alarm
         }
-
     }
 
-    public void uowTopicSubscribe(Set<TopicToken> subscribedTopics, NodeElement wupNode) {
+    public void uowTopicSubscribe(List<DataParcelManifest> subscribedTopics, WorkUnitProcessorTopologyNode wupNode) {
         LOG.debug(".uowTopicSubscribe(): Entry, subscribedTopics --> {}, wupNode --> {}", subscribedTopics, wupNode);
         if (subscribedTopics.isEmpty()) {
             LOG.debug(".uowTopicSubscribe(): Something's wrong, no Topics are subscribed for this WUP");
             return;
         }
-        NodeElementFunctionToken wupFunctionToken = new NodeElementFunctionToken();
-        wupFunctionToken.setFunctionID(wupNode.getNodeFunctionID());
-        wupFunctionToken.setVersion(wupNode.getVersion());
-        Iterator<TopicToken> topicIterator = subscribedTopics.iterator();
-        while (topicIterator.hasNext()) {
-            TopicToken currentTopicID = topicIterator.next();
+        for(DataParcelManifest currentTopicID: subscribedTopics) {
             LOG.trace(".uowTopicSubscribe(): wupNode --> {} is subscribing to UoW Content Topic --> {}", wupNode, currentTopicID);
-            topicServer.addTopicSubscriber(currentTopicID, wupNode.getNodeInstanceID());
+            PubSubParticipant subscriber = constructPubSubSubscriber(wupNode);
+            topicServer.addTopicSubscriber(currentTopicID, subscriber);
         }
         LOG.debug(".uowTopicSubscribe(): Exit");
+    }
+
+    private PubSubParticipant constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
+        PubSubParticipant subscriber = new PubSubParticipant();
+        IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
+        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
+        localSubscriber.setIdentifier(identifier);
+        subscriber.setIntraSubsystemParticipant(localSubscriber);
+        return(subscriber);
     }
 }

@@ -22,25 +22,24 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import java.util.Iterator;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementFunctionToken;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 
 /**
  * @author Mark A. Hunter
@@ -49,79 +48,78 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 @Dependent
 public class WUPContainerEgressProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressProcessor.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
     RouteElementNames elementNames = null;
 
     @Inject
     PetasosMOAServicesBroker petasosMOAServicesBroker;
 
     @Inject
-	DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
 
 
-    public WorkUnitTransportPacket egressContentProcessor(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String wupInstanceKey) {
-      	LOG.debug(".egressContentProcessor(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupInstanceKey (String) --> {}", ingresPacket, wupInstanceKey);
+    public WorkUnitTransportPacket egressContentProcessor(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
+      	getLogger().debug(".egressContentProcessor(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNodeFDNTokenValue (String) --> {}", ingresPacket);
         // Get my Petasos Context
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
-        if(LOG.isTraceEnabled()) {
-        	LOG.trace(".egressContentProcessor{}: Retrieved node from TopologyProxy");
-        	Iterator<String> listIterator = node.debugPrint(".egressContentProcessor{}: node").iterator();
-        	while(listIterator.hasNext()) {
-        		LOG.trace(listIterator.next());
-        	}
-        }
-        NodeElementFunctionToken wupFunctionToken = node.getNodeFunctionToken();
-        LOG.trace(".receiveFromWUP(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken); 
+        getLogger().trace(".egressContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+        getLogger().trace(".egressContentProcessor(): Retrieved the WUPTopologyNode, value->{}", node);
+        TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
+        getLogger().trace(".egressContentProcessor(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         WorkUnitTransportPacket egressPacket = null;
         switch (node.getResilienceMode()) {
             case RESILIENCE_MODE_MULTISITE:
             case RESILIENCE_MODE_KUBERNETES_MULTISITE:
-                LOG.trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_MULTISITE");
+                getLogger().trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_MULTISITE");
             case RESILIENCE_MODE_CLUSTERED:
             case RESILIENCE_MODE_KUBERNETES_CLUSTERED:
-                LOG.trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_CLUSTERED");
+                getLogger().trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_CLUSTERED");
             case RESILIENCE_MODE_STANDALONE:
             case RESILIENCE_MODE_KUBERNETES_STANDALONE:
-                LOG.trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_STANDALONE");
+                getLogger().trace(".egressContentProcessor(): Deployment Mode --> PETASOS_MODE_STANDALONE");
                 egressPacket = standaloneDeploymentModeECP(ingresPacket, camelExchange,node);
         }
-		LOG.debug(".egressContentProcessor(): Exit, egressPacket (WorkUnitTransportPacket) --> {}", egressPacket);
+		getLogger().debug(".egressContentProcessor(): Exit, egressPacket (WorkUnitTransportPacket) --> {}", egressPacket);
         return (egressPacket);
     }
 
-    private WorkUnitTransportPacket standaloneDeploymentModeECP(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, NodeElement wupNode) {
-       	LOG.debug(".standaloneDeploymentModeECP(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNode (NodeElement) --> {}", ingresPacket, wupNode);
-        elementNames = new RouteElementNames(wupNode.getNodeFunctionToken());
-        LOG.trace(".standaloneDeploymentModeECP(): Now, extract WUPJobCard from ingresPacket (WorkUnitTransportPacket)");
+    private WorkUnitTransportPacket standaloneDeploymentModeECP(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, WorkUnitProcessorTopologyNode wupNode) {
+       	getLogger().debug(".standaloneDeploymentModeECP(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNode (NodeElement) --> {}", ingresPacket, wupNode);
+        elementNames = new RouteElementNames(wupNode.getNodeFDN().getToken());
+        getLogger().trace(".standaloneDeploymentModeECP(): Now, extract WUPJobCard from ingresPacket (WorkUnitTransportPacket)");
         WUPJobCard jobCard = ingresPacket.getCurrentJobCard();
-        LOG.trace(".standaloneDeploymentModeECP(): Now, extract ParcelStatusElement from ingresPacket (WorkUnitTransportPacket)");
+        getLogger().trace(".standaloneDeploymentModeECP(): Now, extract ParcelStatusElement from ingresPacket (WorkUnitTransportPacket)");
         ParcelStatusElement statusElement = ingresPacket.getCurrentParcelStatus();
-        LOG.trace(".standaloneDeploymentModeECP(): Now, extract UoW from ingresPacket (WorkUnitTransportPacket)");
+        getLogger().trace(".standaloneDeploymentModeECP(): Now, extract UoW from ingresPacket (WorkUnitTransportPacket)");
         UoW uow = ingresPacket.getPayload();
-		LOG.debug(".standaloneDeploymentModeECP(): uow (UoW) --> {}", uow);
-		LOG.trace(".standaloneDeploymentModeECP(): Now, continue processing based on the ParcelStatusElement.getParcelStatus() (ResilienceParcelProcessingStatusEnum)");
+		getLogger().debug(".standaloneDeploymentModeECP(): uow (UoW) --> {}", uow);
+		getLogger().trace(".standaloneDeploymentModeECP(): Now, continue processing based on the ParcelStatusElement.getParcelStatus() (ResilienceParcelProcessingStatusEnum)");
         ResilienceParcelProcessingStatusEnum parcelProcessingStatusEnum = statusElement.getParcelStatus();
         switch (parcelProcessingStatusEnum) {
             case PARCEL_STATUS_FINISHED:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
                 petasosMOAServicesBroker.notifyFinishOfWorkUnitActivity(jobCard, uow);
                 break;
             case PARCEL_STATUS_ACTIVE_ELSEWHERE:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE_ELSEWHERE);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE_ELSEWHERE);
             case PARCEL_STATUS_FINISHED_ELSEWHERE:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED_ELSEWHERE);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED_ELSEWHERE);
             case PARCEL_STATUS_FINALISED_ELSEWHERE:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED_ELSEWHERE);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED_ELSEWHERE);
             case PARCEL_STATUS_REGISTERED:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             case PARCEL_STATUS_INITIATED:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_INITIATED);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_INITIATED);
             case PARCEL_STATUS_ACTIVE:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE);
             case PARCEL_STATUS_FINALISED:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
             case PARCEL_STATUS_FAILED:
-            	LOG.trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
+            	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
             default:
                 petasosMOAServicesBroker.notifyFailureOfWorkUnitActivity(jobCard, uow);
         }

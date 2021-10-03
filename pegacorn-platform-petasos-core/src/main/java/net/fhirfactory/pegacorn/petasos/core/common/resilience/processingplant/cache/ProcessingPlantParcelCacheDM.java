@@ -21,21 +21,20 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache;
 
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.enterprise.context.ApplicationScoped;
-
-import javax.transaction.Transactional;
-
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.common.model.FDNToken;
 
 /**
  * This class acts as the Data Manager for the Parcel Cache within the local
@@ -209,7 +208,7 @@ public class ProcessingPlantParcelCacheDM {
 
 
 
-    public ResilienceParcel getCurrentParcelForWUP(FDNToken wupInstanceID, FDNToken uowInstanceID) {
+    public ResilienceParcel getCurrentParcelForWUP(WUPIdentifier wupInstanceID, FDNToken uowInstanceID) {
         LOG.debug(".getCurrentParcel(): Entry, wupInstanceID --> {}" + wupInstanceID);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
         Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();

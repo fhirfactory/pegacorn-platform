@@ -21,82 +21,104 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.uow;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelQualityStatement;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.RDN;
-import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author Mark A. Hunter
  */
-public class UoWPayload {
+public class UoWPayload implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(UoWPayload.class);
-    private TopicToken payloadTopicID;
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
+    private DataParcelManifest payloadManifest;
     private String payload;
 
-
     public UoWPayload() {
-        payload = "Empty Payload";
-        TopicToken emptyPayloadToken = new TopicToken();
-        FDN emptyFDN = new FDN();
-        emptyFDN.appendRDN(new RDN("Null", "Null"));
-        emptyPayloadToken.setIdentifier(emptyFDN.getToken());
-        emptyPayloadToken.setVersion("0.0.0");
-        payloadTopicID = emptyPayloadToken;
+        payload = null;
+        payloadManifest = null;
     }
 
     public UoWPayload(UoWPayload originalUoWPayload) {
-        payload = new String(originalUoWPayload.getPayload());
-        TopicToken newToken = new TopicToken();
-        FDN newTokenFDN = new FDN(originalUoWPayload.getPayloadTopicID().getIdentifier());
-        newToken.setIdentifier(newTokenFDN.getToken());
-        newToken.setVersion(new String(originalUoWPayload.getPayloadTopicID().getVersion()));
-        payloadTopicID = newToken;
+        this.payload = (String)SerializationUtils.clone(originalUoWPayload.getPayload());
+        this.payloadManifest = (DataParcelManifest) SerializationUtils.clone(originalUoWPayload.getPayloadManifest());
     }
 
-    public UoWPayload(TopicToken payloadType, String payloadContent){
-        TopicToken newToken = new TopicToken();
-        FDN newTokenFDN = new FDN(payloadType.getIdentifier());
-        newToken.setIdentifier(newTokenFDN.getToken());
-        newToken.setVersion(new String(payloadType.getVersion()));
-        payloadTopicID = newToken;
-        this.payload = new String(payloadContent);
+    public UoWPayload(DataParcelManifest payloadType, String payloadContent){
+        this.payload = (String)SerializationUtils.clone(payloadContent);
+        this.payloadManifest = (DataParcelManifest) SerializationUtils.clone(payloadType);
     }
 
     public String getPayload() {
-        LOG.debug(".getPayload(): Entry");
-        LOG.debug(".getPayload(): Exit, returning Payload (String) --> {}", this.payload);
+        getLogger().debug(".getPayload(): Entry");
+        getLogger().debug(".getPayload(): Exit, returning Payload (String) --> {}", this.payload);
         return payload;
     }
 
     public void setPayload(String payload) {
-        LOG.debug(".setPayload(): Entry, payload (String) --> {}", payload);
-        this.payload = new String(payload);
+        getLogger().debug(".setPayload(): Entry, payload (String) --> {}", payload);
+        this.payload = (String) SerializationUtils.clone(payload);
     }
 
-    public TopicToken getPayloadTopicID() {
-        LOG.debug(".getPayloadTopicID(): Entry");
-        LOG.debug(".getPayloadTopicID(): Exit, returning Payload (String) --> {}", this.payloadTopicID);
-        return payloadTopicID;
+    public DataParcelManifest getPayloadManifest() {
+        getLogger().debug(".getPayloadTopicID(): Entry");
+        getLogger().debug(".getPayloadTopicID(): Exit, returning Payload (String) --> {}", this.payloadManifest);
+        return payloadManifest;
     }
 
-    public void setPayloadTopicID(TopicToken payloadTopicID) {
-        LOG.debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadTopicID);
-        TopicToken newToken = new TopicToken();
-        FDN newTokenFDN = new FDN(payloadTopicID.getIdentifier());
-        newToken.setIdentifier(newTokenFDN.getToken());
-        newToken.setVersion(new String(payloadTopicID.getVersion()));
-        this.payloadTopicID = newToken;
+    public void setPayloadManifest(DataParcelManifest payloadManifest) {
+        getLogger().debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadManifest);
+        this.payloadManifest = (DataParcelManifest) SerializationUtils.clone(payloadManifest);
+    }
+
+    public boolean hasDataParcelQualityStatement(){
+        if(payloadManifest == null){
+            return(false);
+        }
+        return(true);
+    }
+
+    @JsonIgnore
+    public DataParcelQualityStatement getPayloadQuality() {
+        getLogger().debug(".getPayloadQuality(): Entry");
+        if(hasDataParcelQualityStatement()){
+            getLogger().debug(".getPayloadQuality(): Exit, returning payloadQuality->{}", this.getPayloadManifest().getPayloadQuality());
+            return(this.getPayloadManifest().getPayloadQuality());
+        } else {
+            getLogger().debug(".getPayloadQuality(): Exit, no payloadQuality statement available");
+            return (null);
+        }
     }
 
     @Override
-    public String toString(){
-        String payloadToString = "UoWPayload{" +
-                "(payloadTopicID="+ payloadTopicID + ")," +
-                "(payload=" +payload + ")" +
-                "}";
-        return(payloadToString);
+    public String toString() {
+        return "UoWPayload{" +
+                "payloadManifest=" + payloadManifest +
+                ", payload=" + payload +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UoWPayload)) return false;
+        UoWPayload that = (UoWPayload) o;
+        return Objects.equals(getPayloadManifest(), that.getPayloadManifest()) && Objects.equals(getPayload(), that.getPayload());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPayloadManifest(), getPayload());
     }
 }

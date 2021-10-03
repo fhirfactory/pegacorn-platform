@@ -27,23 +27,26 @@ import org.slf4j.LoggerFactory;
  * @author Mark A. Hunter (ACT Health)
  */
 public class SimpleValidatorBase {
-        private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorBase.class);
-        public boolean isValidJSONObject(String pGroupJSONString) {
-        LOG.debug("isSimplyValid(String p): Entry");
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorBase.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
+	public boolean isValidJSONObject(String pGroupJSONString) {
+        getLogger().debug("isSimplyValid(String p): Entry");
         if (pGroupJSONString == null) {
-            LOG.debug("isSimplyValid(String p): Exit, parameter is null");
+            getLogger().debug("isSimplyValid(String p): Exit, parameter is null");
             return (false);
         }
         if (pGroupJSONString.isEmpty()) {
-            LOG.debug("isSimplyValid(String p): Exit, parameter is empty");
+            getLogger().debug("isSimplyValid(String p): Exit, parameter is empty");
             return (false);
         }
         try {
-            LOG.debug("isSimplyValid(String p): Exit, parameter is valid JSON object");
+            getLogger().debug("isSimplyValid(String p): Exit, parameter is valid JSON object");
             JSONObject jsonGeneric = new JSONObject(pGroupJSONString);
             return (true);
         } catch (Exception Ex) {
-            LOG.debug("isSimplyValid(String p): Exception, Exit, parameter is not a valid JSON Object");
+            getLogger().debug("isSimplyValid(String p): Exception, Exit, parameter is not a valid JSON Object");
             return (false);
         }
     }

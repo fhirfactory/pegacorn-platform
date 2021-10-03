@@ -22,9 +22,10 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
-import net.fhirfactory.pegacorn.deployment.topology.manager.DeploymentTopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayloadSet;
@@ -37,15 +38,18 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Dependent
 public class InterchangeUoWPayload2NewUoWProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeUoWPayload2NewUoWProcessor.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     @Inject
-    DeploymentTopologyIM topologyProxy;
+    TopologyIM topologyProxy;
     
     /**
      * This method performs tree key tasks:
@@ -59,36 +63,33 @@ public class InterchangeUoWPayload2NewUoWProcessor {
      * It generates the 
      * @param ingresPacket
      * @param camelExchange
-     * @param wupInstanceKey
      * @return A List<> of WorkUnitTransportPackets - one for each egress UoWPayload element within the incoming UoW.
      */
 
-    public List<WorkUnitTransportPacket> extractUoWPayloadAndCreateNewUoWSet(WorkUnitTransportPacket ingresPacket, Exchange camelExchange, String wupInstanceKey) {
-        LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupInstanceKey (String) --> {}", ingresPacket, wupInstanceKey);
+    public List<WorkUnitTransportPacket> extractUoWPayloadAndCreateNewUoWSet(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
+        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
         // Get my Petasos Context
-        NodeElement node = topologyProxy.getNodeByKey(wupInstanceKey);
+        getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         UoW incomingUoW = ingresPacket.getPayload();
-        if (LOG.isDebugEnabled()) {
-            UoWPayloadSet egressContent = incomingUoW.getEgressContent();
-            Iterator<UoWPayload> incomingPayloadIterator = egressContent.getPayloadElements().iterator();
+        UoWPayloadSet egressContent = incomingUoW.getEgressContent();
+        Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
+        if (getLogger().isDebugEnabled()) {
             int counter = 0;
-            while (incomingPayloadIterator.hasNext()) {
-                UoWPayload payload = incomingPayloadIterator.next();
-                LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).PayloadTopic --> [{}] {}", counter, payload.getPayloadTopicID());
-                LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).Payload --> [{}] {}", counter, payload.getPayload());
+            for(UoWPayload currentPayload: egressPayloadList){
+                getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).PayloadTopic --> [{}] {}", counter, currentPayload.getPayloadManifest());
+                getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): payload (UoWPayload).Payload --> [{}] {}", counter, currentPayload.getPayload());
                 counter++;
             }
         }
         ArrayList<WorkUnitTransportPacket> newEgressTransportPacketSet = new ArrayList<WorkUnitTransportPacket>();
-        UoWPayloadSet egressPayloadSet = incomingUoW.getEgressContent();
-        Iterator<UoWPayload> incomingPayloadIterator = egressPayloadSet.getPayloadElements().iterator();
-        while (incomingPayloadIterator.hasNext()) {
-            UoWPayload currentPayload = incomingPayloadIterator.next();
+        for(UoWPayload currentPayload: egressPayloadList) {
             UoW newUoW = new UoW(currentPayload);
+            getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newUoW->{}", newUoW);
             WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(ingresPacket.getPacketID(), Date.from(Instant.now()), newUoW);
             newEgressTransportPacketSet.add(transportPacket);
         }
-        LOG.debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newEgressTransportPacketSet.size());
+        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newEgressTransportPacketSet.size());
 
         return (newEgressTransportPacketSet);
     }

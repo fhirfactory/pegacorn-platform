@@ -22,19 +22,16 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
+import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.*;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressGatekeeper;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerEgressProcessor;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresGatekeeper;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresProcessor;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPEgressConduit;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPIngresConduit;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 
 /**
  * @author Mark A. Hunter
@@ -43,41 +40,47 @@ import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 
 public class StandardWUPContainerRoute extends BaseRouteBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(StandardWUPContainerRoute.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
-	private NodeElement wupNode;
+	private WorkUnitProcessorTopologyNode wupTopologyNode;
 	private RouteElementNames nameSet;
 
-	public StandardWUPContainerRoute( CamelContext camelCTX, NodeElement wupNode) {
+	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode) {
 		super(camelCTX);
-		LOG.debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
-		this.wupNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFunctionToken());
+		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
+		this.wupTopologyNode = wupTopologyNode;
+		nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
 	}
 
-	public StandardWUPContainerRoute( CamelContext camelCTX, NodeElement wupNode, boolean requiresDirect) {
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, boolean requiresDirect) {
 		super(camelCTX);
-		LOG.debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
-		this.wupNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFunctionToken(), requiresDirect);
+		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
+		this.wupTopologyNode = wupTopologyNode;
+		nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken(), requiresDirect);
 	}
 
 	@Override
 	public void configure() {
-		LOG.debug(".configure(): Entry!, for wupNode --> {}", this.wupNode);
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorIngres --> {}", nameSet.getEndPointWUPContainerIngresProcessorIngres());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorEgress --> {}", nameSet.getEndPointWUPContainerIngresProcessorEgress());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPContainerIngresGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerIngresGatekeeperIngres());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPIngresConduitIngres --> {}", nameSet.getEndPointWUPIngresConduitIngres());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPIngres --> {}", nameSet.getEndPointWUPIngres());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPEgress --> {}", nameSet.getEndPointWUPEgress());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPEgressConduitEgress --> {}", nameSet.getEndPointWUPEgressConduitEgress());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorIngres --> {}", nameSet.getEndPointWUPContainerEgressProcessorIngres());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorEgress --> {}", nameSet.getEndPointWUPContainerEgressProcessorEgress());
-		LOG.debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerEgressGatekeeperIngres());
+		getLogger().debug(".configure(): Entry!, for wupNode --> {}", this.wupTopologyNode);
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorIngres --> {}", nameSet.getEndPointWUPContainerIngresProcessorIngres());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerIngresProcessorEgress --> {}", nameSet.getEndPointWUPContainerIngresProcessorEgress());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerIngresGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerIngresGatekeeperIngres());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPIngresConduitIngres --> {}", nameSet.getEndPointWUPIngresConduitIngres());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPIngres --> {}", nameSet.getEndPointWUPIngres());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPEgress --> {}", nameSet.getEndPointWUPEgress());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPEgressConduitEgress --> {}", nameSet.getEndPointWUPEgressConduitEgress());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorIngres --> {}", nameSet.getEndPointWUPContainerEgressProcessorIngres());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorEgress --> {}", nameSet.getEndPointWUPContainerEgressProcessorEgress());
+		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerEgressGatekeeperIngres());
+
+		NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresProcessorIngres())
 				.routeId(nameSet.getRouteWUPContainerIngressProcessor())
-				.bean(WUPContainerIngresProcessor.class, "ingresContentProcessor(*, Exchange," + this.wupNode.extractNodeKey() + ")")
+				.process(nodeDetailInjector)
+				.bean(WUPContainerIngresProcessor.class, "ingresContentProcessor(*, Exchange)")
 				.to(nameSet.getEndPointWUPContainerIngresProcessorEgress());
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresProcessorEgress())
@@ -86,15 +89,19 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresGatekeeperIngres())
 				.routeId(nameSet.getRouteWUPContainerIngresGateway())
-				.bean(WUPContainerIngresGatekeeper.class, "ingresGatekeeper(*, Exchange," + this.wupNode.extractNodeKey() + ")");
+				.process(nodeDetailInjector)
+				.bean(WUPContainerIngresGatekeeper.class, "ingresGatekeeper(*, Exchange)");
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPIngresConduitIngres())
 				.routeId(nameSet.getRouteIngresConduitIngres2WUPIngres())
-				.bean(WUPIngresConduit.class, "forwardIntoWUP(*, Exchange," + this.wupNode.extractNodeKey() + ")")
+				.process(nodeDetailInjector)
+				.bean(WUPIngresConduit.class, "forwardIntoWUP(*, Exchange)")
 				.to(nameSet.getEndPointWUPIngres());
 
-		fromWithStandardExceptionHandling(nameSet.getEndPointWUPEgress()).routeId(nameSet.getRouteWUPEgress2WUPEgressConduitEgress())
-				.bean(WUPEgressConduit.class, "receiveFromWUP(*, Exchange," + this.wupNode.extractNodeKey() + ")")
+		fromWithStandardExceptionHandling(nameSet.getEndPointWUPEgress())
+				.routeId(nameSet.getRouteWUPEgress2WUPEgressConduitEgress())
+				.process(nodeDetailInjector)
+				.bean(WUPEgressConduit.class, "receiveFromWUP(*, Exchange)")
 				.to( nameSet.getEndPointWUPEgressConduitEgress());
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPEgressConduitEgress())
@@ -103,7 +110,8 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressProcessorIngres())
 				.routeId(nameSet.getRouteWUPContainerEgressProcessor())
-				.bean(WUPContainerEgressProcessor.class, "egressContentProcessor(*, Exchange," + this.wupNode.extractNodeKey() + ")")
+				.process(nodeDetailInjector)
+				.bean(WUPContainerEgressProcessor.class, "egressContentProcessor(*, Exchange)")
 				.to(nameSet.getEndPointWUPContainerEgressProcessorEgress());
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressProcessorEgress())
@@ -112,7 +120,29 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerEgressGatekeeperIngres())
 				.routeId(nameSet.getRouteWUPContainerEgressGateway())
-				.bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange," + this.wupNode.extractNodeKey() + ")");
+				.process(nodeDetailInjector)
+				.bean(WUPContainerEgressGatekeeper.class, "egressGatekeeper(*, Exchange)");
 
+	}
+
+	protected class NodeDetailInjector implements Processor {
+		@Override
+		public void process(Exchange exchange) throws Exception {
+			getLogger().debug("NodeDetailInjector.process(): Entry");
+			boolean alreadyInPlace = false;
+			if(exchange.hasProperties()) {
+				WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+				if (wupTN != null) {
+					alreadyInPlace = true;
+				}
+			}
+			if(!alreadyInPlace) {
+				exchange.setProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, getWupTopologyNode());
+			}
+		}
+	}
+
+	public WorkUnitProcessorTopologyNode getWupTopologyNode() {
+		return wupTopologyNode;
 	}
 }

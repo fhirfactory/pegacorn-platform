@@ -22,43 +22,46 @@
 
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import net.fhirfactory.pegacorn.common.model.FDN;
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class WUPIdentifier extends FDNToken {
+public class WUPIdentifier extends TopologyNodeFDNToken implements Serializable {
 	
-    public WUPIdentifier(FDNToken originalToken) {
-        this.setContent(new String(originalToken.getContent()));
+    public WUPIdentifier(TopologyNodeFDNToken originalToken) {
+        this.setTokenValue(SerializationUtils.clone(originalToken.getTokenValue()));
     }
     public WUPIdentifier(){super();}
 	
 	@Override
 	public String toString() {
-	        FDN tempFDN = new FDN(this);
-	        String simpleString = "WUPIdentifier{";
-	        ArrayList<RDN> rdnSet = tempFDN.getRDNSet();
-	        int setSize = rdnSet.size();
-	        for (int counter = 0; counter < setSize; counter++) {
-	            RDN currentRDN = rdnSet.get(counter);
-	            String currentNameValue = currentRDN.getValue();
-	            if(currentNameValue.contains(".")){
-	                String outputString = currentNameValue.replace(".", "_");
-	                simpleString = simpleString + outputString;
-	            } else {
-	                simpleString = simpleString + currentNameValue;
-	            }
-	            if(counter < (setSize - 1)){
-	                simpleString = simpleString + ".";
-	            }
-	        }
-	        simpleString = simpleString + "}";
-	        return(simpleString);
+
+		TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getTokenValue());
+		String simpleString = "WUPIdentifier{";
+		ArrayList<TopologyNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
+		int setSize = rdnSet.size();
+		for (int counter = 0; counter < setSize; counter++) {
+			TopologyNodeRDN currentRDN = rdnSet.get(counter);
+			String currentNameValue = currentRDN.getNodeName();
+			if(currentNameValue.contains(".")){
+				String outputString = currentNameValue.replace(".", "_");
+				simpleString = simpleString + outputString;
+			} else {
+				simpleString = simpleString + currentNameValue;
+			}
+			if(counter < (setSize - 1)){
+				simpleString = simpleString + ".";
+			}
+		}
+		simpleString = simpleString + "}";
+		return(simpleString);
 	}
 }

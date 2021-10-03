@@ -22,10 +22,10 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache;
 
-import net.fhirfactory.pegacorn.common.model.FDNToken;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.EpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.WUAEpisodeFinalisationRegistrationStatus;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.WUAEpisodeFinalisationRegistrationStatusEnum;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeFinalisationStatus;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionTokenSet;
 import org.slf4j.Logger;
@@ -59,8 +59,8 @@ import javax.enterprise.context.ApplicationScoped;
 public class ProcessingPlantWUAEpisodeFinalisationCacheDM {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantWUAEpisodeFinalisationCacheDM.class);
 
-    private ConcurrentHashMap<EpisodeIdentifier, WUAEpisodeFinalisationRegistrationStatus> downstreamRegistrationStatusSet;
-    private ConcurrentHashMap<EpisodeIdentifier, WUPFunctionTokenSet> downstreamWUPRegistrationMap;
+    private ConcurrentHashMap<PetasosEpisodeIdentifier, PetasosEpisodeFinalisationStatus> downstreamRegistrationStatusSet;
+    private ConcurrentHashMap<PetasosEpisodeIdentifier, WUPFunctionTokenSet> downstreamWUPRegistrationMap;
     private Object wupRegistrationSetLock;
 
     /**
@@ -68,8 +68,8 @@ public class ProcessingPlantWUAEpisodeFinalisationCacheDM {
      * including instantiation of the ConcurrentHashMaps used for caching the data.
      */
     public ProcessingPlantWUAEpisodeFinalisationCacheDM() {
-        downstreamRegistrationStatusSet = new ConcurrentHashMap<EpisodeIdentifier, WUAEpisodeFinalisationRegistrationStatus>();
-        downstreamWUPRegistrationMap = new ConcurrentHashMap<EpisodeIdentifier, WUPFunctionTokenSet>();
+        downstreamRegistrationStatusSet = new ConcurrentHashMap<PetasosEpisodeIdentifier, PetasosEpisodeFinalisationStatus>();
+        downstreamWUPRegistrationMap = new ConcurrentHashMap<PetasosEpisodeIdentifier, WUPFunctionTokenSet>();
         wupRegistrationSetLock = new Object();
     }
 
@@ -88,14 +88,14 @@ public class ProcessingPlantWUAEpisodeFinalisationCacheDM {
      * @param wuaEpisodeID            The WUA Episode ID (that generates the output UoW which we are tracking the finalisation of the associated parcel of)
      * @param downstreamWUPFunctionId The WUP Function that will consuming the UoW and, therefore, is a downstream consumer of the output of this WUA Episode.
      */
-    public void registerDownstreamWUPInterest(EpisodeIdentifier wuaEpisodeID, WUPFunctionToken downstreamWUPFunctionId) {
+    public void registerDownstreamWUPInterest(PetasosEpisodeIdentifier wuaEpisodeID, WUPFunctionToken downstreamWUPFunctionId) {
         LOG.debug(".registerDownstreamWUPInterest(): Entry, wuaEpisodeID --> {}, downstreamWUPFunctionId --> {}", wuaEpisodeID, downstreamWUPFunctionId);
         if ((wuaEpisodeID == null) || (downstreamWUPFunctionId == null)) {
             throw (new IllegalArgumentException(".registerDownstreamWUPInterest(): wuaEpisodeID or downstreamWUPFunctionId are null"));
         }
         synchronized (wupRegistrationSetLock) {
             if(!downstreamRegistrationStatusSet.containsKey(wuaEpisodeID)) {
-                WUAEpisodeFinalisationRegistrationStatus newRegistrationStatusElement = new WUAEpisodeFinalisationRegistrationStatus(downstreamWUPFunctionId);
+                PetasosEpisodeFinalisationStatus newRegistrationStatusElement = new PetasosEpisodeFinalisationStatus(downstreamWUPFunctionId);
                 downstreamRegistrationStatusSet.put(wuaEpisodeID,newRegistrationStatusElement );
             }
             if (downstreamWUPRegistrationMap.containsKey(wuaEpisodeID)) {
@@ -120,12 +120,12 @@ public class ProcessingPlantWUAEpisodeFinalisationCacheDM {
      * @param downstreamWUPFunctionID The WUP Instance that will consuming the UoW and, therefore, is a downstream consumer of the output of this WUA Episode.
      * @param downstreamEpisodeID     The new WUA Episode ID creating by the WUP (and, therefore, synchronised across the WHOLE deployment).
      */
-    public void registerDownstreamEpisodeID(EpisodeIdentifier originalEpisodeID, WUPFunctionToken downstreamWUPFunctionID, EpisodeIdentifier downstreamEpisodeID) {
+    public void registerDownstreamEpisodeID(PetasosEpisodeIdentifier originalEpisodeID, WUPFunctionToken downstreamWUPFunctionID, PetasosEpisodeIdentifier downstreamEpisodeID) {
         LOG.debug(".registerDownstreamEpisodeID(): Entry, originalEpisodeID --> {}, downstreamWUPInstanceID --> {}, downstreamEpisodeID --> {} ", originalEpisodeID, downstreamWUPFunctionID, downstreamEpisodeID);
         if ((originalEpisodeID == null) || (downstreamWUPFunctionID == null) || (downstreamEpisodeID == null)) {
             throw (new IllegalArgumentException(".registerDownstreamEpisodeID(): originalEpisodeID, downstreamWUPInstanceID, downstreamEpisodeID are null"));
         }
-        WUAEpisodeFinalisationRegistrationStatus wupInstanceFinalisationStatus;
+        PetasosEpisodeFinalisationStatus wupInstanceFinalisationStatus;
         if (!downstreamRegistrationStatusSet.containsKey(downstreamWUPFunctionID)) {
             registerDownstreamWUPInterest(originalEpisodeID, downstreamWUPFunctionID);
         }
@@ -155,8 +155,8 @@ public class ProcessingPlantWUAEpisodeFinalisationCacheDM {
         while(wupInstanceIDIterator.hasNext()){
             WUPFunctionToken wupInstanceID = wupInstanceIDIterator.next();
             if(downstreamRegistrationStatusSet.containsKey(wupInstanceID)) {
-                WUAEpisodeFinalisationRegistrationStatus finalisationRegistrationStatus = downstreamRegistrationStatusSet.get(wupInstanceID);
-                if (finalisationRegistrationStatus.getRegistrationStatus() == WUAEpisodeFinalisationRegistrationStatusEnum.DOWNSTREAM_EPISODE_ID_NOT_REGISTERED) {
+                PetasosEpisodeFinalisationStatus finalisationRegistrationStatus = downstreamRegistrationStatusSet.get(wupInstanceID);
+                if (finalisationRegistrationStatus.getRegistrationStatus() == PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_NOT_REGISTERED) {
                     LOG.debug(".checkForEpisodeFinalisation(): If any single registered downstream WUP has registered a successor WUA Episode ID, then it is finalised! Returning -false-");
                     return (false);
                 }

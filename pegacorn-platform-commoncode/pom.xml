@@ -96,10 +96,24 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- logging -->
+        <!--         -->
+        <!-- Logging -->
+        <!--         -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
     </dependencies>
 
