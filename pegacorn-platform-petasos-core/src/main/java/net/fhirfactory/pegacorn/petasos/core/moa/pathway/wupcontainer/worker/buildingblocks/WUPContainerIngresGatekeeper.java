@@ -82,7 +82,7 @@ public class WUPContainerIngresGatekeeper {
             return (null);
         } else {
             getLogger().trace(".ingresGatekeeper(): And we return the ingres point to the associated WUP Ingres Conduit");
-            String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
+            String targetEndpoint = nameSet.getEndPointWUPContainerIngresGatekeeperEgress();
             targetList.add(targetEndpoint);
             getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
             return (targetList);

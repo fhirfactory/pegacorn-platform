@@ -22,7 +22,6 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache;
 
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
@@ -56,7 +55,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
     private ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<ResilienceParcelIdentifier>> wuaEpisode2ParcelInstanceMap;
 
     @Inject
-    ProcessingPlantParcelCacheDM parcelCacheDM;
+    ProcessingPlantResilienceParcelCacheDM parcelCacheDM;
 
     @Inject
     TopologyIM topologyIM;
@@ -109,7 +108,7 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
             boolean sameEpisodeID = existingStatusElement.getActivityID().getPresentEpisodeIdentifier().equals(activityID.getPresentEpisodeIdentifier());
             boolean sameWUPInstanceID = existingStatusElement.getActivityID().getPresentWUPIdentifier().equals(activityID.getPresentWUPIdentifier());
             boolean sameWUPTypeID = existingStatusElement.getActivityID().getPresentWUPFunctionToken().equals(activityID.getPresentWUPFunctionToken());
-            boolean sameUpstreamEpisodeID = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier().equals(activityID.getPreviousEpisodeIdentifier());
+            boolean sameUpstreamEpisodeID = hasSameUpstreamEpisodeID(activityID, existingStatusElement);
             if( sameInstanceID && sameEpisodeID && sameWUPInstanceID && sameWUPTypeID && sameUpstreamEpisodeID ){
                 LOG.trace(".addWUA(): New ActivityID and existing (registered) ID the same, so update the status (maybe) and then exit");
                 existingStatusElement.setParcelStatus(initialProcessingStatus);
@@ -435,5 +434,43 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
             statusElement.setHasClusterFocus(true);
         }
         LOG.debug(".setClusterWideFocusElement(): Exit");
+    }
+
+    //
+    // Some Helpers
+    //
+
+    /**
+     * This is a seriously defensive bit of code...
+     * @param activityID The ActivityID provided as part of the registration process
+     * @param existingStatusElement a potential StatusElement retrieved from the PetasosParcelCache
+     * @return true if the activityID's upstreamEpisodeID is the same as the upstreamEpisodeID from the StatusElement
+     */
+    private boolean hasSameUpstreamEpisodeID(ActivityID activityID, ParcelStatusElement existingStatusElement){
+        PetasosEpisodeIdentifier previousEpisodeIdentifier = null;
+        if(activityID != null){
+            if(activityID.hasPreviousEpisodeIdentifier()){
+                previousEpisodeIdentifier = activityID.getPreviousEpisodeIdentifier();
+            }
+        }
+        PetasosEpisodeIdentifier existingPreviousEpisodeIdentifier = null;
+        if(existingStatusElement != null){
+            if(existingStatusElement.getActivityID() != null){
+                if(existingStatusElement.getActivityID().hasPreviousEpisodeIdentifier()){
+                    existingPreviousEpisodeIdentifier = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier();
+                }
+            }
+        }
+        if(previousEpisodeIdentifier == null && existingPreviousEpisodeIdentifier == null){
+            return(true);
+        }
+        if(previousEpisodeIdentifier == null || existingPreviousEpisodeIdentifier == null){
+            return(false);
+        }
+        if(previousEpisodeIdentifier == existingPreviousEpisodeIdentifier){
+            return(true);
+        } else {
+            return(false);
+        }
     }
 }

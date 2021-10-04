@@ -31,6 +31,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bui
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,10 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 				.routeId(nameSet.getRouteWUPContainerIngresGateway())
 				.process(nodeDetailInjector)
 				.bean(WUPContainerIngresGatekeeper.class, "ingresGatekeeper(*, Exchange)");
+
+		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresGatekeeperEgress())
+				.routeId(nameSet.getRouteIngresGatekeeperEgress2IngresConduitIngres())
+				.to(ExchangePattern.InOnly, nameSet.getEndPointWUPIngresConduitIngres());
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPIngresConduitIngres())
 				.routeId(nameSet.getRouteIngresConduitIngres2WUPIngres())

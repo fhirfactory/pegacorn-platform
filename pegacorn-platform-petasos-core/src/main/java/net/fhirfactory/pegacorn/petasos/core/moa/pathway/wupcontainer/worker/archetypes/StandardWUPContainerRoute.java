@@ -22,13 +22,16 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
+import javax.inject.Inject;
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.*;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +49,7 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 
 	private WorkUnitProcessorTopologyNode wupTopologyNode;
 	private RouteElementNames nameSet;
-
+        
 	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode) {
 		super(camelCTX);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
@@ -91,6 +94,10 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 				.routeId(nameSet.getRouteWUPContainerIngresGateway())
 				.process(nodeDetailInjector)
 				.bean(WUPContainerIngresGatekeeper.class, "ingresGatekeeper(*, Exchange)");
+
+		fromWithStandardExceptionHandling(nameSet.getEndPointWUPContainerIngresGatekeeperEgress())
+				.routeId(nameSet.getRouteIngresGatekeeperEgress2IngresConduitIngres())
+				.to(ExchangePattern.InOnly, nameSet.getEndPointWUPIngresConduitIngres());
 
 		fromWithStandardExceptionHandling(nameSet.getEndPointWUPIngresConduitIngres())
 				.routeId(nameSet.getRouteIngresConduitIngres2WUPIngres())

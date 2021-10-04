@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache;
+package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,13 +47,28 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2020-06-01
  */
 @ApplicationScoped
-public class ProcessingPlantParcelCacheDM {
-    private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantParcelCacheDM.class);
+public class ProcessingPlantResilienceParcelCacheDM {
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantResilienceParcelCacheDM.class);
 
     private ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel> petasosParcelCache;
+    private Object petasosParcelCacheLock;
 
-    public ProcessingPlantParcelCacheDM() {
-        petasosParcelCache = new ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel>();
+    //
+    // Constructor
+    //
+
+    public ProcessingPlantResilienceParcelCacheDM() {
+        this.petasosParcelCache = new ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel>();
+        this.petasosParcelCacheLock = new Object();
+    }
+
+    //
+    // Getters (and Setters)
+    //
+
+
+    public Object getPetasosParcelCacheLock() {
+        return petasosParcelCacheLock;
     }
 
     /**
@@ -62,7 +76,7 @@ public class ProcessingPlantParcelCacheDM {
      * to the particular ParcelID, it replaces it.
      * @param parcel The ResilienceParcel to be added to the (ConcurrentHashMap) Cache
      */
-    @Transactional
+
     public void addParcel(ResilienceParcel parcel) {
         LOG.debug(".addParcel(): Entry, parcel --> {}", parcel);
         if (parcel == null) {
@@ -71,11 +85,13 @@ public class ProcessingPlantParcelCacheDM {
         if (!parcel.hasInstanceIdentifier()) {
             return;
         }
-        ResilienceParcelIdentifier parcelInstanceID = parcel.getIdentifier();
-        if(petasosParcelCache.containsKey(parcelInstanceID)){
-            petasosParcelCache.remove(parcelInstanceID);
+        synchronized (getPetasosParcelCacheLock()) {
+            ResilienceParcelIdentifier parcelInstanceID = parcel.getIdentifier();
+            if (petasosParcelCache.containsKey(parcelInstanceID)) {
+                petasosParcelCache.remove(parcelInstanceID);
+            }
+            petasosParcelCache.put(parcelInstanceID, parcel);
         }
-        petasosParcelCache.put(parcelInstanceID, parcel);
     }
 
     /**
@@ -95,7 +111,7 @@ public class ProcessingPlantParcelCacheDM {
      * This function removes the ResilienceParcel from the Cache.
      * @param parcel The ResilienceParcel to be removed from the Cache
      */
-    @Transactional
+
     public void removeParcel(ResilienceParcel parcel) {
         LOG.debug(".removeParcel(): Entry, parcel --> {}", parcel);
         if (parcel == null) {
@@ -104,8 +120,10 @@ public class ProcessingPlantParcelCacheDM {
         if (!parcel.hasInstanceIdentifier()) {
             return;
         }
-        if(petasosParcelCache.containsKey(parcel.getIdentifier())) {
-            petasosParcelCache.remove(parcel.getIdentifier());
+        synchronized (getPetasosParcelCacheLock()) {
+            if (petasosParcelCache.containsKey(parcel.getIdentifier())) {
+                petasosParcelCache.remove(parcel.getIdentifier());
+            }
         }
     }
 
@@ -113,14 +131,16 @@ public class ProcessingPlantParcelCacheDM {
      * This function removes the ResilienceParcel from the Cache.
      * @param parcelInstanceID The Identifier (FDNToken) of the ResilienceParcel to be removed
      */
-    @Transactional
+
     public void removeParcel(ResilienceParcelIdentifier parcelInstanceID) {
         LOG.debug(".removeParcel(): Entry, parcelInstanceID --> {}", parcelInstanceID);
         if (parcelInstanceID == null) {
             return;
         }
-        if(petasosParcelCache.containsKey(parcelInstanceID)) {
-            petasosParcelCache.remove(parcelInstanceID);
+        synchronized (getPetasosParcelCacheLock()) {
+            if (petasosParcelCache.containsKey(parcelInstanceID)) {
+                petasosParcelCache.remove(parcelInstanceID);
+            }
         }
     }
 
@@ -129,7 +149,7 @@ public class ProcessingPlantParcelCacheDM {
      * instance.
      * @param newParcel The new ResilienceParcel instance
      */
-    @Transactional
+
     public void updateParcel(ResilienceParcel newParcel) {
         LOG.debug(".updateParcel() Entry, parcel --> {}", newParcel);
         if (newParcel == null) {
@@ -148,19 +168,23 @@ public class ProcessingPlantParcelCacheDM {
     public List<ResilienceParcel> getParcelSet() {
         LOG.debug(".getParcelSet(): Entry");
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        petasosParcelCache.entrySet().forEach(entry -> parcelList.add(entry.getValue()));
+        synchronized (getPetasosParcelCacheLock()) {
+            petasosParcelCache.entrySet().forEach(entry -> parcelList.add(entry.getValue()));
+        }
         return (parcelList);
     }
 
     public List<ResilienceParcel> getParcelSetByState(ResilienceParcelProcessingStatusEnum status) {
         LOG.debug(".getParcelSet(): Entry, status --> {}", status);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasProcessingStatus()) {
-                if (currentParcel.getProcessingStatus() == status) {
-                    parcelList.add(currentParcel);
+        synchronized (getPetasosParcelCacheLock()) {
+            Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
+            while (parcelListIterator.hasNext()) {
+                ResilienceParcel currentParcel = parcelListIterator.next();
+                if (currentParcel.hasProcessingStatus()) {
+                    if (currentParcel.getProcessingStatus() == status) {
+                        parcelList.add(currentParcel);
+                    }
                 }
             }
         }
@@ -182,6 +206,16 @@ public class ProcessingPlantParcelCacheDM {
         return (parcelList);
     }
 
+    public List<ResilienceParcel> getCancelledParcelSet(){
+        List<ResilienceParcel> parcelList = getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_CANCELLED);
+        return(parcelList);
+    }
+
+    public List<ResilienceParcel> getFailedParcelSet(){
+        List<ResilienceParcel> parcelList = getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
+        return(parcelList);
+    }
+
     public List<ResilienceParcel> getInProgressParcelSet() {
         LOG.debug(".getInProgressParcelSet(): Entry");
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
@@ -194,31 +228,33 @@ public class ProcessingPlantParcelCacheDM {
     public List<ResilienceParcel> getParcelByEpisodeID(FDNToken parcelTypeID) {
         LOG.debug(".getInProgressParcelSet(): Entry, parcelTypeID --> {}" + parcelTypeID);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasEpisodeIdentifier()) {
-                if (currentParcel.getEpisodeIdentifier().equals(parcelTypeID)) {
-                    parcelList.add(currentParcel);
+        synchronized (getPetasosParcelCacheLock()) {
+            Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
+            while (parcelListIterator.hasNext()) {
+                ResilienceParcel currentParcel = parcelListIterator.next();
+                if (currentParcel.hasEpisodeIdentifier()) {
+                    if (currentParcel.getEpisodeIdentifier().equals(parcelTypeID)) {
+                        parcelList.add(currentParcel);
+                    }
                 }
             }
         }
         return (parcelList);
     }
 
-
-
     public ResilienceParcel getCurrentParcelForWUP(WUPIdentifier wupInstanceID, FDNToken uowInstanceID) {
         LOG.debug(".getCurrentParcel(): Entry, wupInstanceID --> {}" + wupInstanceID);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasAssociatedWUPIdentifier()) {
-                if (currentParcel.getAssociatedWUPIdentifier().equals(wupInstanceID)) {
-                    if (currentParcel.hasActualUoW()) {
-                        if (currentParcel.getActualUoW().getInstanceID().equals(uowInstanceID)) {
-                            return (currentParcel);
+        synchronized (getPetasosParcelCacheLock()) {
+            Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
+            while (parcelListIterator.hasNext()) {
+                ResilienceParcel currentParcel = parcelListIterator.next();
+                if (currentParcel.hasAssociatedWUPIdentifier()) {
+                    if (currentParcel.getAssociatedWUPIdentifier().equals(wupInstanceID)) {
+                        if (currentParcel.hasActualUoW()) {
+                            if (currentParcel.getActualUoW().getInstanceID().equals(uowInstanceID)) {
+                                return (currentParcel);
+                            }
                         }
                     }
                 }
@@ -226,5 +262,4 @@ public class ProcessingPlantParcelCacheDM {
         }
         return (null);
     }
-
 }

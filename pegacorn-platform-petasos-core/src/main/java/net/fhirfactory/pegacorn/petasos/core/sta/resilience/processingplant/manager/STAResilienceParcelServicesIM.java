@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.man
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantResilienceParcelCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -49,7 +49,7 @@ public class STAResilienceParcelServicesIM {
     private static final Logger LOG = LoggerFactory.getLogger(STAResilienceParcelServicesIM.class);
 
     @Inject
-    ProcessingPlantParcelCacheDM parcelCacheDM;
+    ProcessingPlantResilienceParcelCacheDM parcelCacheDM;
 
     @Inject
     STAServicesAuditBroker auditWriter;

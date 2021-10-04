@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache;
 
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantResilienceParcelCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
@@ -57,7 +57,7 @@ public class STAServiceModuleActivityMatrixDM {
     private ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<ResilienceParcelIdentifier>> wuaEpisode2ParcelInstanceMap;
 
     @Inject
-    ProcessingPlantParcelCacheDM parcelCacheDM;
+    ProcessingPlantResilienceParcelCacheDM parcelCacheDM;
 
     @Inject
     TopologyIM moduleIM;

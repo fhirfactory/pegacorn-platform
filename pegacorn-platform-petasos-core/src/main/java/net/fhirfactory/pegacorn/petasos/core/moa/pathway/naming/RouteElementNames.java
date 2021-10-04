@@ -108,6 +108,12 @@ public class RouteElementNames {
         return(endpointName);
     }
 
+    public String getEndPointWUPContainerIngresGatekeeperEgress() {
+        getLogger().debug(".getEndPointWUPContainerIngresGatekeeperEgress(): Entry");
+        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresGatekeeper.Egress";
+        return(endpointName);
+    }
+
     public String getEndPointWUPIngresConduitIngres() {
         getLogger().debug(".getEndPointWUPIngresConduitIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUP.IngresConduit.Ingres";
@@ -152,7 +158,7 @@ public class RouteElementNames {
 
     public String getEndPointInterchangePayloadTransformerIngres() {
         getLogger().debug(".getEndPointInterchangePayloadTransformerIngres(): Entry");
-        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres";
+        String endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres";
         return(endpointName);
     }
 
@@ -177,6 +183,12 @@ public class RouteElementNames {
     public String getRouteIngresProcessorEgress2IngresGatekeeperIngres() {
         getLogger().debug(".getRouteIngresProcessorEgress2IngresGatekeeperIngres(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".WUPC.IP.E-To-" + wupTypeName +".WUPC.IG.I" ;
+        return(endpointName);
+    }
+
+    public String getRouteIngresGatekeeperEgress2IngresConduitIngres() {
+        getLogger().debug(".getRouteIngresGatekeeperEgress2IngresConduitIngres(): Entry");
+        String endpointName = "FROM-" + wupTypeName + ".WUPC.IG-E-To-" + wupTypeName +".WUPC.IC.I" ;
         return(endpointName);
     }
 

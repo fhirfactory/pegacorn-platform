@@ -44,7 +44,7 @@ public class ITOpsMetricsCollectionAgent {
 
     public void updateLastActivityInstant(String componentID){
         ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
-        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.LAST_ACTIVITY_IT_OPS_METRIC);
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_LAST_ACTIVITY_IT_OPS_METRIC);
         newUpdateInstantMetric.setUnit("Date/Time");
         newUpdateInstantMetric.setValue(Instant.now().toString());
         metricsDM.addMetric(componentID, newUpdateInstantMetric);
@@ -52,7 +52,7 @@ public class ITOpsMetricsCollectionAgent {
 
     public void updateLastActivitySuccess(String componentID, boolean success){
         ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
-        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.LAST_ACTIVITY_SUCCESSFUL_IT_OPS_METRIC);
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_LAST_ACTIVITY_SUCCESSFUL_IT_OPS_METRIC);
         newUpdateInstantMetric.setUnit("boolean");
         newUpdateInstantMetric.setValue(Boolean.toString(success));
         metricsDM.addMetric(componentID, newUpdateInstantMetric);
@@ -60,7 +60,7 @@ public class ITOpsMetricsCollectionAgent {
 
     public void updatePresentEpisodeID(String componentID, String episodeID){
         ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
-        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.PRESENT_EPISODE_ID_IT_OPS_METRIC);
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_PRESENT_EPISODE_ID_IT_OPS_METRIC);
         newUpdateInstantMetric.setUnit("Task ID");
         newUpdateInstantMetric.setValue(episodeID);
         metricsDM.addMetric(componentID, newUpdateInstantMetric);
@@ -68,7 +68,7 @@ public class ITOpsMetricsCollectionAgent {
 
     public void updatePreviousEpisodeID(String componentID, String episodeID){
         ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
-        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.PREVIOUS_EPISODE_ID_IT_OPS_METRIC);
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_PREVIOUS_EPISODE_ID_IT_OPS_METRIC);
         newUpdateInstantMetric.setUnit("Task ID");
         newUpdateInstantMetric.setValue(episodeID);
         metricsDM.addMetric(componentID, newUpdateInstantMetric);
@@ -76,9 +76,25 @@ public class ITOpsMetricsCollectionAgent {
 
     public void updateWorkUnitProcessorStatus(String componentID, String status){
         ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
-        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.STATUS_IT_OPS_METRIC);
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_STATUS_IT_OPS_METRIC);
         newUpdateInstantMetric.setUnit("WorkUnitProcessor.Status");
         newUpdateInstantMetric.setValue(status);
+        metricsDM.addMetric(componentID, newUpdateInstantMetric);
+    }
+    
+    public void updateRemoteEndpointDetail(String componentID, String endpointDetail ){
+        ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_REMOTE_ENDPOINT_DETAIL);
+        newUpdateInstantMetric.setUnit("RemoteEndpoint.Detail");
+        newUpdateInstantMetric.setValue(endpointDetail);
+        metricsDM.addMetric(componentID, newUpdateInstantMetric);
+    }
+
+    public void updateWUPIngresSEDAQueueSize(String componentID, int queueSize){
+        ITOpsMetric newUpdateInstantMetric = new ITOpsMetric();
+        newUpdateInstantMetric.setName(ITOpsMetricNameEnum.METRIC_REMOTE_ENDPOINT_DETAIL);
+        newUpdateInstantMetric.setUnit("WorkUnitProcessor.IncomingQueueSize");
+        newUpdateInstantMetric.setValue(Integer.toString(queueSize));
         metricsDM.addMetric(componentID, newUpdateInstantMetric);
     }
 

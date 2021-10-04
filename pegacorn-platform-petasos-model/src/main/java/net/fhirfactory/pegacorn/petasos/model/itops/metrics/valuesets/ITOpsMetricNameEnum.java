@@ -22,12 +22,14 @@
 package net.fhirfactory.pegacorn.petasos.model.itops.metrics.valuesets;
 
 public enum ITOpsMetricNameEnum {
-    STATUS_IT_OPS_METRIC("Status", "itops.metric_type.status"),
-    LAST_ACTIVITY_IT_OPS_METRIC ("LastActivity", "itops.metric_type.last_activity"),
-    LAST_ACTIVITY_SUCCESSFUL_IT_OPS_METRIC("LastActivitySucessful", "itops.metric_type.last_activity_succesful"),
-    IS_CLUSTERED_IT_OPS_METRIC("IsClustered", "itops.metric_type.is_clustered"),
-    PRESENT_EPISODE_ID_IT_OPS_METRIC("PresentEpisodeID", "itops.metric_type.present_episode_id"),
-    PREVIOUS_EPISODE_ID_IT_OPS_METRIC("PreviousEpisodeID", "itops.metric_type.previous_episode_id");
+    METRIC_STATUS_IT_OPS_METRIC("Status", "itops.metric_type.status"),
+    METRIC_LAST_ACTIVITY_IT_OPS_METRIC ("LastActivity", "itops.metric_type.last_activity"),
+    METRIC_LAST_ACTIVITY_SUCCESSFUL_IT_OPS_METRIC("LastActivitySucessful", "itops.metric_type.last_activity_succesful"),
+    METRIC_IS_CLUSTERED_IT_OPS_METRIC("IsClustered", "itops.metric_type.is_clustered"),
+    METRIC_PRESENT_EPISODE_ID_IT_OPS_METRIC("PresentEpisodeID", "itops.metric_type.present_episode_id"),
+    METRIC_PREVIOUS_EPISODE_ID_IT_OPS_METRIC("PreviousEpisodeID", "itops.metric_type.previous_episode_id"),
+    METRIC_REMOTE_ENDPOINT_DETAIL("RemoteEndpoint", "itops.metric_type.remote_endpoinit_detail"),
+    METRIC_WORK_UNIT_PROCESSOR_INCOMING_QUEUE_SIZE("WUPIncomingQueueSize", "itops.metric_type.wup_incoming_queue_size");
 
     private String displayName;
     private String metricType;
