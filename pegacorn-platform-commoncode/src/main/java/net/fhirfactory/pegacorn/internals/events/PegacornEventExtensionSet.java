@@ -32,20 +32,24 @@ import org.slf4j.LoggerFactory;
 public class PegacornEventExtensionSet {
 
     private static final Logger LOG = LoggerFactory.getLogger(PegacornEventExtensionSet.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
     public ArrayList<Extension> extensionList;
 
     public PegacornEventExtensionSet() {
-        LOG.debug("constructure(): Entry - empty constructor");
+        getLogger().debug("constructure(): Entry - empty constructor");
         this.extensionList = new ArrayList<Extension>();
     }
 
     public PegacornEventExtensionSet(Extension sourceExtensionEntity) {
-        LOG.debug("constructor(): Entry - source (single) Extension Entity provided");
+        getLogger().debug("constructor(): Entry - source (single) Extension Entity provided");
         this.extensionList.add(sourceExtensionEntity.copy());
     }
 
     public PegacornEventExtensionSet(List<Extension> sourceExtensionEntityList) {
-        LOG.debug(" constructor(): Entry - source (list) Extension Entity provided");
+        getLogger().debug(" constructor(): Entry - source (list) Extension Entity provided");
         this.extensionList.addAll(extensionList);
     }
 

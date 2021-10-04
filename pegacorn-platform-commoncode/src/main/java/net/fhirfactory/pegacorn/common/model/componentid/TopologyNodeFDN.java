@@ -43,6 +43,10 @@ import java.util.Objects;
 public class TopologyNodeFDN implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TopologyNodeFDN.class);
 
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
     private ArrayList<TopologyNodeRDN> hierarchicalNameSet;
 
     public TopologyNodeFDN(){
@@ -50,13 +54,13 @@ public class TopologyNodeFDN implements Serializable {
     }
 
     public TopologyNodeFDN(TopologyNodeFDN originalToken) {
-        LOG.debug(".TopologyNodeFDN(TopologyNodeFDN): Entry, originalToken->{}", originalToken);
+        getLogger().debug(".TopologyNodeFDN(TopologyNodeFDN): Entry, originalToken->{}", originalToken);
         this.hierarchicalNameSet = new ArrayList<>();
         int size = originalToken.getHierarchicalNameSet().size();
         for(int counter = 0; counter < size; counter ++){
             this.hierarchicalNameSet.add(counter, originalToken.getHierarchicalNameSet().get(counter));
         }
-        LOG.debug(".TopologyNodeFDN(TopologyNodeFDN): Exit");
+        getLogger().debug(".TopologyNodeFDN(TopologyNodeFDN): Exit");
     }
 
     public ArrayList<TopologyNodeRDN> getHierarchicalNameSet() {
@@ -68,7 +72,7 @@ public class TopologyNodeFDN implements Serializable {
     }
 
     public void appendTopologyNodeRDN(TopologyNodeRDN newRDN){
-        LOG.debug(".appendTopologyNodeRDN: Entry, newRDN->{}", newRDN);
+        getLogger().debug(".appendTopologyNodeRDN: Entry, newRDN->{}", newRDN);
         int count = this.hierarchicalNameSet.size();
         this.hierarchicalNameSet.add(count, newRDN);
     }
@@ -165,7 +169,7 @@ public class TopologyNodeFDN implements Serializable {
     }
 
     public TopologyNodeFDN(TopologyNodeFDNToken token){
-        LOG.debug(".TopologyNodeFDN(): Entry, token->{}", token);
+        getLogger().debug(".TopologyNodeFDN(): Entry, token->{}", token);
         this.hierarchicalNameSet = new ArrayList<>();
         try{
             JsonMapper mapper = new JsonMapper();
@@ -182,16 +186,16 @@ public class TopologyNodeFDN implements Serializable {
     }
 
     public TopologyNodeFDN(String tokenString){
-        LOG.debug(".TopologyNodeFDN(): Entry, tokenString->{}", tokenString);
+        getLogger().debug(".TopologyNodeFDN(): Entry, tokenString->{}", tokenString);
         this.hierarchicalNameSet = new ArrayList<>();
         try{
             JsonMapper mapper = new JsonMapper();
             TopologyNodeRDNSet nodeRDNSet = mapper.readValue(tokenString, TopologyNodeRDNSet.class);
             int rdnCount = nodeRDNSet.getPayload().size();
-            LOG.trace(".TopologyNodeFDN(): Converted tokenString (String) to nodeRDNSet(TopologyNodeRDNSet), rdnCount->{}", rdnCount);
+            getLogger().trace(".TopologyNodeFDN(): Converted tokenString (String) to nodeRDNSet(TopologyNodeRDNSet), rdnCount->{}", rdnCount);
             for(int counter = 0; counter < rdnCount; counter ++){
                 TopologyNodeRDN topologyNodeRDN = nodeRDNSet.getPayload().get(counter);
-                LOG.trace(".TopologyNodeFDN(): Adding entry[{}], to this.hierarchicalNameSet, value->{}", counter, topologyNodeRDN );
+                getLogger().trace(".TopologyNodeFDN(): Adding entry[{}], to this.hierarchicalNameSet, value->{}", counter, topologyNodeRDN );
                 this.hierarchicalNameSet.add(counter, topologyNodeRDN);
             }
         } catch (JsonMappingException e) {
@@ -202,7 +206,7 @@ public class TopologyNodeFDN implements Serializable {
     }
 
     public TopologyNodeRDN extractRDNForNodeType(TopologyNodeTypeEnum nodeType){
-        LOG.debug(".TopologyNodeFDN(): Entry, nodeType->{}", nodeType);
+        getLogger().debug(".TopologyNodeFDN(): Entry, nodeType->{}", nodeType);
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
             if(nodeRDN.getNodeType().equals(nodeType)){
                 return(nodeRDN);

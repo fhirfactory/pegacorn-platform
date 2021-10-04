@@ -38,6 +38,10 @@ import java.util.Objects;
  */
 public class UoWPayload implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(UoWPayload.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
     private DataParcelManifest payloadManifest;
     private String payload;
 
@@ -57,24 +61,24 @@ public class UoWPayload implements Serializable {
     }
 
     public String getPayload() {
-        LOG.debug(".getPayload(): Entry");
-        LOG.debug(".getPayload(): Exit, returning Payload (String) --> {}", this.payload);
+        getLogger().debug(".getPayload(): Entry");
+        getLogger().debug(".getPayload(): Exit, returning Payload (String) --> {}", this.payload);
         return payload;
     }
 
     public void setPayload(String payload) {
-        LOG.debug(".setPayload(): Entry, payload (String) --> {}", payload);
+        getLogger().debug(".setPayload(): Entry, payload (String) --> {}", payload);
         this.payload = (String) SerializationUtils.clone(payload);
     }
 
     public DataParcelManifest getPayloadManifest() {
-        LOG.debug(".getPayloadTopicID(): Entry");
-        LOG.debug(".getPayloadTopicID(): Exit, returning Payload (String) --> {}", this.payloadManifest);
+        getLogger().debug(".getPayloadTopicID(): Entry");
+        getLogger().debug(".getPayloadTopicID(): Exit, returning Payload (String) --> {}", this.payloadManifest);
         return payloadManifest;
     }
 
     public void setPayloadManifest(DataParcelManifest payloadManifest) {
-        LOG.debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadManifest);
+        getLogger().debug(".setPayloadTopicID(): Entry, payloadTopicID (TopicToken) --> {}", payloadManifest);
         this.payloadManifest = (DataParcelManifest) SerializationUtils.clone(payloadManifest);
     }
 
@@ -87,12 +91,12 @@ public class UoWPayload implements Serializable {
 
     @JsonIgnore
     public DataParcelQualityStatement getPayloadQuality() {
-        LOG.debug(".getPayloadQuality(): Entry");
+        getLogger().debug(".getPayloadQuality(): Entry");
         if(hasDataParcelQualityStatement()){
-            LOG.debug(".getPayloadQuality(): Exit, returning payloadQuality->{}", this.getPayloadManifest().getPayloadQuality());
+            getLogger().debug(".getPayloadQuality(): Exit, returning payloadQuality->{}", this.getPayloadManifest().getPayloadQuality());
             return(this.getPayloadManifest().getPayloadQuality());
         } else {
-            LOG.debug(".getPayloadQuality(): Exit, no payloadQuality statement available");
+            getLogger().debug(".getPayloadQuality(): Exit, no payloadQuality statement available");
             return (null);
         }
     }
@@ -101,7 +105,7 @@ public class UoWPayload implements Serializable {
     public String toString() {
         return "UoWPayload{" +
                 "payloadManifest=" + payloadManifest +
-                ", payload='" + payload + '\'' +
+                ", payload=" + payload +
                 '}';
     }
 

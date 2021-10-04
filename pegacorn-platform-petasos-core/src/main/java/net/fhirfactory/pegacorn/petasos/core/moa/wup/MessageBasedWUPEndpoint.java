@@ -56,7 +56,7 @@ public class MessageBasedWUPEndpoint {
     public String toString() {
         return "MessageBasedWUPEndpoint{" +
                 "endpointTopologyNode=" + endpointTopologyNode +
-                ", endpointSpecification='" + endpointSpecification + '\'' +
+                ", endpointSpecification=" + endpointSpecification +
                 ", frameworkEnabled=" + frameworkEnabled +
                 '}';
     }

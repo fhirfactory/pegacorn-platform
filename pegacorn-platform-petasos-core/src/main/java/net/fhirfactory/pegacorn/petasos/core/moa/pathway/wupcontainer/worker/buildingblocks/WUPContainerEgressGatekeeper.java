@@ -49,6 +49,9 @@ import java.util.List;
 public class WUPContainerEgressGatekeeper {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerEgressGatekeeper.class);
     private static final String EGRESS_GATEKEEPER_PROCESSED_PROPERTY = "EgressGatekeeperSemaphore";
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     @Inject
     TopologyIM topologyProxy;
@@ -72,30 +75,30 @@ public class WUPContainerEgressGatekeeper {
      */
     @RecipientList
     public List<String> egressGatekeeper(WorkUnitTransportPacket transportPacket, Exchange camelExchange) {
-        LOG.debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket );
+        getLogger().debug(".egressGatekeeper(): Enter, transportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", transportPacket );
         // Get my Petasos Context
-        LOG.trace(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        getLogger().trace(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        LOG.trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
+        getLogger().trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
         TopologyNodeFDNToken wupFunctionToken = node.getNodeFDN().getToken();
-        LOG.trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
+        getLogger().trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);
-        LOG.trace(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
+        getLogger().trace(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
         ArrayList<String> targetList = new ArrayList<String>();
         if(!transportPacket.hasCurrentJobCard()) {
-            LOG.warn(".egressGatekeeper(): CurrentJobCard is null!");
+            getLogger().warn(".egressGatekeeper(): CurrentJobCard is null!");
         }
         if (transportPacket.getCurrentJobCard().getIsToBeDiscarded()) {
-            LOG.trace(".egressGatekeeper(): The isToBeDiscarded attribute is true, so we return null (and discard the packet");
-            LOG.debug(".egressGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
+            getLogger().trace(".egressGatekeeper(): The isToBeDiscarded attribute is true, so we return null (and discard the packet");
+            getLogger().debug(".egressGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (targetList);
         } else {
-            LOG.trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so we need to set the Semaphore (so we know we've processed this packet)");
-            LOG.trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
+            getLogger().trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so we need to set the Semaphore (so we know we've processed this packet)");
+            getLogger().trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
             String targetEndpoint = nameSet.getEndPointInterchangePayloadTransformerIngres();
             targetList.add(targetEndpoint);
-            LOG.debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
+            getLogger().debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);
         }
     }

@@ -39,6 +39,10 @@ import java.util.ArrayList;
 public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
     private static final Logger LOG = LoggerFactory.getLogger(TopologyNodeFunctionFDN.class);
 
+    protected Logger getLogger(){
+        return(LOG);
+    }
+
     public TopologyNodeFunctionFDN(TopologyNodeFunctionFDN oriFDN){
         super(oriFDN);
     }
@@ -48,18 +52,18 @@ public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
     }
 
     public TopologyNodeFunctionFDN(TopologyNodeFunctionFDNToken token){
-        LOG.debug(".TopologyNodeFunctionFDN(): Entry, token->{}", token);
+        getLogger().debug(".TopologyNodeFunctionFDN(): Entry, token->{}", token);
         ArrayList<TopologyNodeRDN> nodeSet= new ArrayList<>();
         try{
             JsonMapper mapper = new JsonMapper();
             TopologyNodeRDNSet nodeRDNSet = mapper.readValue(token.getToken(), TopologyNodeRDNSet.class);
             int rdnCount = nodeRDNSet.getPayload().size();
-            LOG.trace(".TopologyNodeFunctionFDN: RDN Count --> {}", rdnCount);
+            getLogger().trace(".TopologyNodeFunctionFDN: RDN Count --> {}", rdnCount);
             for(int counter = 0; counter < rdnCount; counter ++){
                 TopologyNodeRDN currentRDN = nodeRDNSet.getPayload().get(counter);
                 nodeSet.add(currentRDN);
             }
-            LOG.trace(".TopologyNodeFunctionFDN: Built nodeSet");
+            getLogger().trace(".TopologyNodeFunctionFDN: Built nodeSet");
             setHierarchicalNameSet(nodeSet);
         } catch (JsonMappingException e) {
             e.printStackTrace();
@@ -70,13 +74,13 @@ public class TopologyNodeFunctionFDN extends TopologyNodeFDN {
 
     @JsonIgnore
     public TopologyNodeFunctionFDNToken getFunctionToken(){
-        LOG.debug(".getFunctionToken(): Entry");
+        getLogger().debug(".getFunctionToken(): Entry");
         TopologyNodeRDNSet nodeRDNSet = new TopologyNodeRDNSet(this.getHierarchicalNameSet());
         String tokenString = null;
         try{
             JsonMapper mapper = new JsonMapper();
             tokenString = mapper.writeValueAsString(nodeRDNSet);
-            LOG.trace(".getFunctionToken(): Generated tokenString, value->{}", tokenString);
+            getLogger().trace(".getFunctionToken(): Generated tokenString, value->{}", tokenString);
         } catch(JsonProcessingException jsonException){
             jsonException.printStackTrace();
             tokenString = "";

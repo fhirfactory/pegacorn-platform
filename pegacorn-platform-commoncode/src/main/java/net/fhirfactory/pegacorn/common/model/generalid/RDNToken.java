@@ -46,7 +46,7 @@ public class RDNToken implements Serializable {
 	@Override
 	public String toString() {
 		return "RDNToken{" +
-				"content='" + content + '\'' +
+				"content=" + content +
 				'}';
 	}
 }

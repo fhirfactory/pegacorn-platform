@@ -34,22 +34,25 @@ import org.slf4j.LoggerFactory;
 public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterchangeExtractAndRouteTemplate.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     private WorkUnitProcessorTopologyNode wupTopologyNode;
     private RouteElementNames nameSet;
 
     public InterchangeExtractAndRouteTemplate(CamelContext context, WorkUnitProcessorTopologyNode nodeElement) {
         super(context);
-        LOG.debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
+        getLogger().debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
         this.wupTopologyNode = nodeElement;
         nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
     }
 
     @Override
     public void configure() {
-        LOG.debug(".configure(): Entry!, for wupNodeElement --> {}", this.wupTopologyNode);
-        LOG.debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangePayloadTransformerIngres --> {}", nameSet.getEndPointInterchangePayloadTransformerIngres());
-        LOG.debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangeRouterIngres --> {}", nameSet.getEndPointInterchangeRouterIngres());
+        getLogger().debug(".configure(): Entry!, for wupNodeElement --> {}", this.wupTopologyNode);
+        getLogger().debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangePayloadTransformerIngres --> {}", nameSet.getEndPointInterchangePayloadTransformerIngres());
+        getLogger().debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangeRouterIngres --> {}", nameSet.getEndPointInterchangeRouterIngres());
 
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 
@@ -72,7 +75,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
     protected class NodeDetailInjector implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
-            LOG.debug("NodeDetailInjector.process(): Entry");
+            getLogger().debug("NodeDetailInjector.process(): Entry");
             boolean alreadyInPlace = false;
             if(exchange.hasProperties()) {
                 WorkUnitProcessorTopologyNode wupTN = exchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);

@@ -144,10 +144,10 @@ public class InterSubsystemPubSubPublisherSubscriptionRegistration implements Se
     @Override
     public String toString() {
         return "DistributedPubSubPublisherSubscriptionRegistration{" +
-                "publisherService='" + publisherServiceName + '\'' +
+                "publisherService=" + publisherServiceName +
                 ", registrationStatus=" + publisherServiceRegistrationStatus +
                 ", subscriptionList=" + subscriptionList +
-                ", registrationCommentary='" + registrationCommentary + '\'' +
+                ", registrationCommentary=" + registrationCommentary +
                 ", registrationDate=" + registrationDate +
                 ", lock=" + lock +
                 '}';

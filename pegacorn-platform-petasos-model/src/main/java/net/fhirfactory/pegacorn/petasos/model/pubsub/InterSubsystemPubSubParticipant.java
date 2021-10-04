@@ -76,10 +76,10 @@ public class InterSubsystemPubSubParticipant extends PetasosEndpoint implements 
         return "InterSubsystemPubSubParticipant{" +
                 "endpointScope=" + getEndpointScope() +
                 ", interfaceFunction=" + getInterfaceFunction() +
-                ", endpointServiceName='" + getEndpointServiceName() + '\'' +
+                ", endpointServiceName=" + getEndpointServiceName() +
                 ", representativeFHIREndpoint=" + getRepresentativeFHIREndpoint() +
                 ", endpointStatus=" + getEndpointStatus() +
-                ", endpointDescription='" + getEndpointDescription() + '\'' +
+                ", endpointDescription=" + getEndpointDescription() +
                 ", endpointID=" + getEndpointID() +
                 ", connectionStatus=" + connectionStatus +
                 ", utilisationUpdateDate=" + utilisationUpdateDate +

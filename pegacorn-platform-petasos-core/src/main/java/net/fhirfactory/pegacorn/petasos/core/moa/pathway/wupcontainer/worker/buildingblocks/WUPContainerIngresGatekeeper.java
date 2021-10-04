@@ -47,6 +47,9 @@ import java.util.List;
 public class WUPContainerIngresGatekeeper {
     private static final Logger LOG = LoggerFactory.getLogger(WUPContainerIngresGatekeeper.class);
     private static final String INGRES_GATEKEEPER_PROCESSED_PROPERTY = "IngresGatekeeperSemaphore";
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     @Inject
     TopologyIM topologyProxy;
@@ -63,25 +66,25 @@ public class WUPContainerIngresGatekeeper {
      */
     @RecipientList
     public List<String> ingresGatekeeper(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
-        LOG.debug(".ingresGatekeeper(): Enter, ingresPacket->{}", ingresPacket);
+        getLogger().debug(".ingresGatekeeper(): Enter, ingresPacket->{}", ingresPacket);
         // Get my Petasos Context
-        LOG.trace(".ingresGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        getLogger().trace(".ingresGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        LOG.trace(".ingresGatekeeper(): Node Element retrieved --> {}", node);
+        getLogger().trace(".ingresGatekeeper(): Node Element retrieved --> {}", node);
         TopologyNodeFDNToken wupToken = node.getNodeFDN().getToken();
-        LOG.trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
+        getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
         // Now, continue with business logic
         RouteElementNames nameSet = new RouteElementNames(wupToken);
         ArrayList<String> targetList = new ArrayList<String>();
-        LOG.trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
+        getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
         if (ingresPacket.getCurrentJobCard().getIsToBeDiscarded()) {
-            LOG.debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
+            getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (null);
         } else {
-            LOG.trace(".ingresGatekeeper(): And we return the ingres point to the associated WUP Ingres Conduit");
+            getLogger().trace(".ingresGatekeeper(): And we return the ingres point to the associated WUP Ingres Conduit");
             String targetEndpoint = nameSet.getEndPointWUPIngresConduitIngres();
             targetList.add(targetEndpoint);
-            LOG.debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
+            getLogger().debug(".ingresGatekeeper(): Returning route to the WUP Ingres Conduit instance --> {}", targetEndpoint);
             return (targetList);
         }
     }

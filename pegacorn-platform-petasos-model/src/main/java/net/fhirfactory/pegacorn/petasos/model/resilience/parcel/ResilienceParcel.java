@@ -626,8 +626,8 @@ public class ResilienceParcel implements Serializable {
                 ", finalisationDate=" + finalisationDate +
                 ", cancellationDate=" + cancellationDate +
                 ", anInteractWUP=" + anInteractWUP +
-                ", associatedPortValue='" + associatedPortValue + '\'' +
-                ", associatedPortType='" + associatedPortType + '\'' +
+                ", associatedPortValue=" + associatedPortValue +
+                ", associatedPortType=" + associatedPortType +
                 '}';
     }
 }

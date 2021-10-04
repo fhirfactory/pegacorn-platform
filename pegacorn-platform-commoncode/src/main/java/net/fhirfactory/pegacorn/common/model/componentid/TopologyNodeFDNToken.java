@@ -46,7 +46,7 @@ public class TopologyNodeFDNToken implements Serializable {
     @Override
     public String toString() {
         return "TopologyNodeFDNToken{" +
-                "tokenValue='" + tokenValue + '\'' +
+                "tokenValue=" + tokenValue +
                 '}';
     }
 

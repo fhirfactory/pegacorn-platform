@@ -30,9 +30,12 @@ import org.slf4j.LoggerFactory;
 public class SimpleValidatorForCommunication extends SimpleValidatorBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleValidatorForCommunication.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     public boolean isSimplyValid(Communication pCommunicationEntity) {
-        LOG.debug("isSimplyValid(Communication p): Entry");
+        getLogger().debug("isSimplyValid(Communication p): Entry");
         return (false);
     }
 }

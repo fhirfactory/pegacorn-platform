@@ -96,7 +96,7 @@ public class InterSubsystemPubSubPublisherRegistration implements Serializable {
         return "DistributedPubSubPublisherRegistration{" +
                 "publisher=" + publisher +
                 ", publisherStatus=" + publisherStatus +
-                ", registrationCommentary='" + registrationCommentary + '\'' +
+                ", registrationCommentary=" + registrationCommentary +
                 ", registrationDate=" + registrationDate +
                 ", lastActivityDate=" + lastActivityDate +
                 '}';

@@ -30,6 +30,9 @@ import java.util.Properties;
 
 public class PegacornProperties {
     private static final Logger LOG = LoggerFactory.getLogger(PegacornEnvironmentProperties.class);
+    protected Logger getLogger(){
+        return(LOG);
+    }
 
     private static Properties getProperties() {
         return null; //TODO do we want to load defaults from somewhere?
@@ -64,7 +67,7 @@ public class PegacornProperties {
         value = value == null ? null : value.trim();
 
         //Log at warning level so the logs are always shown
-        LOG.warn("In PegacornProperties.getProperty(" + propertyName + ") " + logMsg + " " + value);
+        getLogger().warn("In PegacornProperties.getProperty(" + propertyName + ") " + logMsg + " " + value);
 
         return value;
     }
