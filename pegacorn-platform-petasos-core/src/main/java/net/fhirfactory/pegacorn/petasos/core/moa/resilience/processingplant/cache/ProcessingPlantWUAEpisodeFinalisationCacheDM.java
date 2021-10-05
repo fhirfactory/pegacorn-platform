@@ -117,20 +117,18 @@ public class ProcessingPlantWUAEpisodeFinalisationCacheDM {
      * "Finalised".
      *
      * @param originalEpisodeID       The WUA Episode ID (that generates the output UoW which we are tracking the finalisation of the associated parcel of)
-     * @param downstreamWUPFunctionID The WUP Instance that will consuming the UoW and, therefore, is a downstream consumer of the output of this WUA Episode.
      * @param downstreamEpisodeID     The new WUA Episode ID creating by the WUP (and, therefore, synchronised across the WHOLE deployment).
      */
-    public void registerDownstreamEpisodeID(PetasosEpisodeIdentifier originalEpisodeID, WUPFunctionToken downstreamWUPFunctionID, PetasosEpisodeIdentifier downstreamEpisodeID) {
-        LOG.debug(".registerDownstreamEpisodeID(): Entry, originalEpisodeID --> {}, downstreamWUPInstanceID --> {}, downstreamEpisodeID --> {} ", originalEpisodeID, downstreamWUPFunctionID, downstreamEpisodeID);
-        if ((originalEpisodeID == null) || (downstreamWUPFunctionID == null) || (downstreamEpisodeID == null)) {
+    public void registerDownstreamEpisodeID(PetasosEpisodeIdentifier originalEpisodeID, PetasosEpisodeIdentifier downstreamEpisodeID) {
+        LOG.debug(".registerDownstreamEpisodeID(): Entry, originalEpisodeID --> {}, downstreamWUPInstanceID --> {}, downstreamEpisodeID --> {} ", originalEpisodeID, downstreamEpisodeID);
+        if ((originalEpisodeID == null) || (downstreamEpisodeID == null)) {
             throw (new IllegalArgumentException(".registerDownstreamEpisodeID(): originalEpisodeID, downstreamWUPInstanceID, downstreamEpisodeID are null"));
         }
         PetasosEpisodeFinalisationStatus wupInstanceFinalisationStatus;
-        if (!downstreamRegistrationStatusSet.containsKey(downstreamWUPFunctionID)) {
-            registerDownstreamWUPInterest(originalEpisodeID, downstreamWUPFunctionID);
+        if (downstreamRegistrationStatusSet.containsKey(originalEpisodeID)) {
+            wupInstanceFinalisationStatus = downstreamRegistrationStatusSet.get(originalEpisodeID);
+            wupInstanceFinalisationStatus.setActualDownstreamEpisodeID(downstreamEpisodeID);
         }
-        wupInstanceFinalisationStatus = downstreamRegistrationStatusSet.get(downstreamWUPFunctionID);
-        wupInstanceFinalisationStatus.setActualDownstreamEpisodeID(downstreamEpisodeID);
     }
 
     /**

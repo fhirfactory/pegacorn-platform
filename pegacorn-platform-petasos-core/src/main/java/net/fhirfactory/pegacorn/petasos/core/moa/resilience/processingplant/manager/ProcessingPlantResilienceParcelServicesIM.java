@@ -25,6 +25,8 @@ package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.man
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantResilienceParcelCacheDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeFinalisationCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -50,10 +52,13 @@ public class ProcessingPlantResilienceParcelServicesIM {
 //    private FDN nodeInstanceFDN;
 
     @Inject
-    ProcessingPlantResilienceParcelCacheDM parcelCacheDM;
+    private ProcessingPlantResilienceParcelCacheDM parcelCacheDM;
 
     @Inject
-    MOAServicesAuditBroker auditServicesBroker;
+    private ProcessingPlantResilienceActivityServicesController activityServicesController;
+
+    @Inject
+    private MOAServicesAuditBroker auditServicesBroker;
 
     public ResilienceParcel registerParcel(ActivityID activityID, UoW unitOfWork, boolean synchronousWriteToAudit){
         ResilienceParcel registeredParcel = registerParcel(activityID, unitOfWork, null, null, synchronousWriteToAudit);
@@ -64,25 +69,6 @@ public class ProcessingPlantResilienceParcelServicesIM {
         LOG.debug(".registerParcel(): Entry"); 
         if ((unitOfWork == null) || (activityID == null)) {
             throw (new IllegalArgumentException("unitOfWork, wupTypeID or wupInstanceID are null in method invocation"));
-        }
-        if(LOG.isDebugEnabled()) {
-    		LOG.debug(".registerParcel(): activityID (ActivityID).previousParcelIdentifier -->{}", activityID.getPreviousParcelIdentifier());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).previousEpisodeIdentifier --> {}", activityID.getPreviousEpisodeIdentifier());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).previousWUPFunctionTokan --> {}", activityID.getPreviousWUPFunctionToken());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).previousWUPIdentifier --> {}", activityID.getPreviousWUPIdentifier());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).presentParcelIdentifier -->{}", activityID.getPresentParcelIdentifier());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).presentEpisodeIdentifier --> {}", activityID.getPresentEpisodeIdentifier());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).presentWUPFunctionTokan --> {}", activityID.getPresentWUPFunctionToken());
-    		LOG.debug(".registerParcel(): activityID (ActivityID).presentWUPIdentifier --> {}", activityID.getPresentWUPIdentifier());
-    		LOG.debug(".registerParcel(): activityID (ContunuityID).createDate --> {}", activityID.getCreationDate());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).instanceID --> {}", unitOfWork.getInstanceID());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).typeID --> {}", unitOfWork.getTypeID());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).payloadTopicID --> {}", unitOfWork.getPayloadTopicID());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).ingresContent --> {}", unitOfWork.getIngresContent());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).egressContent --> {}", unitOfWork.getEgressContent());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).payloadTopicID --> {}", unitOfWork.getPayloadTopicID());
-    		LOG.debug(".registerParcel(): unitOfWork (UoW).processingOutcome --> {}", unitOfWork.getProcessingOutcome());
-    		LOG.debug(".registerParcel(): synchronousWriteToAudit (boolean) --> {}", synchronousWriteToAudit);
         }
         LOG.trace(".registerParcel(): Checking and/or Creating a WUAEpisde ID");
         if(!activityID.hasPresentEpisodeIdentifier()) {
@@ -119,28 +105,11 @@ public class ProcessingPlantResilienceParcelServicesIM {
             auditServicesBroker.logActivity(parcelInstance);
 
         }
-        LOG.debug(".registerParcel(): Exit");
-        if(LOG.isDebugEnabled()) {
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).episodeID --> {}", parcelInstance.getEpisodeIdentifier());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).upsteamEpisodeID --> {}", parcelInstance.getUpstreamEpisodeIdentifier());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).parcelInstanceID --> {}", parcelInstance.getIdentifier());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).associatedWUPInstanceID --> {}", parcelInstance.getAssociatedWUPIdentifier());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).processingStatus --> {}", parcelInstance.getProcessingStatus());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).typeID --> {}", parcelInstance.getTypeID());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).registrationDate --> {}", parcelInstance.getRegistrationDate());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).startDate --> {}", parcelInstance.getStartDate());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).finishedDate --> {}", parcelInstance.getFinishedDate());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).finalisationDate --> {}", parcelInstance.getFinalisationDate());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).finalisationStatus --> {}", parcelInstance.getFinalisationStatus());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).cancellationDate --> {}", parcelInstance.getCancellationDate());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).instanceID --> {}", parcelInstance.getActualUoW().getInstanceID());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).typeID --> {}", parcelInstance.getActualUoW().getTypeID());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).payloadTopicID --> {}", parcelInstance.getActualUoW().getPayloadTopicID());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).ingresContent --> {}", parcelInstance.getActualUoW().getIngresContent());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).egressContent --> {}", parcelInstance.getActualUoW().getEgressContent());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).payloadTopicID --> {}", parcelInstance.getActualUoW().getPayloadTopicID());
-        	LOG.debug(".registerParcel(): parcelInstance (ResilienceParcel).actualUoW (UoW).processingOutcome --> {}", parcelInstance.getActualUoW().getProcessingOutcome());
+        // now let's register the "downstream" episode with the finalisation cache
+        if(parcelInstance.getUpstreamEpisodeIdentifier() != null){
+            activityServicesController.registerWUADownstreamEpisode(parcelInstance.getUpstreamEpisodeIdentifier(), parcelInstance.getEpisodeIdentifier());
         }
+        LOG.debug(".registerParcel(): Exit");
         return(parcelInstance);
     }
 

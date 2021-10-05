@@ -86,9 +86,11 @@ public class ProcessingPlantResilienceActivityServicesController {
         return(retrievedElement);
     }
 
-    public void registerWUAEpisodeDownstreamWUPInterest(PetasosEpisodeIdentifier wuaEpisodeID, WUPFunctionToken downstreamWUPInstanceID) {
-        finalisationCacheDM.registerDownstreamWUPInterest(wuaEpisodeID,downstreamWUPInstanceID);
+    public void registerWUAEpisodeDownstreamWUPInterest(PetasosEpisodeIdentifier wuaEpisodeID, WUPFunctionToken downstreamWUPFunction) {
+        finalisationCacheDM.registerDownstreamWUPInterest(wuaEpisodeID,downstreamWUPFunction);
     }
 
-
+    public void registerWUADownstreamEpisode(PetasosEpisodeIdentifier previousEpisodeID, PetasosEpisodeIdentifier newEpisodeID){
+        finalisationCacheDM.registerDownstreamEpisodeID(previousEpisodeID, newEpisodeID);
+    }
 }
