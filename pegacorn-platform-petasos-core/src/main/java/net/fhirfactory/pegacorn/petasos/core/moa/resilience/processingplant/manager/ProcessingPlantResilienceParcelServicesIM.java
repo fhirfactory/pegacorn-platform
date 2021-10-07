@@ -22,11 +22,13 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.core.PetasosEpisodeIdentifierFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantResilienceParcelCacheDM;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeFinalisationCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -60,6 +62,9 @@ public class ProcessingPlantResilienceParcelServicesIM {
     @Inject
     private MOAServicesAuditBroker auditServicesBroker;
 
+    @Inject
+    private PetasosEpisodeIdentifierFactory episodeIdentifierFactory;
+
     public ResilienceParcel registerParcel(ActivityID activityID, UoW unitOfWork, boolean synchronousWriteToAudit){
         ResilienceParcel registeredParcel = registerParcel(activityID, unitOfWork, null, null, synchronousWriteToAudit);
         return(registeredParcel);
@@ -72,11 +77,10 @@ public class ProcessingPlantResilienceParcelServicesIM {
         }
         LOG.trace(".registerParcel(): Checking and/or Creating a WUAEpisde ID");
         if(!activityID.hasPresentEpisodeIdentifier()) {
-        	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().toVersionBasedFDNToken());
-        	FDN uowTypeFDN = new FDN(unitOfWork.getTypeID());
-        	newWUAFDN.appendFDN(uowTypeFDN);
-        	PetasosEpisodeIdentifier wuaEpisodeToken = new PetasosEpisodeIdentifier(newWUAFDN.getToken());
-        	activityID.setPresentEpisodeIdentifier(wuaEpisodeToken);
+        	TopologyNodeFunctionFDN nodeFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            DataParcelTypeDescriptor descriptor = unitOfWork.getIngresContent().getPayloadManifest().getContentDescriptor();
+        	PetasosEpisodeIdentifier episodeIdentifier = episodeIdentifierFactory.newEpisodeIdentifier(nodeFDN, descriptor);
+        	activityID.setPresentEpisodeIdentifier(episodeIdentifier);
         }
         // 1st, lets register the parcel
         LOG.trace(".registerParcel(): check for existing ResilienceParcel instance for this WUP/UoW combination");
@@ -103,12 +107,13 @@ public class ProcessingPlantResilienceParcelServicesIM {
             parcelInstance.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             LOG.trace(".registerParcel(): Doing an Audit Write");
             auditServicesBroker.logActivity(parcelInstance);
+            // now let's register the "downstream" episode with the finalisation cache
+            LOG.trace(".registerParcel(): Register the Downstream Episode with the Finalisation Cache");
+            if(parcelInstance.getUpstreamEpisodeIdentifier() != null){
+                activityServicesController.registerWUADownstreamEpisode(parcelInstance.getUpstreamEpisodeIdentifier(), parcelInstance.getAssociatedWUPFunction(), parcelInstance.getEpisodeIdentifier());
+            }
+        }
 
-        }
-        // now let's register the "downstream" episode with the finalisation cache
-        if(parcelInstance.getUpstreamEpisodeIdentifier() != null){
-            activityServicesController.registerWUADownstreamEpisode(parcelInstance.getUpstreamEpisodeIdentifier(), parcelInstance.getEpisodeIdentifier());
-        }
         LOG.debug(".registerParcel(): Exit");
         return(parcelInstance);
     }

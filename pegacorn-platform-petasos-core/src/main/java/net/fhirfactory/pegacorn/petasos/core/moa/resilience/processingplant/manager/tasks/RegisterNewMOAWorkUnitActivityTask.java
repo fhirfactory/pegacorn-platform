@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.man
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantEpisodeActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -41,7 +41,7 @@ public class RegisterNewMOAWorkUnitActivityTask {
 	private static final Logger LOG = LoggerFactory.getLogger(RegisterNewMOAWorkUnitActivityTask.class);
 
 	@Inject
-	ProcessingPlantWUAEpisodeActivityMatrixDM activityMatrixDM;
+    ProcessingPlantEpisodeActivityMatrixDM activityMatrixDM;
 
 	@Inject
 	TopologyIM topologyIM;

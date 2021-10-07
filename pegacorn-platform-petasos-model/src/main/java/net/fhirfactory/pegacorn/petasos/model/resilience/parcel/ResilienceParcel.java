@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,8 @@ public class ResilienceParcel implements Serializable {
     private SerializableObject actualUoWLock;
     private WUPIdentifier associatedWUPIdentifier;
     private SerializableObject associatedWUPIdentifierLock;
+    private WUPFunctionToken associatedWUPFunction;
+    private SerializableObject associatedWUPFunctionLock;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private SerializableObject downstreamEpisodeIdentifierSetLock;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
@@ -89,6 +92,7 @@ public class ResilienceParcel implements Serializable {
         this.identifier = null;
         this.typeID = null;
         this.associatedWUPIdentifier = null;
+        this.associatedWUPFunction = null;
         this.actualUoW = null;
         this.downstreamEpisodeIdentifierSet = null;
         this.upstreamEpisodeIdentifier = null;
@@ -116,9 +120,11 @@ public class ResilienceParcel implements Serializable {
         this.finishedDateLock = new SerializableObject();
         this.finalisationDateLock = new SerializableObject();
         this.cancellationDateLock = new SerializableObject();
+        this.associatedWUPFunctionLock = new SerializableObject();
         // Now, add what we have been supplied
         this.associatedWUPIdentifier = activityID.getPresentWUPIdentifier();
-        this.episodeIdentifier = this.buildEpisodeID(activityID, theUoW);
+        this.associatedWUPFunction = new WUPFunctionToken(activityID.getPresentWUPFunctionToken());
+        this.episodeIdentifier = activityID.getPresentEpisodeIdentifier();
         this.typeID = this.buildParcelTypeID(activityID, theUoW);
         this.identifier = this.buildParcelInstanceIdentifier(activityID, theUoW);
         this.actualUoW = theUoW;
@@ -133,6 +139,7 @@ public class ResilienceParcel implements Serializable {
         this.identifier = null;
         this.typeID = null;
         this.associatedWUPIdentifier = null;
+        this.associatedWUPFunction = null;
         this.actualUoW = null;
         this.downstreamEpisodeIdentifierSet = null;
         this.upstreamEpisodeIdentifier = null;
@@ -159,12 +166,16 @@ public class ResilienceParcel implements Serializable {
         this.finishedDateLock = new SerializableObject();
         this.finalisationDateLock = new SerializableObject();
         this.cancellationDateLock = new SerializableObject();
+        this.associatedWUPFunctionLock = new SerializableObject();
         // Now, add what we have been supplied
         if (originalParcel.hasCancellationDate()) {
             this.cancellationDate = originalParcel.getCancellationDate();
         }
         if (originalParcel.hasAssociatedWUPIdentifier()) {
             this.associatedWUPIdentifier = originalParcel.getAssociatedWUPIdentifier();
+        }
+        if (originalParcel.hasAssociatedWUPFunction()) {
+            this.associatedWUPFunction = originalParcel.getAssociatedWUPFunction();
         }
         if (originalParcel.hasActualUoW()) {
             this.actualUoW = originalParcel.getActualUoW();
@@ -210,6 +221,18 @@ public class ResilienceParcel implements Serializable {
     // Bean/Attribute Methods
     //
 
+    public boolean hasAssociatedWUPFunction(){
+        boolean hasValue = this.associatedWUPFunction != null;
+        return(hasValue);
+    }
+
+    public WUPFunctionToken getAssociatedWUPFunction() {
+        return associatedWUPFunction;
+    }
+
+    public void setAssociatedWUPFunction(WUPFunctionToken associatedWUPFunction) {
+        this.associatedWUPFunction = associatedWUPFunction;
+    }
 
     public boolean isAnInteractWUP() {
         return anInteractWUP;
@@ -535,31 +558,6 @@ public class ResilienceParcel implements Serializable {
         }
     }
 
-    public PetasosEpisodeIdentifier buildEpisodeID(ActivityID activityID, UoW theUoW) {
-        if (theUoW == null) {
-            throw (new IllegalArgumentException(".buildEpisodeID(): null UoW passed as parameter"));
-        }
-        if (activityID == null) {
-            throw (new IllegalArgumentException(".buildEpisodeID(): null ActivityID passed as parameter"));
-        }
-        FDN uowInstanceFDN;
-        if (theUoW.hasInstanceID()) {
-            uowInstanceFDN = new FDN(theUoW.getInstanceID());
-        } else {
-            throw (new IllegalArgumentException(".buildEpisodeID(): UoW has no instance value, bad parameter"));
-        }
-        FDN newEpisodeID;
-        if (activityID.hasPresentWUPFunctionToken()) {
-            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
-            newEpisodeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
-        } else {
-            throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
-        }
-        newEpisodeID.appendFDN(uowInstanceFDN);
-        PetasosEpisodeIdentifier episodeId = new PetasosEpisodeIdentifier(newEpisodeID.getToken());
-        return (episodeId);
-    }
-
     public FDNToken buildParcelTypeID(ActivityID activityID, UoW theUoW) {
         if (theUoW == null) {
             throw (new IllegalArgumentException(".buildEpisodeID(): null UoW passed as parameter"));
@@ -616,6 +614,7 @@ public class ResilienceParcel implements Serializable {
                 ", episodeIdentifier=" + episodeIdentifier +
                 ", actualUoW=" + actualUoW +
                 ", associatedWUPIdentifier=" + associatedWUPIdentifier +
+                ", associatedWUPFunciton=" + associatedWUPFunction +
                 ", downstreamEpisodeIdentifierSet=" + downstreamEpisodeIdentifierSet +
                 ", upstreamEpisodeIdentifier=" + upstreamEpisodeIdentifier +
                 ", finalisationStatus=" + finalisationStatus +

@@ -22,8 +22,8 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeFinalisationCacheDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantEpisodeActivityMatrixDM;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantEpisodeFinalisationCacheDM;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.RegisterNewMOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.SynchroniseMOAWorkUnitActivityJobCardTask;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
@@ -45,10 +45,10 @@ public class ProcessingPlantResilienceActivityServicesController {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantResilienceActivityServicesController.class);
 
     @Inject
-    ProcessingPlantWUAEpisodeActivityMatrixDM activityMatrixDM;
+    ProcessingPlantEpisodeActivityMatrixDM activityMatrixDM;
 
     @Inject
-    ProcessingPlantWUAEpisodeFinalisationCacheDM finalisationCacheDM;
+    ProcessingPlantEpisodeFinalisationCacheDM finalisationCacheDM;
     
     //task Specific Classes
 
@@ -87,10 +87,14 @@ public class ProcessingPlantResilienceActivityServicesController {
     }
 
     public void registerWUAEpisodeDownstreamWUPInterest(PetasosEpisodeIdentifier wuaEpisodeID, WUPFunctionToken downstreamWUPFunction) {
+        LOG.debug(".registerWUAEpisodeDownstreamWUPInterest(): Entry, wuaEpisodeID->{}, downstreamWUPFunction->{} ", wuaEpisodeID, downstreamWUPFunction);
         finalisationCacheDM.registerDownstreamWUPInterest(wuaEpisodeID,downstreamWUPFunction);
+        LOG.debug(".registerWUAEpisodeDownstreamWUPInterest(): Exit");
     }
 
-    public void registerWUADownstreamEpisode(PetasosEpisodeIdentifier previousEpisodeID, PetasosEpisodeIdentifier newEpisodeID){
-        finalisationCacheDM.registerDownstreamEpisodeID(previousEpisodeID, newEpisodeID);
+    public void registerWUADownstreamEpisode(PetasosEpisodeIdentifier previousEpisodeID, WUPFunctionToken wupFunction, PetasosEpisodeIdentifier newEpisodeID){
+        LOG.debug(".registerWUADownstreamEpisode(): Entry, previousEpisodeID->{}, wupFunction->{}, newEpisodeID->{} ", previousEpisodeID, wupFunction, newEpisodeID);
+        finalisationCacheDM.registerDownstreamEpisodeID(previousEpisodeID, wupFunction,  newEpisodeID);
+        LOG.debug(".registerWUADownstreamEpisode(): Exit");
     }
 }

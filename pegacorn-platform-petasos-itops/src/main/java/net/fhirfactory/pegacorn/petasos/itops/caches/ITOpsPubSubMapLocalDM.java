@@ -55,6 +55,7 @@ public class ITOpsPubSubMapLocalDM extends ITOpsLocalDMRefreshBase {
     //
 
     public void addProcessingPlantSubscriptionSummary(ProcessingPlantSubscriptionSummary summary){
+        LOG.debug(".addProcessingPlantSubscriptionSummary(): Entry");
         synchronized (processingPlantMapLock) {
             if (processingPlantSubscriptionSummarySet.containsKey(summary.getComponentID())) {
                 processingPlantSubscriptionSummarySet.remove(summary.getComponentID());
@@ -62,9 +63,11 @@ public class ITOpsPubSubMapLocalDM extends ITOpsLocalDMRefreshBase {
             processingPlantSubscriptionSummarySet.put(summary.getComponentID(), summary);
         }
         refreshCurrentStateUpdateInstant();
+        LOG.debug(".addProcessingPlantSubscriptionSummary(): Exit");
     }
 
     public void addWorkUnitProcessorSubscriptionSummary(WorkUnitProcessorSubscriptionSummary summary){
+        LOG.debug(".addWorkUnitProcessorSubscriptionSummary(): Entry");
         synchronized (wupMapLock) {
             if (workUnitProcessorSubscriptionSummarySet.containsKey(summary.getSubscriber())) {
                 workUnitProcessorSubscriptionSummarySet.remove(summary.getSubscriber());
@@ -72,13 +75,15 @@ public class ITOpsPubSubMapLocalDM extends ITOpsLocalDMRefreshBase {
             workUnitProcessorSubscriptionSummarySet.put(summary.getSubscriber(), summary);
         }
         refreshCurrentStateUpdateInstant();
+        LOG.debug(".addWorkUnitProcessorSubscriptionSummary(): Exit");
     }
 
     public ITOpsPubSubReport getPubSubReport(){
+        LOG.debug(".getPubSubReport(): Entry");
         ITOpsPubSubReport report = new ITOpsPubSubReport();
         synchronized (wupMapLock) {
             for (WorkUnitProcessorSubscriptionSummary currentSummary : this.workUnitProcessorSubscriptionSummarySet.values()) {
-                LOG.info(".getPubSubReport(): Adding summary->{}", currentSummary);
+                LOG.trace(".getPubSubReport(): Adding summary->{}", currentSummary);
                 report.addWorkUnitProcessorSubscriptionSummary(currentSummary);
             }
         }
@@ -88,6 +93,7 @@ public class ITOpsPubSubMapLocalDM extends ITOpsLocalDMRefreshBase {
             }
         }
         report.setTimestamp(getCurrentStateUpdateInstant());
+        LOG.debug(".getPubSubReport(): Eixt");
         return(report);
     }
 }

@@ -85,6 +85,8 @@ public class WUPJobCard {
 
         if ((activityID == null)) {
             throw (new IllegalArgumentException("WUP Continuity Record is null in Constructor"));
+        } else {
+            this.activityID = activityID;
         }
         this.updateDate = updateDate;
         this.currentStatus = currentStatus;
@@ -115,8 +117,9 @@ public class WUPJobCard {
         this.isToBeDiscardedLock = new Object();
         if (originalCard == null) {
             throw (new IllegalArgumentException("originalCard (WUPJobCard) is null in Copy Constructor"));
+        } else {
+            this.activityID = new ActivityID(originalCard.getActivityID());
         }
-        this.activityID = new ActivityID(originalCard.getActivityID());
         this.updateDate = originalCard.getUpdateDate();
         this.currentStatus = originalCard.getCurrentStatus();
         this.clusterMode = originalCard.getClusterMode();

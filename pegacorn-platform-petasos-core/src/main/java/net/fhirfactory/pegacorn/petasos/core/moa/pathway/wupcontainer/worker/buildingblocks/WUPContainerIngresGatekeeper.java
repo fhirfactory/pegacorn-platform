@@ -23,10 +23,10 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
@@ -52,7 +52,10 @@ public class WUPContainerIngresGatekeeper {
     }
 
     @Inject
-    TopologyIM topologyProxy;
+    private TopologyIM topologyProxy;
+
+    @Inject
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     /**
      * This class/method checks the status of the WUPJobCard for the parcel, and ascertains if it is to be
@@ -78,6 +81,7 @@ public class WUPContainerIngresGatekeeper {
         ArrayList<String> targetList = new ArrayList<String>();
         getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
         if (ingresPacket.getCurrentJobCard().getIsToBeDiscarded()) {
+            metricsAgent.touchActivityFinishInstant(node.getComponentID());
             getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (null);
         } else {

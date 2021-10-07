@@ -31,21 +31,18 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.interact.StandardInteractClientTopologyEndpointPort;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceWatchDog;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsTopologyCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetric;
-import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetricsSet;
-import net.fhirfactory.pegacorn.petasos.model.itops.metrics.valuesets.ITOpsMetricNameEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
@@ -57,7 +54,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +104,12 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     @Inject
     private ITOpsTopologyCollectionAgent itopsCollectionAgent;
 
+    @Inject
+    private ProcessingPlantResilienceWatchDog resilienceWatchDog;
+
+    @Inject
+    private WorkUnitProcessorMetricsCollectionAgent collectionAgent;
+
     public GenericMessageBasedWUPTemplate() {
         super();
     }
@@ -143,6 +145,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         buildWUPFramework(this.getContext());
 
         registerCapabilities();
+
+        resilienceWatchDog.initialise();
 
         getLogger().debug(".initialise(): Exit");
     }
@@ -250,6 +254,10 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     protected FHIRContextUtility getFHIRContextUtility(){
         return(this.fhirContextUtility);
+    }
+
+    protected WorkUnitProcessorMetricsCollectionAgent getCollectionAgent(){
+        return(collectionAgent);
     }
 
     //

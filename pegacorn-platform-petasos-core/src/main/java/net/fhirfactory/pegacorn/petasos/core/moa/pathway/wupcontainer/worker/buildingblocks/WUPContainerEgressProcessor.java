@@ -22,13 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsMetricsCollectionAgent;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
@@ -63,7 +62,7 @@ public class WUPContainerEgressProcessor {
     TopologyIM topologyProxy;
 
     @Inject
-    private ITOpsMetricsCollectionAgent metricsAgent;
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     public WorkUnitTransportPacket egressContentProcessor(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
       	getLogger().debug(".egressContentProcessor(): Entry, ingresPacket (WorkUnitTransportPacket) --> {}, wupNodeFDNTokenValue (String) --> {}", ingresPacket);
@@ -108,7 +107,7 @@ public class WUPContainerEgressProcessor {
             	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
                 petasosMOAServicesBroker.notifyFinishOfWorkUnitActivity(jobCard, uow);
                 metricsAgent.updateWorkUnitProcessorStatus(wupNode.getComponentID(), WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED.toString());
-                metricsAgent.updateLastActivitySuccess(wupNode.getComponentID(), true);
+                metricsAgent.incrementFinishedTasks(wupNode.getComponentID());
                 break;
             case PARCEL_STATUS_ACTIVE_ELSEWHERE:
             	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE_ELSEWHERE);
@@ -129,9 +128,10 @@ public class WUPContainerEgressProcessor {
             default:
                 petasosMOAServicesBroker.notifyFailureOfWorkUnitActivity(jobCard, uow);
                 metricsAgent.updateWorkUnitProcessorStatus(wupNode.getComponentID(), WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED.toString());
-                metricsAgent.updateLastActivitySuccess(wupNode.getComponentID(), false);
+                metricsAgent.incrementFailedTasks(wupNode.getComponentID());
         }
-        metricsAgent.updateLastActivityInstant(wupNode.getComponentID());
+        metricsAgent.touchLastActivityInstant(wupNode.getComponentID());
+        metricsAgent.touchActivityFinishInstant(wupNode.getComponentID());
         return (ingresPacket);
     }
 }

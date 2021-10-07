@@ -23,12 +23,12 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import org.apache.camel.Exchange;
@@ -56,6 +56,9 @@ public class WUPContainerEgressGatekeeper {
     @Inject
     TopologyIM topologyProxy;
 
+    @Inject
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
+
     private String getGatekeeperProperty(FDNToken wupIdentifier) {
         FDN workingFDN = new FDN(wupIdentifier);
         String workingInstanceID = workingFDN.getUnqualifiedRDN().getValue();
@@ -79,6 +82,8 @@ public class WUPContainerEgressGatekeeper {
         // Get my Petasos Context
         getLogger().trace(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+        metricsAgent.touchLastActivityInstant(node.getComponentID());
+        metricsAgent.touchActivityFinishInstant(node.getComponentID());
         getLogger().trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
         TopologyNodeFDNToken wupFunctionToken = node.getNodeFDN().getToken();
         getLogger().trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
@@ -98,6 +103,7 @@ public class WUPContainerEgressGatekeeper {
             getLogger().trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
             String targetEndpoint = nameSet.getEndPointInterchangePayloadTransformerIngres();
             targetList.add(targetEndpoint);
+            metricsAgent.incrementEgressMessageCount(node.getComponentID());
             getLogger().debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);
         }

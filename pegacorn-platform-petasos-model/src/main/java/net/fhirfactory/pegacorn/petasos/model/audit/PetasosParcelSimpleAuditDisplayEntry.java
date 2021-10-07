@@ -37,12 +37,12 @@ public class PetasosParcelSimpleAuditDisplayEntry {
     private Date auditTrailEntryDate;
     private UoW actualUoW;
     private String identifier;
-    private ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus;
+    private ResilienceParcelFinalisationStatusEnum parcelFinalisationStatus;
     private ResilienceParcelProcessingStatusEnum processingStatus;
     private HashSet<String> alternativeWUPIdentifierSet;
     private HashSet<String> alternativeParcelIdentifiersSet;
-    private HashSet<String> downstreamEpisodeIdentifierSet;
-    private String upstreamEpisodeIdentifier;
+    private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
+    private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
     private String primaryWUPIdentifier;
     private String parcelTypeID;
     @JsonSerialize(using = JsonDateSerializer.class)
@@ -64,7 +64,7 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         this.auditTrailEntryDate = null;
         this.actualUoW = null;
         this.identifier = null;
-        this.parcelFinalsationStatus = null;
+        this.parcelFinalisationStatus = null;
         this.alternativeWUPIdentifierSet = null;
         this.processingStatus = null;
         this.downstreamEpisodeIdentifierSet = null;
@@ -83,7 +83,7 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         this.auditTrailEntryDate = null;
         this.actualUoW = null;
         this.identifier = null;
-        this.parcelFinalsationStatus = null;
+        this.parcelFinalisationStatus = null;
         this.alternativeWUPIdentifierSet = null;
         this.processingStatus = null;
         this.downstreamEpisodeIdentifierSet = null;
@@ -106,11 +106,11 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         if(theParcel.getDownstreamEpisodeIdentifierSet() != null){
             this.downstreamEpisodeIdentifierSet = new HashSet<>();
             for(PetasosEpisodeIdentifier currentParcelIdentifier: theParcel.getDownstreamEpisodeIdentifierSet()){
-                this.downstreamEpisodeIdentifierSet.add(currentParcelIdentifier.getUnqualifiedToken());
+                this.downstreamEpisodeIdentifierSet.add(currentParcelIdentifier);
             }
         }
         if(theParcel.getUpstreamEpisodeIdentifier() != null){
-            this.upstreamEpisodeIdentifier = theParcel.getUpstreamEpisodeIdentifier().getUnqualifiedToken();
+            this.upstreamEpisodeIdentifier = theParcel.getUpstreamEpisodeIdentifier();
         }
         if(theParcel.getParcelTypeID() != null){
             this.parcelTypeID = theParcel.getParcelTypeID().getUnqualifiedToken();
@@ -136,8 +136,8 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         if(theParcel.getProcessingStatus() != null){
             this.processingStatus = theParcel.getProcessingStatus();
         }
-        if(theParcel.getParcelFinalsationStatus() != null){
-            this.parcelFinalsationStatus = theParcel.getParcelFinalsationStatus();
+        if(theParcel.getParcelFinalisationStatus() != null){
+            this.parcelFinalisationStatus = theParcel.getParcelFinalisationStatus();
         }
         if(theParcel.getPrimaryWUPIdentifier() != null){
             this.primaryWUPIdentifier = theParcel.getPrimaryWUPIdentifier().getTokenValue();
@@ -174,12 +174,12 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         this.identifier = identifier;
     }
 
-    public ResilienceParcelFinalisationStatusEnum getParcelFinalsationStatus() {
-        return parcelFinalsationStatus;
+    public ResilienceParcelFinalisationStatusEnum getParcelFinalisationStatus() {
+        return parcelFinalisationStatus;
     }
 
-    public void setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus) {
-        this.parcelFinalsationStatus = parcelFinalsationStatus;
+    public void setParcelFinalisationStatus(ResilienceParcelFinalisationStatusEnum parcelFinalisationStatus) {
+        this.parcelFinalisationStatus = parcelFinalisationStatus;
     }
 
     public ResilienceParcelProcessingStatusEnum getProcessingStatus() {
@@ -206,19 +206,19 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         this.alternativeParcelIdentifiersSet = alternativeParcelIdentifiersSet;
     }
 
-    public HashSet<String> getDownstreamEpisodeIdentifierSet() {
+    public HashSet<PetasosEpisodeIdentifier> getDownstreamEpisodeIdentifierSet() {
         return downstreamEpisodeIdentifierSet;
     }
 
-    public void setDownstreamEpisodeIdentifierSet(HashSet<String> downstreamEpisodeIdentifierSet) {
+    public void setDownstreamEpisodeIdentifierSet(HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet) {
         this.downstreamEpisodeIdentifierSet = downstreamEpisodeIdentifierSet;
     }
 
-    public String getUpstreamEpisodeIdentifier() {
+    public PetasosEpisodeIdentifier getUpstreamEpisodeIdentifier() {
         return upstreamEpisodeIdentifier;
     }
 
-    public void setUpstreamEpisodeIdentifier(String upstreamEpisodeIdentifier) {
+    public void setUpstreamEpisodeIdentifier(PetasosEpisodeIdentifier upstreamEpisodeIdentifier) {
         this.upstreamEpisodeIdentifier = upstreamEpisodeIdentifier;
     }
 

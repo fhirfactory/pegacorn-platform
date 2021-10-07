@@ -30,7 +30,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnu
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsMetricsCollectionAgent;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
@@ -69,7 +69,7 @@ public class WUPContainerIngresProcessor {
     PetasosMOAServicesBroker petasosMOAServicesBroker;
 
     @Inject
-    private ITOpsMetricsCollectionAgent metricsAgent;
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     @Inject
     TopologyIM topologyProxy;
@@ -102,6 +102,10 @@ public class WUPContainerIngresProcessor {
         // Get my Petasos Context
         getLogger().trace(".ingresContentProcessor(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
+        metricsAgent.incrementIngresMessageCount(node.getComponentID());
+        metricsAgent.touchLastActivityInstant(node.getComponentID());
+        metricsAgent.touchActivityStartInstant(node.getComponentID());
+        metricsAgent.incrementRegisteredTasks(node.getComponentID());
         TopologyNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         getLogger().trace(".ingresContentProcessor(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
@@ -119,33 +123,49 @@ public class WUPContainerIngresProcessor {
         boolean waitState = true;
         WUPJobCard jobCard = newTransportPacket.getCurrentJobCard();
         ParcelStatusElement statusElement = newTransportPacket.getCurrentParcelStatus();
-        metricsAgent.updateLastActivityInstant(node.getComponentID());
-        metricsAgent.updatePresentEpisodeID(node.getComponentID(), statusElement.getActivityID().getPresentEpisodeIdentifier().toString());
+        metricsAgent.updateCurrentEpisode(node.getComponentID(), statusElement.getActivityID().getPresentEpisodeIdentifier());
+        if(statusElement.getActivityID().hasPreviousEpisodeIdentifier()) {
+            metricsAgent.updatePreviousEpisodeID(node.getComponentID(), statusElement.getActivityID().getPreviousEpisodeIdentifier());
+        }
         metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(),jobCard.getCurrentStatus().toString());
         while (waitState) {
+            getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus->{}", jobCard.getCurrentStatus());
             switch (jobCard.getCurrentStatus()) {
                 case WUP_ACTIVITY_STATUS_WAITING:
+                    metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(), WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING.toString());
                     getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}",WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING );
                     jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                     petasosMOAServicesBroker.synchroniseJobCard(jobCard);
                     if (jobCard.getGrantedStatus() == WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
                         jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
                         petasosMOAServicesBroker.notifyStartOfWorkUnitActivity(jobCard);
+                        metricsAgent.touchLastActivityInstant(node.getComponentID());
+                        metricsAgent.incrementStartedTasks(node.getComponentID());
+                        metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(), WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING.toString());
                         getLogger().trace(".ingresContentProcessor(): We've been granted execution privileges!");
                         waitState = false;
-                        break;
                     }
                     break;
                 case WUP_ACTIVITY_STATUS_EXECUTING:
                 case WUP_ACTIVITY_STATUS_FINISHED:
                 case WUP_ACTIVITY_STATUS_FAILED:
+                    jobCard.setIsToBeDiscarded(true);
+                    waitState = false;
+                    metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(), WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED.toString());
+                    metricsAgent.incrementFailedTasks(node.getComponentID());
+                    jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
+                    jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
+                    break;
                 case WUP_ACTIVITY_STATUS_CANCELED:
                 default:
-                    getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> Default");
                     jobCard.setIsToBeDiscarded(true);
                     waitState = false;
                     jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
                     jobCard.setRequestedStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED);
+                    metricsAgent.touchLastActivityInstant(node.getComponentID());
+                    metricsAgent.incrementCancelledTasks(node.getComponentID());
+                    metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(),WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED.toString());
+
             }
             if (waitState) {
                 try {
@@ -159,8 +179,6 @@ public class WUPContainerIngresProcessor {
             ParcelStatusElement currentParcelStatus = newTransportPacket.getCurrentParcelStatus();
             currentParcelStatus.setRequiresRetry(true);
             currentParcelStatus.setParcelStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
-            metricsAgent.updateWorkUnitProcessorStatus(node.getComponentID(),WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_CANCELED.toString());
-            metricsAgent.updateLastActivitySuccess(node.getComponentID(), false);
         }
         getLogger().debug(".ingresContentProcessor(): Exit, newTransportPacket --> {}", newTransportPacket);
         return (newTransportPacket);

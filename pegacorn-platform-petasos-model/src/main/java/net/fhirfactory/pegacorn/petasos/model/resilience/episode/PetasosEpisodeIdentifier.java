@@ -23,53 +23,91 @@
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import org.apache.commons.lang3.SerializationUtils;
 
 /**
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class PetasosEpisodeIdentifier extends FDNToken implements Serializable {
+public class PetasosEpisodeIdentifier implements Serializable {
+	private String value;
+	private Instant creationInstant;
+
+	public PetasosEpisodeIdentifier(){
+		this.value = null;
+		this.creationInstant = null;
+	}
 	
     public PetasosEpisodeIdentifier(FDNToken originalToken) {
-        this.setContent(new String(originalToken.getContent()));
+		this.value = SerializationUtils.clone(originalToken.getContent());
+		this.creationInstant = Instant.now();
     }
 
-    public PetasosEpisodeIdentifier(){
-    	super();
+	public PetasosEpisodeIdentifier(TopologyNodeFunctionFDN functionFDN){
+		this.value = SerializationUtils.clone(functionFDN.toTypeBasedFDNWithVersion().getToken().getContent());
+		this.creationInstant = Instant.now();
 	}
-	
+
+	public PetasosEpisodeIdentifier(PetasosEpisodeIdentifier ori){
+		if(ori != null) {
+			if (ori.value != null) {
+				this.value = SerializationUtils.clone(ori.getValue());
+			} else {
+				this.value = null;
+			}
+			if (ori.creationInstant != null) {
+				this.creationInstant = SerializationUtils.clone(ori.getCreationInstant());
+			} else {
+				this.creationInstant = Instant.now();
+			}
+		} else {
+			this.value = null;
+			this.creationInstant = Instant.now();
+		}
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public Instant getCreationInstant() {
+		return creationInstant;
+	}
+
+	public void setCreationInstant(Instant creationInstant) {
+		this.creationInstant = creationInstant;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PetasosEpisodeIdentifier that = (PetasosEpisodeIdentifier) o;
+		return Objects.equals(value, that.value) && Objects.equals(creationInstant, that.creationInstant);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value, creationInstant);
+	}
+
 	@Override
 	public String toString() {
-	        FDN tempFDN = new FDN(this);
-	        String simpleString = "WUPIdentifier{";
-	        ArrayList<RDN> rdnSet = tempFDN.getRDNSet();
-	        int setSize = rdnSet.size();
-	        for (int counter = 0; counter < setSize; counter++) {
-	            RDN currentRDN = rdnSet.get(counter);
-	            String currentNameValue = currentRDN.getValue();
-	            if(currentNameValue.contains(".")){
-	                String outputString = currentNameValue.replace(".", "_");
-	                simpleString = simpleString + outputString;
-	            } else {
-	                simpleString = simpleString + currentNameValue;
-	            }
-	            if(counter < (setSize - 1)){
-	                simpleString = simpleString + ".";
-	            }
-	        }
-	        simpleString = simpleString + "}";
-	        return(simpleString);
+		return "PetasosEpisodeIdentifier{" +
+				"value='" + value + '\'' +
+				", creationInstant=" + creationInstant +
+				'}';
 	}
-
-	public PetasosEpisodeIdentifier(TopologyNodeFunctionFDN functionFDN){
-    	super();
-    	this.setContent(functionFDN.toTypeBasedFDNWithVersion().getToken().getContent());
-	}
-
 }

@@ -31,15 +31,17 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
  *
  */
 public class PetasosEpisodeFinalisationStatus {
-    private PetasosEpisodeIdentifier actualDownstreamEpisodeID;
-    private WUPFunctionToken downstreamRegisteredWUPID;
+    private PetasosEpisodeIdentifier episodeID;
+    private PetasosEpisodeIdentifier downstreamEpisodeID;
+    private WUPFunctionToken downstreamWUPFunction;
     private Object registrationStatusLock;
     private PetasosEpisodeFinalisationStatusEnum registrationStatus;
 
 
-    public PetasosEpisodeFinalisationStatus(WUPFunctionToken downstreamWUPID){
-        this.downstreamRegisteredWUPID = downstreamWUPID;
-        this.actualDownstreamEpisodeID = null;
+    public PetasosEpisodeFinalisationStatus(PetasosEpisodeIdentifier episodeID, WUPFunctionToken downstreamWUPID){
+        this.downstreamWUPFunction = downstreamWUPID;
+        this.episodeID = episodeID;
+        this.downstreamEpisodeID = null;
         this.registrationStatusLock = new Object();
         this.registrationStatus = PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_NOT_REGISTERED;
     }
@@ -48,18 +50,34 @@ public class PetasosEpisodeFinalisationStatus {
         return(this.registrationStatus);
     }
 
-    public FDNToken getActualDownstreamEpisodeID(){
-        return(this.actualDownstreamEpisodeID);
+    public PetasosEpisodeIdentifier getDownstreamEpisodeID(){
+        return(this.downstreamEpisodeID);
     }
 
-    public void setActualDownstreamEpisodeID(PetasosEpisodeIdentifier downstreamEpisodeID){
+    public void setDownstreamEpisodeID(PetasosEpisodeIdentifier downstreamEpisodeID){
         synchronized (registrationStatusLock){
-            this.actualDownstreamEpisodeID = downstreamEpisodeID;
+            this.downstreamEpisodeID = downstreamEpisodeID;
             this.registrationStatus = PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_REGISTERED;
         }
     }
 
-    public WUPFunctionToken getDownstreamRegisteredWUPID(){
-        return(this.downstreamRegisteredWUPID);
+    public WUPFunctionToken getDownstreamWUPFunction(){
+        return(this.downstreamWUPFunction);
+    }
+
+    public PetasosEpisodeIdentifier getEpisodeID() {
+        return episodeID;
+    }
+
+    public void setEpisodeID(PetasosEpisodeIdentifier episodeID) {
+        this.episodeID = episodeID;
+    }
+
+    public void setDownstreamWUPFunction(WUPFunctionToken downstreamWUPFunction) {
+        this.downstreamWUPFunction = downstreamWUPFunction;
+    }
+
+    public void setRegistrationStatus(PetasosEpisodeFinalisationStatusEnum registrationStatus) {
+        this.registrationStatus = registrationStatus;
     }
 }

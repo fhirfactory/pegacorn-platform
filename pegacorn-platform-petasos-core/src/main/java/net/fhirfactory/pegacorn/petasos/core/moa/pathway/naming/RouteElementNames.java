@@ -45,6 +45,7 @@ public class RouteElementNames {
     private static final String INTRA_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
+    private static final String SEDA_INTER_FUNCTION_CONFIGURATION_PARAMETERS = "?blockWhenFull=true&size=10000";
 
     public RouteElementNames(TopologyNodeFDNToken functionToken, boolean mustBeDirect){
         getLogger().debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
@@ -91,7 +92,7 @@ public class RouteElementNames {
         if(this.mustBeDirect){
             endpointName = DIRECT_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres";
         } else {
-            endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres";
+            endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".WUPContainer.IngresProcessor.Ingres" + SEDA_INTER_FUNCTION_CONFIGURATION_PARAMETERS;
         }
         return(endpointName);
     }
@@ -158,7 +159,7 @@ public class RouteElementNames {
 
     public String getEndPointInterchangePayloadTransformerIngres() {
         getLogger().debug(".getEndPointInterchangePayloadTransformerIngres(): Entry");
-        String endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres";
+        String endpointName = SEDA_INTER_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres" + SEDA_INTER_FUNCTION_CONFIGURATION_PARAMETERS;
         return(endpointName);
     }
 

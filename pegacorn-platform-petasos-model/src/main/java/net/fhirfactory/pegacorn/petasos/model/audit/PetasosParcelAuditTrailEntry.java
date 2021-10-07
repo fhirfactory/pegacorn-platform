@@ -42,7 +42,7 @@ public class PetasosParcelAuditTrailEntry {
     private Date auditTrailEntryDate;
     private UoW actualUoW;
     private ResilienceParcelIdentifier identifier;
-    private ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus;
+    private ResilienceParcelFinalisationStatusEnum parcelFinalisationStatus;
     private ResilienceParcelProcessingStatusEnum processingStatus;
     private HashSet<WUPIdentifier> alternativeWUPIdentifierSet;
     private HashSet<ResilienceParcelIdentifier> alternativeParcelIdentifiersSet;
@@ -64,7 +64,7 @@ public class PetasosParcelAuditTrailEntry {
         this.auditTrailEntryDate = null;
         this.actualUoW = null;
         this.identifier = null;
-        this.parcelFinalsationStatus = null;
+        this.parcelFinalisationStatus = null;
         this.alternativeWUPIdentifierSet = null;
         this.processingStatus = null;
         this.downstreamEpisodeIdentifierSet = null;
@@ -83,7 +83,7 @@ public class PetasosParcelAuditTrailEntry {
         this.auditTrailEntryDate = null;
         this.actualUoW = null;
         this.identifier = null;
-        this.parcelFinalsationStatus = null;
+        this.parcelFinalisationStatus = null;
         this.alternativeWUPIdentifierSet = null;
         this.processingStatus = null;
         this.downstreamEpisodeIdentifierSet = null;
@@ -134,7 +134,7 @@ public class PetasosParcelAuditTrailEntry {
             this.processingStatus = theParcel.getProcessingStatus();
         }
         if(theParcel.hasFinalisationStatus()){
-            this.parcelFinalsationStatus = theParcel.getFinalisationStatus();
+            this.parcelFinalisationStatus = theParcel.getFinalisationStatus();
         }
         if(theParcel.hasAssociatedWUPIdentifier()){
             this.primaryWUPIdentifier = theParcel.getAssociatedWUPIdentifier();
@@ -366,12 +366,12 @@ public class PetasosParcelAuditTrailEntry {
         this.identifier = identifier;
     }
 
-    public ResilienceParcelFinalisationStatusEnum getParcelFinalsationStatus() {
-        return parcelFinalsationStatus;
+    public ResilienceParcelFinalisationStatusEnum getParcelFinalisationStatus() {
+        return parcelFinalisationStatus;
     }
 
-    public void setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus) {
-        this.parcelFinalsationStatus = parcelFinalsationStatus;
+    public void setParcelFinalisationStatus(ResilienceParcelFinalisationStatusEnum parcelFinalisationStatus) {
+        this.parcelFinalisationStatus = parcelFinalisationStatus;
     }
 
     public WUPIdentifier getPrimaryWUPIdentifier() {

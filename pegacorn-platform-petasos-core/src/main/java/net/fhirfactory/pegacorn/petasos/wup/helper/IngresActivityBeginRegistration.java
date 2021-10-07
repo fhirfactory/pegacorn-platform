@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
@@ -65,7 +65,7 @@ public class IngresActivityBeginRegistration {
     PetasosMOAServicesBroker servicesBroker;
 
     @Inject
-    PetasosPathwayExchangePropertyNames exchangePropertyNames;
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     public UoW registerActivityStart(UoW theUoW, Exchange camelExchange){
         LOG.debug(".registerActivityStart(): Entry, payload --> {}", theUoW);
@@ -93,6 +93,12 @@ public class IngresActivityBeginRegistration {
         } else {
             statusElement = servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         }
+        LOG.trace(".registerActivityStart(): Updated metrics");
+        metricsAgent.touchActivityStartInstant(wup.getComponentID());
+        metricsAgent.touchLastActivityInstant(wup.getComponentID());
+        metricsAgent.incrementIngresMessageCount(wup.getComponentID());
+        metricsAgent.incrementRegisteredTasks(wup.getComponentID());
+        metricsAgent.incrementStartedTasks(wup.getComponentID());
         LOG.trace(".registerActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
         LOG.trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");

@@ -23,8 +23,9 @@
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -59,19 +60,24 @@ public class EgressActivityFinalisationRegistration {
     PetasosMOAServicesBroker servicesBroker;
 
     @Inject
-    PetasosPathwayExchangePropertyNames exchangePropertyNames;
+    private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     public UoW registerActivityFinishAndFinalisation(UoW theUoW, Exchange camelExchange, String wupInstanceKey){
         LOG.debug(".registerActivityFinishAndFinalisation(): Entry, payload --> {}, wupInstanceKey --> {}", theUoW, wupInstanceKey);
+        LOG.trace(".ingresGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
+        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         LOG.trace(".registerActivityFinishAndFinalisation(): Get Job Card and Status Element from Exchange for extraction by the WUP Egress Conduit");
         WUPJobCard jobCard = camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
         ParcelStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ParcelStatusElement.class);
+        metricsAgent.touchLastActivityInstant(node.getComponentID());
         LOG.trace(".registerActivityFinishAndFinalisation(): Extract the UoW");
         switch(theUoW.getProcessingOutcome()){
             case UOW_OUTCOME_SUCCESS:{
                 jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 servicesBroker.notifyFinishOfWorkUnitActivity(jobCard, theUoW);
                 servicesBroker.notifyFinalisationOfWorkUnitActivity(jobCard);
+                metricsAgent.incrementFinishedTasks(node.getComponentID());
+                metricsAgent.touchActivityFinishInstant(node.getComponentID());
                 break;
             }
             case UOW_OUTCOME_INCOMPLETE:
@@ -79,6 +85,8 @@ public class EgressActivityFinalisationRegistration {
             case UOW_OUTCOME_FAILED:{
                 jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
                 servicesBroker.notifyFailureOfWorkUnitActivity(jobCard, theUoW);
+                metricsAgent.incrementFailedTasks(node.getComponentID());
+                metricsAgent.touchActivityFinishInstant(node.getComponentID());
             }
         }
         LOG.debug(".registerActivityFinishAndFinalisation(): exit, my work is done!");

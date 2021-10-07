@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import net.fhirfactory.pegacorn.petasos.itops.collectors.ITOpsMetricsCollectionAgent;
-import org.apache.camel.spi.UnitOfWork;
 
 /**
  * @author Mark A. Hunter

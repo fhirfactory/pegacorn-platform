@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.petasos.itops.caches;
 
 import net.fhirfactory.pegacorn.petasos.itops.caches.common.ITOpsLocalDMRefreshBase;
-import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetric;
-import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ITOpsMetricsSet;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.WorkUnitProcessorNodeMetrics;
+import net.fhirfactory.pegacorn.petasos.model.itops.metrics.common.NodeMetricsBase;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
@@ -34,51 +34,57 @@ import java.util.concurrent.ConcurrentHashMap;
 @ApplicationScoped
 public class ITOpsMetricsLocalDM extends ITOpsLocalDMRefreshBase {
 
-    private Map<String, ITOpsMetricsSet> metricsSetMap;
+    private Map<String, NodeMetricsBase> nodeMetricsMap;
+    private Map<String, Object> nodeMetricsLockMap;
     private Object metricsSetMapLock;
 
     public ITOpsMetricsLocalDM(){
-        this.metricsSetMap = new ConcurrentHashMap<>();
+        this.nodeMetricsMap = new ConcurrentHashMap<>();
+        this.nodeMetricsLockMap = new ConcurrentHashMap<>();
         this.metricsSetMapLock = new Object();
     }
 
-    public Map<String, ITOpsMetricsSet> getMetricsSetMap() {
-        return metricsSetMap;
+    public Map<String, NodeMetricsBase> getNodeMetricsMap() {
+        return nodeMetricsMap;
     }
 
-    public void setMetricsSetMap(Map<String, ITOpsMetricsSet> metricsSetMap) {
-        this.metricsSetMap = metricsSetMap;
+    public Map<String, Object> getNodeMetricsLockMap() {
+        return nodeMetricsLockMap;
     }
 
-    public void addMetricSet(ITOpsMetricsSet metricSet){
-        synchronized (metricsSetMapLock) {
-            if (metricsSetMap.containsKey(metricSet.getComponentID())) {
-                metricsSetMap.remove(metricSet.getComponentID());
+    public Object getMetricsSetMapLock() {
+        return metricsSetMapLock;
+    }
+
+    public void addMetricSet(NodeMetricsBase metrics){
+        synchronized (getMetricsSetMapLock()) {
+            if (getNodeMetricsLockMap().containsKey(metrics.getComponentID())) {
+                getNodeMetricsLockMap().remove(metrics.getComponentID());
             }
-            metricsSetMap.put(metricSet.getComponentID(), metricSet);
+            if(getNodeMetricsMap().containsKey(metrics.getComponentID())){
+                getNodeMetricsMap().remove(metrics.getComponentID());
+            }
+            getNodeMetricsMap().put(metrics.getComponentID(), metrics);
+            getNodeMetricsLockMap().put(metrics.getComponentID(), new Object());
             refreshCurrentStateUpdateInstant();
         }
     }
 
-    public void addMetric(String componentID, ITOpsMetric metric){
-        synchronized (metricsSetMapLock) {
-            if (metricsSetMap.containsKey(componentID)) {
-                metricsSetMap.get(componentID).addMetric(metric);
-            } else {
-                ITOpsMetricsSet newSet = new ITOpsMetricsSet();
-                newSet.addMetric(metric);
-                newSet.setComponentID(componentID);
-                metricsSetMap.put(componentID, newSet);
-            }
-            refreshCurrentStateUpdateInstant();
-        }
-    }
-
-    public List<ITOpsMetricsSet> getAllMetricsSets(){
-        List<ITOpsMetricsSet> metricsSetList = new ArrayList<>();
-        synchronized (metricsSetMapLock){
-            metricsSetList.addAll(metricsSetMap.values());
+    public List<NodeMetricsBase> getAllMetricsSets(){
+        List<NodeMetricsBase> metricsSetList = new ArrayList<>();
+        synchronized (getMetricsSetMapLock()){
+            metricsSetList.addAll(getNodeMetricsMap().values());
         }
         return(metricsSetList);
+    }
+
+    public Object getNodeMetricsLock(String componentID){
+        Object lock = getNodeMetricsLockMap().get(componentID);
+        return(lock);
+    }
+
+    public NodeMetricsBase getNodeMetrics(String componentID){
+        NodeMetricsBase metrics = getNodeMetricsMap().get(componentID);
+        return(metrics);
     }
 }

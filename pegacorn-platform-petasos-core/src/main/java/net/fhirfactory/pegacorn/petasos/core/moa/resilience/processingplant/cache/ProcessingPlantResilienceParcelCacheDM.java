@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -225,9 +226,13 @@ public class ProcessingPlantResilienceParcelCacheDM {
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getParcelByEpisodeID(FDNToken parcelTypeID) {
+    public List<ResilienceParcel> getParcelByEpisodeID(PetasosEpisodeIdentifier parcelTypeID) {
         LOG.debug(".getInProgressParcelSet(): Entry, parcelTypeID --> {}" + parcelTypeID);
         List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
+        if(getParcelSet().isEmpty()){
+            LOG.debug(".getInProgressParcelSet(): Exit, returning empty list");
+            return(parcelList);
+        }
         synchronized (getPetasosParcelCacheLock()) {
             Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
             while (parcelListIterator.hasNext()) {
@@ -239,6 +244,7 @@ public class ProcessingPlantResilienceParcelCacheDM {
                 }
             }
         }
+        LOG.debug(".getInProgressParcelSet(): Exit, returning non-empty list");
         return (parcelList);
     }
 
@@ -261,5 +267,56 @@ public class ProcessingPlantResilienceParcelCacheDM {
             }
         }
         return (null);
+    }
+
+    public String getMetrics(){
+        LOG.debug(".getMetrics(): Entry");
+        int registeredCount = 0;
+        int waitingCount = 0;
+        int activeCount = 0;
+        int cancelledCount = 0;
+        int failedCount = 0;
+        int finishedCount = 0;
+        int finalisedCount = 0;
+        if(!this.petasosParcelCache.isEmpty()){
+            synchronized (getPetasosParcelCacheLock()){
+                Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
+                while (parcelListIterator.hasNext()) {
+                    ResilienceParcel currentParcel = parcelListIterator.next();
+                    switch(currentParcel.getProcessingStatus()){
+                        case PARCEL_STATUS_REGISTERED:
+                            registeredCount += 1;
+                            break;
+                        case PARCEL_STATUS_CANCELLED:
+                            cancelledCount += 1;
+                            break;
+                        case PARCEL_STATUS_INITIATED:
+                        case PARCEL_STATUS_ACTIVE:
+                        case PARCEL_STATUS_ACTIVE_ELSEWHERE:
+                            activeCount += 1;
+                            break;
+                        case PARCEL_STATUS_FINISHED:
+                        case PARCEL_STATUS_FINISHED_ELSEWHERE:
+                            finishedCount += 1;
+                            break;
+                        case PARCEL_STATUS_FINALISED:
+                        case PARCEL_STATUS_FINALISED_ELSEWHERE:
+                            finalisedCount += 1;
+                            break;
+                        case PARCEL_STATUS_FAILED:
+                            failedCount += 1;
+                            break;
+                    }
+                }
+            }
+        }
+        String metricsString =
+                "Register["+registeredCount+"]"
+                + ", Active["+activeCount+"]"
+                + ", Cancelled["+cancelledCount+"]"
+                + ", Failed["+failedCount+"]"
+                + ", Finished["+finishedCount+"]"
+                + ", Finalised["+finalisedCount+"]";
+        return(metricsString);
     }
 }

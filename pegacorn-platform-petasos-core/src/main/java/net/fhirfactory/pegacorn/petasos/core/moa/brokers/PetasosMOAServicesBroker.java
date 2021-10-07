@@ -22,12 +22,16 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.brokers;
 
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.core.PetasosEpisodeIdentifierFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
@@ -59,22 +63,25 @@ public class PetasosMOAServicesBroker {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMOAServicesBroker.class);
 
     @Inject
-    ProcessingPlantResilienceParcelServicesIM parcelServicesIM;
+    private ProcessingPlantResilienceParcelServicesIM parcelServicesIM;
 
     @Inject
-    ProcessingPlantResilienceActivityServicesController rasController;
+    private ProcessingPlantResilienceActivityServicesController rasController;
 
     @Inject
-    WorkUnitProcessorFrameworkManager wupFrameworkManager;
+    private WorkUnitProcessorFrameworkManager wupFrameworkManager;
 
     @Inject
-    PathwayInterchangeManager wupInterchangeManager;
+    private PathwayInterchangeManager wupInterchangeManager;
 
     @Inject
-    DataParcelSubscriptionMapIM topicManager;
+    private DataParcelSubscriptionMapIM topicManager;
 
     @Inject
-    MOAServicesAuditBroker auditWriter;
+    private MOAServicesAuditBroker auditWriter;
+
+    @Inject
+    private PetasosEpisodeIdentifierFactory episodeIdentifierFactory;
 
     /**
      *
@@ -85,6 +92,12 @@ public class PetasosMOAServicesBroker {
     public ParcelStatusElement registerStandardWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW) {
         if ((jobCard == null) || (initialUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
+        }
+        if(!jobCard.getActivityID().hasPresentEpisodeIdentifier()){
+            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(jobCard.getActivityID().getPresentWUPFunctionToken());
+            DataParcelTypeDescriptor contentDescriptor = initialUoW.getIngresContent().getPayloadManifest().getContentDescriptor();
+            PetasosEpisodeIdentifier episodeIdentifier = episodeIdentifierFactory.newEpisodeIdentifier(nodeFunctionFDN, contentDescriptor);
+            jobCard.getActivityID().setPresentEpisodeIdentifier(episodeIdentifier);
         }
         ResilienceParcel newParcel = parcelServicesIM.registerParcel(jobCard.getActivityID(), initialUoW, false);
         jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());
@@ -273,7 +286,7 @@ public class PetasosMOAServicesBroker {
         auditEntryIdentifier.appendRDN(new RDN("action", action));
         ResilienceParcelIdentifier parcelId = new ResilienceParcelIdentifier(auditEntryIdentifier.getToken());
         newAuditEntry.setIdentifier(parcelId);
-        newAuditEntry.setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        newAuditEntry.setParcelFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
         newAuditEntry.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         newAuditEntry.setParcelFinalisedDate(Date.from(Instant.now()));
         newAuditEntry.setParcelFinishedDate(Date.from(Instant.now()));
