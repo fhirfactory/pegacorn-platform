@@ -46,11 +46,32 @@ public class DataParcelSubscriptionMapDM {
 	
 	private ConcurrentHashMap<DataParcelTypeDescriptor, List<PubSubSubscription>> distributionList;
 	private Object distributionListUpdateLock;
-	
+
+	//
+	// Constructor
+	//
+
     public DataParcelSubscriptionMapDM(){
         this.distributionList = new ConcurrentHashMap<DataParcelTypeDescriptor, List<PubSubSubscription>>();
         this.distributionListUpdateLock = new Object();
     }
+
+	//
+	// Metrics
+	//
+
+	public String getCacheName(){
+		return("DataParcelSubscriptionMap");
+	}
+
+	public String getMetrics(){
+		String metrics = "DistributionList["+distributionList.size()+"]";
+		return(metrics);
+	}
+
+	//
+	// Business Methods
+	//
 
     /**
      * This function retrieves the list (FDNTokenSet) of WUPs that are interested in 

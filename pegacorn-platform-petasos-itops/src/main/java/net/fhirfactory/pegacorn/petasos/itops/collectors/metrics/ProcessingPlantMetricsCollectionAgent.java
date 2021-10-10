@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.itops.collectors.metrics;
 
+import net.fhirfactory.pegacorn.components.metrics.ProcessingPlantAuditActivityMetricsReportingInterface;
+import net.fhirfactory.pegacorn.components.metrics.ProcessingPlantLocalCacheMetricsReportingInterface;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.common.ITOpsMetricsCollectionAgentBase;
 import net.fhirfactory.pegacorn.petasos.model.itops.metrics.ProcessingPlantNodeMetrics;
 import org.slf4j.Logger;
@@ -29,9 +31,10 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class ProcessingPlantMetricsCollectionAgent extends ITOpsMetricsCollectionAgentBase {
-    private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantMetricsCollectionAgent.class);
+public class ProcessingPlantMetricsCollectionAgent extends ITOpsMetricsCollectionAgentBase
+        implements ProcessingPlantLocalCacheMetricsReportingInterface, ProcessingPlantAuditActivityMetricsReportingInterface {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantMetricsCollectionAgent.class);
 
     //
     // Getters (and Setters)
@@ -64,12 +67,33 @@ public class ProcessingPlantMetricsCollectionAgent extends ITOpsMetricsCollectio
         }
     }
 
-    public void updateResilienceCacheMetrics(String componentID, String metricsString){
-        getLogger().debug(".updateResilienceCacheMetrics(): Entry, componentID->{}, metricsString->{}", componentID, metricsString);
+    public void updatedLocalCacheStatus(String componentID, String cacheName, String cacheMetricsValue){
+        getLogger().debug(".updateResilienceCacheMetrics(): Entry, componentID->{}, cacheName->{}, cacheMetricsValue->{}", componentID, cacheName, cacheMetricsValue);
         ProcessingPlantNodeMetrics nodeMetrics = getNodeMetrics(componentID);
         synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
-            nodeMetrics.setResilienceCacheStatus(metricsString);
+            nodeMetrics.updateLocalCacheStatus(cacheName, cacheMetricsValue);
         }
         getLogger().debug(".updateResilienceCacheMetrics(): Exit");
+    }
+
+    public void incrementSynchronousAuditEventWritten(String componentID){
+        ProcessingPlantNodeMetrics nodeMetrics = getNodeMetrics(componentID);
+        synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
+            nodeMetrics.incrementSynchronousAuditEventWritten();
+        }
+    }
+
+    public void incrementAsynchronousAuditEventWritten(String componentID){
+        ProcessingPlantNodeMetrics nodeMetrics = getNodeMetrics(componentID);
+        synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
+            nodeMetrics.incrementAsynchronousAuditEventWritten();
+        }
+    }
+
+    public void touchAsynchronousAuditEventWrite(String componentID){
+        ProcessingPlantNodeMetrics nodeMetrics = getNodeMetrics(componentID);
+        synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
+            nodeMetrics.touchAsynchronousAuditEventWrite();
+        }
     }
 }

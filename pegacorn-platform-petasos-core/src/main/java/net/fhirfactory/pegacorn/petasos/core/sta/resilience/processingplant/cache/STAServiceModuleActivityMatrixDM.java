@@ -22,12 +22,12 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache;
 
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantResilienceParcelCacheDM;
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
+import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.cache.ProcessingPlantResilienceParcelCacheDM;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +53,8 @@ public class STAServiceModuleActivityMatrixDM {
 
     private static final Logger LOG = LoggerFactory.getLogger(STAServiceModuleActivityMatrixDM.class);
 
-    private ConcurrentHashMap<ResilienceParcelIdentifier, ParcelStatusElement> parcelStatusElementCache;
-    private ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<ResilienceParcelIdentifier>> wuaEpisode2ParcelInstanceMap;
+    private ConcurrentHashMap<FulfillmentTrackingIdType, TaskStatusType> parcelStatusElementCache;
+    private ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<FulfillmentTrackingIdType>> wuaEpisode2ParcelInstanceMap;
 
     @Inject
     ProcessingPlantResilienceParcelCacheDM parcelCacheDM;
@@ -63,8 +63,8 @@ public class STAServiceModuleActivityMatrixDM {
     TopologyIM moduleIM;
 
     public STAServiceModuleActivityMatrixDM() {
-        parcelStatusElementCache = new ConcurrentHashMap<ResilienceParcelIdentifier, ParcelStatusElement>();
-        wuaEpisode2ParcelInstanceMap = new ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<ResilienceParcelIdentifier>>();
+        parcelStatusElementCache = new ConcurrentHashMap<FulfillmentTrackingIdType, TaskStatusType>();
+        wuaEpisode2ParcelInstanceMap = new ConcurrentHashMap<PetasosEpisodeIdentifier, HashSet<FulfillmentTrackingIdType>>();
     }
     
     /**
@@ -77,92 +77,92 @@ public class STAServiceModuleActivityMatrixDM {
      * (ConcurrentHashMap<EpisodeIdentifier,HashSet<ResilienceParcelIdentifier>>) to track that
      * the specific Parcel is part of a processing Episode.
      *
-     * @param activityID The WUP/Parcel ActivityID
+     * @param petasosTaskFulfillment The WUP/Parcel ActivityID
      * @param initialProcessingStatus The initial (provided) Processing Status of the ResilienceParcel
      * @return A ParcelStatusElement which is used by the WUP Components to determine execution & status privileges.
      */
-    public ParcelStatusElement startTransaction(ActivityID activityID, ResilienceParcelProcessingStatusEnum initialProcessingStatus) {
+    public TaskStatusType startTransaction(TaskFulfillmentType petasosTaskFulfillment, FulfillmentExecutionStatusEnum initialProcessingStatus) {
     	if(LOG.isDebugEnabled()) {
     		// There's just too much information in this object to have it print on a single line and be able to debug with it!!!
     		LOG.debug(".startTransaction(): Entry");
-    		LOG.debug(".startTransaction(): activityID (ActivityID).previousParcelIdentifier -->{}", activityID.getPreviousParcelIdentifier());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).previousEpisodeIdentifier --> {}", activityID.getPreviousEpisodeIdentifier());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).previousWUPFunctionToken --> {}", activityID.getPreviousWUPFunctionToken());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).perviousWUPIdentifier --> {}", activityID.getPreviousWUPIdentifier());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).presentParcelIdentifier -->{}", activityID.getPresentParcelIdentifier());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).presentEpisodeIdentifier --> {}", activityID.getPresentEpisodeIdentifier());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPFunctionTokan --> {}", activityID.getPresentWUPFunctionToken());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", activityID.getPresentWUPIdentifier());
-    		LOG.debug(".startTransaction(): activityID (ContunuityID).createDate --> {}", activityID.getCreationDate());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).previousParcelIdentifier -->{}", petasosTaskFulfillment.getPreviousParcelIdentifier());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).previousEpisodeIdentifier --> {}", petasosTaskFulfillment.getPreviousEpisodeIdentifier());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).previousWUPFunctionToken --> {}", petasosTaskFulfillment.getPreviousWUPFunctionToken());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).perviousWUPIdentifier --> {}", petasosTaskFulfillment.getPreviousWUPIdentifier());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).presentParcelIdentifier -->{}", petasosTaskFulfillment.getPresentParcelIdentifier());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).presentEpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPFunctionTokan --> {}", petasosTaskFulfillment.getPresentWUPFunctionToken());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+    		LOG.debug(".startTransaction(): activityID (ContunuityID).createDate --> {}", petasosTaskFulfillment.getCreationDate());
     		LOG.debug(".startTransaction(): initialProcessingStatus (ResilienceParcelProcessingStatusEnum) --> {}", initialProcessingStatus);
     	}
-        if (activityID == null) {
+        if (petasosTaskFulfillment == null) {
             throw (new IllegalArgumentException(".startTransaction(): activityID is null"));
         }
         // First we are going to update the ParcelCache
         LOG.trace(".startTransaction(): Adding/Updating the ParcelStatusElementCache with a new ParcelStatusElement");
-        ParcelStatusElement newStatusElement = null;
-        if(parcelStatusElementCache.containsKey(activityID.getPresentParcelIdentifier()))
+        TaskStatusType newStatusElement = null;
+        if(parcelStatusElementCache.containsKey(petasosTaskFulfillment.getPresentParcelIdentifier()))
         {
             // This really shouldn't happen, as concurrency should already be handled by the calling system... But, it's
             // better to be safe than sorry!
             LOG.trace(".startTransaction(): ParcelIdentifier already registered in the ParcelStatusElementCache, let's make sure it's the same though!");
-            ParcelStatusElement existingStatusElement = parcelStatusElementCache.get(activityID.getPresentParcelIdentifier());
-            boolean sameInstanceID = existingStatusElement.getParcelInstanceID().equals(activityID.getPresentParcelIdentifier());
-            boolean sameEpisodeID = existingStatusElement.getActivityID().getPresentEpisodeIdentifier().equals(activityID.getPresentEpisodeIdentifier());
-            boolean sameWUPInstanceID = existingStatusElement.getActivityID().getPresentWUPIdentifier().equals(activityID.getPresentWUPIdentifier());
-            boolean sameWUPTypeID = existingStatusElement.getActivityID().getPresentWUPFunctionToken().equals(activityID.getPresentWUPFunctionToken());
-            boolean sameUpstreamEpisodeID = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier().equals(activityID.getPreviousEpisodeIdentifier());
+            TaskStatusType existingStatusElement = parcelStatusElementCache.get(petasosTaskFulfillment.getPresentParcelIdentifier());
+            boolean sameInstanceID = existingStatusElement.getParcelInstanceID().equals(petasosTaskFulfillment.getPresentParcelIdentifier());
+            boolean sameEpisodeID = existingStatusElement.getActivityID().getPresentEpisodeIdentifier().equals(petasosTaskFulfillment.getPresentEpisodeIdentifier());
+            boolean sameWUPInstanceID = existingStatusElement.getActivityID().getImplementingWorkUnitProcessID().equals(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+            boolean sameWUPTypeID = existingStatusElement.getActivityID().getPresentWUPFunctionToken().equals(petasosTaskFulfillment.getPresentWUPFunctionToken());
+            boolean sameUpstreamEpisodeID = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier().equals(petasosTaskFulfillment.getPreviousEpisodeIdentifier());
             if( sameInstanceID && sameEpisodeID && sameWUPInstanceID && sameWUPTypeID && sameUpstreamEpisodeID ){
                 LOG.trace(".startTransaction(): New ActivityID and existing (registered) ID the same, so update the status (maybe) and then exit");
-                existingStatusElement.setParcelStatus(initialProcessingStatus);
+                existingStatusElement.setFulfillmentExecutionStatus(initialProcessingStatus);
                 LOG.trace(".startTransaction(): Set the to-be-returned ParcelStatusElement to the existingStatusElement");
                 newStatusElement = existingStatusElement;
             } else {
                 LOG.trace(".startTransaction(): New ActivityID and existing (registered) ID are different, so delete the existing one from the ParcelStatusElementCache!");
-                parcelStatusElementCache.remove(activityID.getPresentParcelIdentifier());
+                parcelStatusElementCache.remove(petasosTaskFulfillment.getPresentParcelIdentifier());
                 LOG.trace(".startTransaction(): Now create a new ParcelStatusElement, set its initial status and add it to the ParcelStatusElementCache!");
-                newStatusElement = new ParcelStatusElement(activityID);
-                newStatusElement.setParcelStatus(initialProcessingStatus);
+                newStatusElement = new TaskStatusType(petasosTaskFulfillment);
+                newStatusElement.setFulfillmentExecutionStatus(initialProcessingStatus);
                 LOG.trace(".startTransaction(): New ParcelStatusElement created, newStatusElement --> {}", newStatusElement);
-                parcelStatusElementCache.put(activityID.getPresentParcelIdentifier(), newStatusElement);
+                parcelStatusElementCache.put(petasosTaskFulfillment.getPresentParcelIdentifier(), newStatusElement);
             }
         } else {
             LOG.trace(".startTransaction(): Create a new ParcelStatusElement, set its initial status and add it to the ParcelStatusElementCache!");
-            newStatusElement = new ParcelStatusElement(activityID);
-            newStatusElement.setParcelStatus(initialProcessingStatus);
+            newStatusElement = new TaskStatusType(petasosTaskFulfillment);
+            newStatusElement.setFulfillmentExecutionStatus(initialProcessingStatus);
             LOG.trace(".startTransaction(): New ParcelStatusElement created, newStatusElement --> {}", newStatusElement);
-            parcelStatusElementCache.put(activityID.getPresentParcelIdentifier(), newStatusElement);
+            parcelStatusElementCache.put(petasosTaskFulfillment.getPresentParcelIdentifier(), newStatusElement);
         }
         // Now let's update the WUAEpisode2ParcelMap for the Episode/ResilienceParcel combination
         if(LOG.isTraceEnabled()) {
             LOG.trace(".startTransaction(): Adding the ReslienceParcelIdentifier to the WUAEpisode2ParcelMap");
-            LOG.trace(".startTransaction(): EpisodeIdentifier --> {}", activityID.getPresentEpisodeIdentifier() );
-            LOG.trace(".startTransaction(): ResilienceParcelIdentifier --> {}", activityID.getPresentParcelIdentifier());
+            LOG.trace(".startTransaction(): EpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier() );
+            LOG.trace(".startTransaction(): ResilienceParcelIdentifier --> {}", petasosTaskFulfillment.getPresentParcelIdentifier());
         }
-        if(!wuaEpisode2ParcelInstanceMap.containsKey(activityID.getPresentEpisodeIdentifier()) ){
+        if(!wuaEpisode2ParcelInstanceMap.containsKey(petasosTaskFulfillment.getPresentEpisodeIdentifier()) ){
         	LOG.trace(".startTransaction(): No WUAEpisode2ParcelMap Entry for this Episode, creating!");
-        	HashSet<ResilienceParcelIdentifier> wuaEpisodeParcelSet = new HashSet<ResilienceParcelIdentifier>();
+        	HashSet<FulfillmentTrackingIdType> wuaEpisodeParcelSet = new HashSet<FulfillmentTrackingIdType>();
         	LOG.trace(".startTransaction(): Add the ResilienceParcelIdentifier to the HashSet<ResilienceParcelIdentifier> set of Parcels associated to this Episode");
-            wuaEpisodeParcelSet.add(activityID.getPresentParcelIdentifier());
+            wuaEpisodeParcelSet.add(petasosTaskFulfillment.getPresentParcelIdentifier());
             LOG.trace(".startTransaction(): Add the EpisodeIdentifier/HashSet<ResilienceParcelIdentifier> combination to the WUAEpisode2ParcelMap");
-        	wuaEpisode2ParcelInstanceMap.put(activityID.getPresentEpisodeIdentifier(),wuaEpisodeParcelSet );
+        	wuaEpisode2ParcelInstanceMap.put(petasosTaskFulfillment.getPresentEpisodeIdentifier(),wuaEpisodeParcelSet );
         } else {
         	LOG.trace(".startTransaction(): WUAEpisode2ParcelMap Entry exists for this Episode, so retrieve the HashSet<ResilienceParcelIdentifier> set of Parcels associated to this Episode!");
-            Set<ResilienceParcelIdentifier> wuaEpisodeParcelSet = wuaEpisode2ParcelInstanceMap.get(activityID.getPresentEpisodeIdentifier());
+            Set<FulfillmentTrackingIdType> wuaEpisodeParcelSet = wuaEpisode2ParcelInstanceMap.get(petasosTaskFulfillment.getPresentEpisodeIdentifier());
             LOG.trace(".startTransaction(): Now check to see if the ResilienceParcelIdentifier is already in the HashSet<ResilienceParcelIdentifier> set of Parcels associated to this Episode?");
-            Iterator<ResilienceParcelIdentifier> setIterator = wuaEpisodeParcelSet.iterator();
+            Iterator<FulfillmentTrackingIdType> setIterator = wuaEpisodeParcelSet.iterator();
             boolean foundParcelIdentifierInSet = false;
             while(setIterator.hasNext()){
-                ResilienceParcelIdentifier currentParcelIdentifier = setIterator.next();
-                if(currentParcelIdentifier.equals(activityID.getPresentParcelIdentifier())){
+                FulfillmentTrackingIdType currentParcelIdentifier = setIterator.next();
+                if(currentParcelIdentifier.equals(petasosTaskFulfillment.getPresentParcelIdentifier())){
                     foundParcelIdentifierInSet = true;
                     break;
                 }
             }
             if(!foundParcelIdentifierInSet) {
                 LOG.trace(".startTransaction(): The ResilienceParcelIdentifier is not already in the HashSet<ResilienceParcelIdentifier> set, so add it!");
-                wuaEpisodeParcelSet.add(activityID.getPresentParcelIdentifier());
+                wuaEpisodeParcelSet.add(petasosTaskFulfillment.getPresentParcelIdentifier());
             } else {
                 LOG.trace(".startTransaction(): The ResilienceParcelIdentifier is already in the HashSet<ResilienceParcelIdentifier> set, so do nothing!");
             }
@@ -174,43 +174,43 @@ public class STAServiceModuleActivityMatrixDM {
     /**
      * Update the Status of the WUA Element to reflect the requested change.
      *
-     * @param activityID The unique Identifier that distinctly represents this work/resilience activity function
+     * @param petasosTaskFulfillment The unique Identifier that distinctly represents this work/resilience activity function
      * @param status     The new status to be applied to the WUA Element
      */
-    public void finishTransaction(ActivityID activityID, ResilienceParcelProcessingStatusEnum status) {
-        if (activityID == null) {
+    public void finishTransaction(TaskFulfillmentType petasosTaskFulfillment, FulfillmentExecutionStatusEnum status) {
+        if (petasosTaskFulfillment == null) {
             throw (new IllegalArgumentException(".updateParcelActivity(): ActivityID (activityID) Processing Status (status) is null"));
         }
         if(LOG.isDebugEnabled()) {
             // There's just too much information in this object to have it print on a single line and be able to debug with it!!!
             LOG.debug(".startTransaction(): Entry");
-            LOG.debug(".startTransaction(): activityID (ActivityID).previousParcelIdentifier -->{}", activityID.getPreviousParcelIdentifier());
-            LOG.debug(".startTransaction(): activityID (ActivityID).previousEpisodeIdentifier --> {}", activityID.getPreviousEpisodeIdentifier());
-            LOG.debug(".startTransaction(): activityID (ActivityID).previousWUPFunctionToken --> {}", activityID.getPreviousWUPFunctionToken());
-            LOG.debug(".startTransaction(): activityID (ActivityID).perviousWUPIdentifier --> {}", activityID.getPreviousWUPIdentifier());
-            LOG.debug(".startTransaction(): activityID (ActivityID).presentParcelIdentifier -->{}", activityID.getPresentParcelIdentifier());
-            LOG.debug(".startTransaction(): activityID (ActivityID).presentEpisodeIdentifier --> {}", activityID.getPresentEpisodeIdentifier());
-            LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPFunctionTokan --> {}", activityID.getPresentWUPFunctionToken());
-            LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", activityID.getPresentWUPIdentifier());
-            LOG.debug(".startTransaction(): activityID (ContunuityID).createDate --> {}", activityID.getCreationDate());
+            LOG.debug(".startTransaction(): activityID (ActivityID).previousParcelIdentifier -->{}", petasosTaskFulfillment.getPreviousParcelIdentifier());
+            LOG.debug(".startTransaction(): activityID (ActivityID).previousEpisodeIdentifier --> {}", petasosTaskFulfillment.getPreviousEpisodeIdentifier());
+            LOG.debug(".startTransaction(): activityID (ActivityID).previousWUPFunctionToken --> {}", petasosTaskFulfillment.getPreviousWUPFunctionToken());
+            LOG.debug(".startTransaction(): activityID (ActivityID).perviousWUPIdentifier --> {}", petasosTaskFulfillment.getPreviousWUPIdentifier());
+            LOG.debug(".startTransaction(): activityID (ActivityID).presentParcelIdentifier -->{}", petasosTaskFulfillment.getPresentParcelIdentifier());
+            LOG.debug(".startTransaction(): activityID (ActivityID).presentEpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier());
+            LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPFunctionTokan --> {}", petasosTaskFulfillment.getPresentWUPFunctionToken());
+            LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+            LOG.debug(".startTransaction(): activityID (ContunuityID).createDate --> {}", petasosTaskFulfillment.getCreationDate());
             LOG.debug(".startTransaction(): initialProcessingStatus (ResilienceParcelProcessingStatusEnum) --> {}", status);
         }
         LOG.trace(".finishTransaction(): Get the current ParcelStatusElement");
-        ResilienceParcelIdentifier parcelInstanceID = activityID.getPresentParcelIdentifier();
-        ParcelStatusElement currentStatusElement;
+        FulfillmentTrackingIdType parcelInstanceID = petasosTaskFulfillment.getPresentParcelIdentifier();
+        TaskStatusType currentStatusElement;
         if(parcelStatusElementCache.containsKey(parcelInstanceID)) {
             LOG.trace(".finishTransaction(): ParcelStatusElement exists -> get it!");
             currentStatusElement = parcelStatusElementCache.get(parcelInstanceID);
             LOG.trace(".finishTransaction(): Updating status of the ParcelStatusElement!");
-            currentStatusElement.setParcelStatus(status);
+            currentStatusElement.setFulfillmentExecutionStatus(status);
         }
         LOG.debug(".finishTransaction(): Exit, updated currentStatusElement --> {}");
     }
 
-    public ParcelStatusElement getTransactionElement(ResilienceParcelIdentifier parcelInstanceID) {
+    public TaskStatusType getTransactionElement(FulfillmentTrackingIdType parcelInstanceID) {
         LOG.debug(".getCurrentParcelStatusElement(): Entry, parcelInstanceID --> {}", parcelInstanceID);
         if(parcelStatusElementCache.containsKey(parcelInstanceID)) {
-	        ParcelStatusElement requestedElement = parcelStatusElementCache.get(parcelInstanceID);
+	        TaskStatusType requestedElement = parcelStatusElementCache.get(parcelInstanceID);
 	        LOG.debug(".getCurrentParcelStatusElement(): Exit, returning requestedElement --> {}", requestedElement);
 	        return (requestedElement);
         }

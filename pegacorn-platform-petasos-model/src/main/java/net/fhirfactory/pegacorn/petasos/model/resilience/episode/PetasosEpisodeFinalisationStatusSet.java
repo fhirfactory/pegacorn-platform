@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 
 import java.util.ArrayList;
 import java.util.Enumeration;

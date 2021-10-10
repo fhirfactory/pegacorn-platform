@@ -26,12 +26,12 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
-import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class FinaliseSOAWorkUnitActivityTask {
 	@Inject
 	TopologyIM topologyIM;
 
-	public void finaliseWUA(WUPJobCard submittedJobCard) {
+	public void finaliseWUA(PetasosTaskJobCard submittedJobCard) {
 		LOG.debug(".synchroniseJobCard(): Entry"); 
 		if (submittedJobCard == null) {
 			throw (new IllegalArgumentException(".doTask(): submittedJobCard is null"));
@@ -63,7 +63,7 @@ public class FinaliseSOAWorkUnitActivityTask {
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ActivityID).presentParcelIdentifier -->{}", submittedJobCard.getActivityID().getPresentParcelIdentifier());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ActivityID).presentEpisodeIdentifier --> {}", submittedJobCard.getActivityID().getPresentEpisodeIdentifier());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ActivityID).presentWUPFunctionTokan --> {}", submittedJobCard.getActivityID().getPresentWUPFunctionToken());
-        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ActivityID).presentWUPIdentifier --> {}", submittedJobCard.getActivityID().getPresentWUPIdentifier());
+        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ActivityID).presentWUPIdentifier --> {}", submittedJobCard.getActivityID().getImplementingWorkUnitProcessID());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ContunuityID).createDate --> {}", submittedJobCard.getActivityID().getCreationDate());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).clusterMode (ConcurrencyModeEnum) -->{}", submittedJobCard.getClusterMode());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).currentStatus (WUPActivityStatusEnum) --> {}", submittedJobCard.getCurrentStatus());
@@ -71,10 +71,10 @@ public class FinaliseSOAWorkUnitActivityTask {
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).toBeDiscarded (boolean) --> {}", submittedJobCard.getIsToBeDiscarded());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).requestedStatus (WUPActivityStatusEnum) --> {}", submittedJobCard.getRequestedStatus());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).systemMode (ResilienceModeEnum) --> {}", submittedJobCard.getSystemMode());
-        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).updateDate (Date) --> {}", submittedJobCard.getUpdateDate());
+        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).updateDate (Date) --> {}", submittedJobCard.getUpdateInstant());
         }
-		ActivityID activityID = submittedJobCard.getActivityID();
-        TopologyNodeFDN nodeFDN = new TopologyNodeFDN(activityID.getPresentWUPIdentifier());
+		TaskFulfillmentType petasosTaskFulfillment = submittedJobCard.getActivityID();
+        TopologyNodeFDN nodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
 		WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode)topologyIM.getNode(nodeFDN);
 		switch (wup.getResilienceMode()) {
 			case RESILIENCE_MODE_MULTISITE: {
@@ -126,22 +126,22 @@ public class FinaliseSOAWorkUnitActivityTask {
 					case CONCURRENCY_MODE_STANDALONE: // Really only good for PoCs and Integration Testing
 					default: {
 						LOG.trace(".synchroniseJobCard(): Deployment Mode --> PETASOS_MODE_STANDALONE, Concurrency Mode --> PETASOS_WUA_CONCURRENCY_MODE_STANDALONE (default concurrent mode)");
-						ResilienceParcelIdentifier parcelInstanceID = activityID.getPresentParcelIdentifier();
-						PetasosEpisodeIdentifier wuaEpisodeID = activityID.getPresentEpisodeIdentifier();
+						FulfillmentTrackingIdType parcelInstanceID = petasosTaskFulfillment.getPresentParcelIdentifier();
+						PetasosEpisodeIdentifier wuaEpisodeID = petasosTaskFulfillment.getPresentEpisodeIdentifier();
 						LOG.trace(".standaloneModeSynchroniseJobCard(): Retrieve the ParcelStatusElement from the Cache for ParcelInstanceID --> {}", parcelInstanceID);
-						ParcelStatusElement statusElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
+						TaskStatusType statusElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
 						LOG.trace(".standaloneModeSynchroniseJobCard(): Retrieved ParcelStatusElement --> {}", statusElement);
 						submittedJobCard.setGrantedStatus(submittedJobCard.getCurrentStatus());
-						submittedJobCard.setUpdateDate(Date.from(Instant.now()));
+						submittedJobCard.setUpdateInstant(Date.from(Instant.now()));
 						switch (submittedJobCard.getCurrentStatus()) {
 							case WUP_ACTIVITY_STATUS_FINISHED:
-								activityMatrixDM.finishTransaction(activityID, ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
+								activityMatrixDM.finishTransaction(petasosTaskFulfillment, FulfillmentExecutionStatusEnum.PARCEL_STATUS_FINALISED);
 							case WUP_ACTIVITY_STATUS_FAILED:
 							case WUP_ACTIVITY_STATUS_WAITING:
 							case WUP_ACTIVITY_STATUS_CANCELED:
 							case WUP_ACTIVITY_STATUS_EXECUTING:
 							default:
-								activityMatrixDM.finishTransaction(activityID, ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
+								activityMatrixDM.finishTransaction(petasosTaskFulfillment, FulfillmentExecutionStatusEnum.PARCEL_STATUS_FAILED);
 						}
 					}
 				}

@@ -25,7 +25,7 @@ import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParc
 import net.fhirfactory.pegacorn.petasos.audit.transformers.UoWPayload2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
+import net.fhirfactory.pegacorn.petasos.model.task.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;

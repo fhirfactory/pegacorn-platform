@@ -26,7 +26,7 @@ import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParc
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class STAServicesAuditBroker {
         }
     }
 
-    public TransactionStatusElement logAPIActivity(WUPJobCard jobCard, UoW uow, TransactionTypeEnum transactionType){
+    public TransactionStatusElement logAPIActivity(PetasosTaskJobCard jobCard, UoW uow, TransactionTypeEnum transactionType){
         LOG.debug(".logAPIActivity(): Entry, jobCard->{}, uow->{}, transactionType->{}", jobCard, uow, transactionType);
         TransactionStatusElement statusElement = new TransactionStatusElement();
         return(statusElement);

@@ -26,9 +26,9 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.tasks.FinaliseSOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.tasks.RegisterNewSOAWorkUnitActivityTask;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,26 +55,26 @@ public class STAResilienceActivityServicesController {
     FinaliseSOAWorkUnitActivityTask soaTaskFinaliseWUA;
 
 
-    public ParcelStatusElement startTransaction(WUPJobCard jobCard) {
+    public TaskStatusType startTransaction(PetasosTaskJobCard jobCard) {
         LOG.debug(".registerNewWorkUnitActivity(): Entry, activityID --> {}, statusEnum --> {}", jobCard);
         if (jobCard == null) {
             return (null);
         }
-        ParcelStatusElement parcelStatusElement = soaTaskRegisterWUA.registerNewWUA(jobCard);
-        LOG.debug(".registerNewWorkUnitActivity(): Exit, parcelStatusElement --> {}", parcelStatusElement);
-        return (parcelStatusElement);
+        TaskStatusType statusSegment = soaTaskRegisterWUA.registerNewWUA(jobCard);
+        LOG.debug(".registerNewWorkUnitActivity(): Exit, parcelStatusElement --> {}", statusSegment);
+        return (statusSegment);
     }
 
-    public void finishTransaction(WUPJobCard jobCard){
+    public void finishTransaction(PetasosTaskJobCard jobCard){
         if( jobCard == null){
             return;
         }
         soaTaskFinaliseWUA.finaliseWUA(jobCard);
     }
 
-    public ParcelStatusElement getStatusElement(ResilienceParcelIdentifier parcelInstanceID){
+    public TaskStatusType getStatusElement(FulfillmentTrackingIdType parcelInstanceID){
         LOG.debug(".getStatusElement(): Entry, parcelInstanceID --> {}", parcelInstanceID);
-        ParcelStatusElement retrievedElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
+        TaskStatusType retrievedElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
         LOG.debug(".getStatusElement(): Exit, retrievedElement --> {}", retrievedElement);
         return(retrievedElement);
     }

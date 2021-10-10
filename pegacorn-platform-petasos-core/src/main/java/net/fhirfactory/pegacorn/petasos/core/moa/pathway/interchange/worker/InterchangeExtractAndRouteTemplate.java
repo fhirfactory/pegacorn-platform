@@ -59,7 +59,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerIngres())
                 .routeId(nameSet.getRouteInterchangePayloadTransformer())
                 .process(nodeDetailInjector)
-                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange)")
+                .split().method(InterchangeTaskPayload2NewTaskProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange)")
                 .to(nameSet.getEndPointInterchangePayloadTransformerEgress());
 
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerEgress())

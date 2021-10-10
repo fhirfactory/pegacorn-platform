@@ -26,10 +26,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.audit.JsonDateSerializer;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
+import net.fhirfactory.pegacorn.petasos.model.task.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 
 import java.time.Instant;
 import java.util.Date;
@@ -41,7 +41,7 @@ public class PetasosEpisode {
     private ConcurrentHashMap<WUPIdentifier, ResilienceParcel> episodeParcelMap;
     private PetasosEpisodeIdentifier episodeIdentifier;
     private ResilienceParcelFinalisationStatusEnum episodeFinalisationStatus;
-    private ResilienceParcelProcessingStatusEnum episodeProcessingStatus;
+    private FulfillmentExecutionStatusEnum episodeProcessingStatus;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
     private WUPIdentifier activeWUPIdentifier;
@@ -215,11 +215,11 @@ public class PetasosEpisode {
         }
         return(true);
     }
-    public ResilienceParcelProcessingStatusEnum getEpisodeProcessingStatus() {
+    public FulfillmentExecutionStatusEnum getEpisodeProcessingStatus() {
         return(this.episodeProcessingStatus);
     }
 
-    public void setEpisodeProcessingStatus(ResilienceParcelProcessingStatusEnum newProcessingStatus) {
+    public void setEpisodeProcessingStatus(FulfillmentExecutionStatusEnum newProcessingStatus) {
         synchronized(this.episodeLock) {
             this.episodeProcessingStatus = newProcessingStatus;
             updateEpisodeLastUpdateTime();

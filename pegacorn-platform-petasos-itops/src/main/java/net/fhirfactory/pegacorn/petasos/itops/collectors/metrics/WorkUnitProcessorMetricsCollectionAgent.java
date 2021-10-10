@@ -105,6 +105,15 @@ public class WorkUnitProcessorMetricsCollectionAgent extends ITOpsMetricsCollect
         getLogger().debug(".touchEventDistributionFinishInstant(): Exit");
     }
 
+    public void incrementDistributedMessageEndpointCount(String componentID, String targetName){
+        getLogger().debug(".incrementDistributedMessageEndpointCount(): Entry, componentID->{}, targetName->{}", componentID, targetName);
+        WorkUnitProcessorNodeMetrics nodeMetrics = getNodeMetrics(componentID);
+        synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
+            nodeMetrics.incrementDistributedMessageEndpointCount(targetName);
+        }
+        getLogger().debug(".touchEventDistributionFinishInstant(): Exit");
+    }
+
     public void touchEventDistributionStartInstant(String componentID){
         getLogger().debug(".touchEventDistributionStartInstant(): Entry, componentID->{}", componentID);
         WorkUnitProcessorNodeMetrics nodeMetrics = getNodeMetrics(componentID);

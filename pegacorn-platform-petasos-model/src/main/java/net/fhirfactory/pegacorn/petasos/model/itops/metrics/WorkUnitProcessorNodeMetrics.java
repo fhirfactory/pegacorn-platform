@@ -26,6 +26,7 @@ import net.fhirfactory.pegacorn.petasos.model.itops.metrics.common.NodeMetricsBa
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 
 import java.time.Instant;
+import java.util.HashMap;
 
 public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
 
@@ -34,6 +35,7 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
     private int ingresMessageCount;
     private int egressMessageCount;
     private int distributedMessageCount;
+    private HashMap<String, Integer> distributionCountMap;
     private double averageEventProcessingDuration;
     private double rollingEventProcessingDuration;
     private double lastEventProcessingDuration;
@@ -79,6 +81,7 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
         this.currentEpisode = null;
         this.lastEpisode = null;
         this.nodeIngresQueueSize = 0;
+        this.distributionCountMap = new HashMap<>();
         this.setMetricsType(WORK_UNIT_PROCESSOR_METRICS_TYPE);
     }
 
@@ -105,12 +108,25 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
         this.currentEpisode = null;
         this.lastEpisode = null;
         this.nodeIngresQueueSize = 0;
+        this.distributionCountMap = new HashMap<>();
         this.setMetricsType(WORK_UNIT_PROCESSOR_METRICS_TYPE);
     }
 
     //
     // Some Helper Methods
     //
+
+    @JsonIgnore
+    public void incrementDistributedMessageEndpointCount(String targetName){
+        if(!distributionCountMap.containsKey(targetName)){
+            distributionCountMap.put(targetName, 1);
+        } else {
+            Integer currentValue = distributionCountMap.get(targetName);
+            currentValue += 1;
+            distributionCountMap.remove(targetName);
+            distributionCountMap.put(targetName, currentValue);
+        }
+    }
 
     @JsonIgnore
     public void incrementIngresMessageCount(){
@@ -419,6 +435,14 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
         this.distributedMessageCount = distributedMessageCount;
     }
 
+    public HashMap<String, Integer> getDistributionCountMap() {
+        return distributionCountMap;
+    }
+
+    public void setDistributionCountMap(HashMap<String, Integer> distributionCountMap) {
+        this.distributionCountMap = distributionCountMap;
+    }
+
     //
     // To String Method(s)
     //
@@ -452,6 +476,7 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
                 ", nodeIngresQueueSize=" + nodeIngresQueueSize +
                 ", nodeStatus=" + getNodeStatus() +
                 ", metricsType=" + getMetricsType()+
+                ", distributionCountMap=" + distributionCountMap +
                 '}';
     }
 }

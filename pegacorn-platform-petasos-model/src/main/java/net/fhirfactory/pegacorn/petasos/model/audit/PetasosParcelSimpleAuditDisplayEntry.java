@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.model.audit;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
 import java.time.Instant;
@@ -38,7 +38,7 @@ public class PetasosParcelSimpleAuditDisplayEntry {
     private UoW actualUoW;
     private String identifier;
     private ResilienceParcelFinalisationStatusEnum parcelFinalisationStatus;
-    private ResilienceParcelProcessingStatusEnum processingStatus;
+    private FulfillmentExecutionStatusEnum processingStatus;
     private HashSet<String> alternativeWUPIdentifierSet;
     private HashSet<String> alternativeParcelIdentifiersSet;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
@@ -182,11 +182,11 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         this.parcelFinalisationStatus = parcelFinalisationStatus;
     }
 
-    public ResilienceParcelProcessingStatusEnum getProcessingStatus() {
+    public FulfillmentExecutionStatusEnum getProcessingStatus() {
         return processingStatus;
     }
 
-    public void setProcessingStatus(ResilienceParcelProcessingStatusEnum processingStatus) {
+    public void setProcessingStatus(FulfillmentExecutionStatusEnum processingStatus) {
         this.processingStatus = processingStatus;
     }
 

@@ -25,8 +25,8 @@ package net.fhirfactory.pegacorn.petasos.model.audit;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.ResilienceParcel;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
 import java.time.Instant;
@@ -35,17 +35,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 
 public class PetasosParcelAuditTrailEntry {
     private Date auditTrailEntryDate;
     private UoW actualUoW;
-    private ResilienceParcelIdentifier identifier;
+    private FulfillmentTrackingIdType identifier;
     private ResilienceParcelFinalisationStatusEnum parcelFinalisationStatus;
-    private ResilienceParcelProcessingStatusEnum processingStatus;
+    private FulfillmentExecutionStatusEnum processingStatus;
     private HashSet<WUPIdentifier> alternativeWUPIdentifierSet;
-    private HashSet<ResilienceParcelIdentifier> alternativeParcelIdentifiersSet;
+    private HashSet<FulfillmentTrackingIdType> alternativeParcelIdentifiersSet;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
     private WUPIdentifier primaryWUPIdentifier;
@@ -239,15 +239,15 @@ public class PetasosParcelAuditTrailEntry {
         }
         return(true);
     }
-    public ResilienceParcelProcessingStatusEnum getProcessingStatus() {
+    public FulfillmentExecutionStatusEnum getProcessingStatus() {
         return(this.processingStatus);
     }
     
-    public void setProcessingStatus(ResilienceParcelProcessingStatusEnum newProcessingStatus) {
+    public void setProcessingStatus(FulfillmentExecutionStatusEnum newProcessingStatus) {
         this.processingStatus = newProcessingStatus;
     }    
 
-    public void setUowOutcome(ResilienceParcelProcessingStatusEnum newProcessingStatus) {
+    public void setUowOutcome(FulfillmentExecutionStatusEnum newProcessingStatus) {
         this.processingStatus = newProcessingStatus;
     }
 
@@ -358,11 +358,11 @@ public class PetasosParcelAuditTrailEntry {
         this.parcelFinalisedDate = parcelFinalisedDate;
     }
 
-    public ResilienceParcelIdentifier getIdentifier() {
+    public FulfillmentTrackingIdType getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(ResilienceParcelIdentifier identifier) {
+    public void setIdentifier(FulfillmentTrackingIdType identifier) {
         this.identifier = identifier;
     }
 

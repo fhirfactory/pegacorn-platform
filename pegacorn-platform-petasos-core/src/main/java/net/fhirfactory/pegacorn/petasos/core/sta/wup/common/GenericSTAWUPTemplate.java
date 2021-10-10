@@ -10,9 +10,9 @@ import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.slf4j.Logger;
 
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 
 public abstract class GenericSTAWUPTemplate {
     private WorkUnitProcessorTopologyNode wup;
-    private WUPJobCard wupJobCard;
+    private PetasosTaskJobCard petasosTaskJobCard;
     private boolean isInitialised;
 
     private IParser parserR4;
@@ -100,8 +100,8 @@ public abstract class GenericSTAWUPTemplate {
         return (getWUP().getNodeRDN().getNodeName());
     }
 
-    public WUPJobCard getWUPJobCard() {
-        return (wupJobCard);
+    public PetasosTaskJobCard getWUPJobCard() {
+        return (petasosTaskJobCard);
     }
 
     public String getWUPVersion() {

@@ -24,13 +24,13 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta;
 import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionStatusEnum;
 import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 
 import java.time.Instant;
 import java.util.Date;
 
 public class TransactionStatusElement {
-    private WUPJobCard jobCard;
+    private PetasosTaskJobCard jobCard;
     private UoW unitOfWork;
     private TransactionStatusEnum transactionStatus;
     private TransactionTypeEnum transactionType;
@@ -52,11 +52,11 @@ public class TransactionStatusElement {
         this.statusUpdateTime = Date.from(Instant.now());
     }
 
-    public WUPJobCard getJobCard() {
+    public PetasosTaskJobCard getJobCard() {
         return jobCard;
     }
 
-    public void setJobCard(WUPJobCard jobCard) {
+    public void setJobCard(PetasosTaskJobCard jobCard) {
         this.jobCard = jobCard;
     }
 

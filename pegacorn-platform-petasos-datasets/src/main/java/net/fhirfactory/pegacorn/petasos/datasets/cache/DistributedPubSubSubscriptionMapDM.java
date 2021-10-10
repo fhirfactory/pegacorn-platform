@@ -61,6 +61,21 @@ public class DistributedPubSubSubscriptionMapDM {
     }
 
     //
+    // Metrics
+    //
+
+    public String getCacheName(){
+        return("DistributedPubSubSubscriptionMap");
+    }
+
+    public String getMetrics(){
+        String metrics = "PublisherMap["+publisherMap.size()+"]"
+                + ", PublisherServiceFulfillmentMap["+publisherServiceFulfillmentMap.size()+"]"
+                + ", PublisherServiceSubscriptionMap["+publisherServiceSubscriptionMap.size()+"]";
+        return(metrics);
+    }
+
+    //
     // Publisher Traceability
     //
 

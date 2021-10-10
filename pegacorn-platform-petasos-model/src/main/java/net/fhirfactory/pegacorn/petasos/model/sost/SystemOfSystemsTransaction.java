@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.model.sost;
 
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
 
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ public class SystemOfSystemsTransaction {
     private SystemOfSystemsTransactionIdentifier transactionIdentifier;
     private ArrayList<SystemOfSystemsTriggerEvent> triggerSet;
     private ArrayList<SystemOfSystemsOutcomeEvent> outcomeSet;
-    private ArrayList<ResilienceParcelIdentifier> associatedPetasosParcelSet;
+    private ArrayList<FulfillmentTrackingIdType> associatedPetasosParcelSet;
 
     public SystemOfSystemsTransactionIdentifier getTransactionIdentifier() {
         return transactionIdentifier;
@@ -34,11 +34,11 @@ public class SystemOfSystemsTransaction {
         this.outcomeSet = outcomeSet;
     }
 
-    public ArrayList<ResilienceParcelIdentifier> getAssociatedPetasosParcelSet() {
+    public ArrayList<FulfillmentTrackingIdType> getAssociatedPetasosParcelSet() {
         return associatedPetasosParcelSet;
     }
 
-    public void setAssociatedPetasosParcelSet(ArrayList<ResilienceParcelIdentifier> associatedPetasosParcelSet) {
+    public void setAssociatedPetasosParcelSet(ArrayList<FulfillmentTrackingIdType> associatedPetasosParcelSet) {
         this.associatedPetasosParcelSet = associatedPetasosParcelSet;
     }
 }

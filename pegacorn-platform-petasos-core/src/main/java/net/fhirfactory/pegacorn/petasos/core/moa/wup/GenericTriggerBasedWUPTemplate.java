@@ -40,8 +40,8 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTop
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -67,7 +67,7 @@ public abstract class GenericTriggerBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     private WorkUnitProcessorTopologyNode associatedTopologyNode;
-    private WUPJobCard wupJobCard;
+    private PetasosTaskJobCard petasosTaskJobCard;
     private RouteElementNames nameSet;
     private WUPArchetypeEnum wupArchetype;
     private List<DataParcelManifest> topicSubscriptionSet;

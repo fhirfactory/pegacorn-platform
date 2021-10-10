@@ -28,14 +28,14 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.STAResilienceParcelServicesIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.ResilienceParcel;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +56,13 @@ public class PetasosSTAServicesBroker {
     @Inject
     DataParcelSubscriptionMapIM topicManager;
 
-    public TransactionStatusElement registerSTAWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW){
+    public TransactionStatusElement registerSTAWorkUnitActivity(PetasosTaskJobCard jobCard, UoW initialUoW){
         if((jobCard == null) || (initialUoW == null)){
             throw( new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
         }
-        ResilienceParcel newParcel = parcelServicesIM.registerSOAParcel(jobCard.getActivityID(), initialUoW );
+        ResilienceParcel newParcel = parcelServicesIM.registerSOAParcel(jobCard.getActivityID(), initialUoW);
         jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());
-        ParcelStatusElement statusElement = activityMatrixDM.startTransaction(jobCard.getActivityID(), ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE );
+        TaskStatusType statusElement = activityMatrixDM.startTransaction(jobCard.getActivityID(), FulfillmentExecutionStatusEnum.PARCEL_STATUS_ACTIVE );
         TransactionStatusElement transaction = new TransactionStatusElement();
         transaction.setUnitOfWork(initialUoW);
 //        transaction.setStatusElement(statusElement);
@@ -75,7 +75,7 @@ public class PetasosSTAServicesBroker {
             throw( new IllegalArgumentException(".notifyFinishOfWorkUnitActivity(): transaction is null"));
         }
         ResilienceParcel finishedParcel = parcelServicesIM.notifySOAParcelProcessingFinish(transaction.getJobCard().getActivityID().getPresentParcelIdentifier(), transaction.getUnitOfWork());
-        activityMatrixDM.finishTransaction(transaction.getJobCard().getActivityID(), ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
+        activityMatrixDM.finishTransaction(transaction.getJobCard().getActivityID(), FulfillmentExecutionStatusEnum.PARCEL_STATUS_FINISHED);
     }
 
     public void notifyFailureOfWorkUnitActivity(TransactionStatusElement transaction){
@@ -83,7 +83,7 @@ public class PetasosSTAServicesBroker {
             throw( new IllegalArgumentException(".notifyFailureOfWorkUnitActivity(): jobCard or finishedUoW are null"));
         }
         ResilienceParcel failedParcel = parcelServicesIM.notifySOAParcelProcessingFailure(transaction.getJobCard().getActivityID().getPresentParcelIdentifier(), transaction.getUnitOfWork());
-        activityMatrixDM.finishTransaction(transaction.getJobCard().getActivityID(), ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
+        activityMatrixDM.finishTransaction(transaction.getJobCard().getActivityID(), FulfillmentExecutionStatusEnum.PARCEL_STATUS_FAILED);
     }
 
     public void notifyCancellationOfWorkUnitActivity(TransactionStatusElement transaction){
@@ -91,7 +91,7 @@ public class PetasosSTAServicesBroker {
             throw( new IllegalArgumentException(".notifyCancellationOfWorkUnitActivity(): jobCard or finishedUoW are null"));
         }
         ResilienceParcel failedParcel = parcelServicesIM.notifySOAParcelProcessingCancellation(transaction.getJobCard().getActivityID().getPresentParcelIdentifier());
-        activityMatrixDM.finishTransaction(transaction.getJobCard().getActivityID(),ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_CANCELLED);
+        activityMatrixDM.finishTransaction(transaction.getJobCard().getActivityID(), FulfillmentExecutionStatusEnum.PARCEL_STATUS_CANCELLED);
     }
 
     public void notifyPurgeOfWorkUnitActivity(TransactionStatusElement transaction){
@@ -107,8 +107,8 @@ public class PetasosSTAServicesBroker {
         parcelServicesIM.notifySOAParcelProcessingPurge(transaction.getJobCard().getActivityID().getPresentParcelIdentifier());
     }
 
-    public ParcelStatusElement getCurrentParcelStatusElement(ResilienceParcelIdentifier parcelInstanceID){
-        ParcelStatusElement statusElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
+    public TaskStatusType getCurrentParcelStatusElement(FulfillmentTrackingIdType parcelInstanceID){
+        TaskStatusType statusElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
         return(statusElement);
     }
 

@@ -22,22 +22,26 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.PetasosEpisodeIdentifierFactory;
+import net.fhirfactory.pegacorn.petasos.core.PetasosActionableTaskIdentifierFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
+import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.coordinators.PetasosOversightTaskManager;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 import org.apache.camel.*;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +72,7 @@ public class InterchangeTargetWUPTypeRouter {
     TopologyIM topologyProxy;
 
     @Inject
-    PetasosEpisodeIdentifierFactory episodeIdentifierFactory;
+    PetasosActionableTaskIdentifierFactory episodeIdentifierFactory;
 
     @Inject
     WorkUnitProcessorMetricsCollectionAgent metricsAgent;
@@ -77,7 +81,7 @@ public class InterchangeTargetWUPTypeRouter {
     private ProducerTemplate template;
 
     @Inject
-    ProcessingPlantResilienceActivityServicesController activityServicesController;
+    PetasosOversightTaskManager activityServicesController;
 
     /**
      * Essentially, we get the set of WUPs subscribing to a particular UoW type,
@@ -86,28 +90,31 @@ public class InterchangeTargetWUPTypeRouter {
      * to. Once we've cycled through all the targets (subscribers), we return
      * null.
      *
-     * @param ingresPacket Incoming WorkUnitTransportPacket that will be distributed to all
+     * @param wupTransportPacket Incoming WorkUnitTransportPacket that will be distributed to all
      * Subscribed WUPs
      * @param camelExchange The Apache Camel Exchange instance associated with
      * this route.
      * @return An endpoint (name) for a recipient for the incoming UoW
      */
     @RecipientList
-    public List<String> forwardUoW2WUPs(WorkUnitTransportPacket ingresPacket, Exchange camelExchange) {
-        getLogger().debug(".forwardUoW2WUPs(): Entry, ingresPacket (WorkUnitTransportPacket)->{}", ingresPacket);
+    public List<String> forwardUoW2WUPs(PetasosTaskOld wupTransportPacket, Exchange camelExchange) {
+        getLogger().debug(".forwardUoW2WUPs(): Entry, wupTransportPacket (WorkUnitTransportPacket)->{}", wupTransportPacket);
 
         // Get my Petasos Context
         getLogger().trace(".forwardUoW2WUPs(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         DataParcelManifest uowTopicID = null;
-        if (ingresPacket.getPayload().hasIngresContent()) {
-            uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadManifest();
-            getLogger().trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
-        } else {
+        if (!wupTransportPacket.getPayload().hasIngresContent()) {
             getLogger().debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
             metricsAgent.touchEventDistributionFinishInstant(node.getComponentID());
             return (new ArrayList<String>());
         }
+        //
+        // We have content, so let's now work out who is interested!
+        //
+        uowTopicID = wupTransportPacket.getPayload().getIngresContent().getPayloadManifest();
+        getLogger().trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
+        // We know the topic, so let's see the registered subscribers
         getLogger().trace(".forwardUoW2WUPs(): Getting the set of subscribers for the given topic (calling the topicServer)");
         getLogger().trace(".forwardUoW2WUPs(): Looking for Subscribers To->{}:", uowTopicID);
         List<PubSubParticipant> subscriberSet = topicServer.getSubscriberSet(uowTopicID);
@@ -133,7 +140,7 @@ public class InterchangeTargetWUPTypeRouter {
                 if(hasRemoteServiceName(currentSubscriber)) {
                     String subscriberName = currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName();
                     if (subscriberName.contentEquals(uowTopicID.getIntendedTargetSystem())) {
-                        forwardPacket(node.getComponentID(), currentSubscriber, ingresPacket);
+                        forwardPacket(node.getComponentID(), currentSubscriber, wupTransportPacket);
                         metricsAgent.incrementDistributedMessageCount(node.getComponentID());
                         alreadySentTo = subscriberName;
                     }
@@ -159,7 +166,7 @@ public class InterchangeTargetWUPTypeRouter {
                     }
                     if (!dontSendAgain) {
                         getLogger().trace(".forwardUoW2WUPs(): does not have Inter-Subsystem element");
-                        forwardPacket(node.getComponentID(), currentSubscriber, ingresPacket);
+                        forwardPacket(node.getComponentID(), currentSubscriber, wupTransportPacket);
                     }
                 }
             }
@@ -197,7 +204,7 @@ public class InterchangeTargetWUPTypeRouter {
         return(true);
     }
 
-    private void forwardPacket(String thisComponentID, PubSubParticipant subscriber, WorkUnitTransportPacket packet){
+    private void forwardPacket(String thisComponentID, PubSubParticipant subscriber, PetasosTaskOld packet){
         getLogger().debug(".forwardUoW2WUPs(): Subscriber --> {}", subscriber);
         IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
         getLogger().trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
@@ -207,11 +214,14 @@ public class InterchangeTargetWUPTypeRouter {
         getLogger().trace(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", targetWUPNode);
         RouteElementNames routeName = new RouteElementNames(targetWUPNodeToken);
         // Clone and Inject Message into Target Route
-        WorkUnitTransportPacket clonedPacket = packet.deepClone();
+        PetasosTaskOld clonedPacket = SerializationUtils.clone(packet);
+
+        // Everything we do here should be against the clonedPacket, so be careful....
+
         // Now check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
         if(hasRemoteServiceName(subscriber)){
             getLogger().trace(".forwardPacket(): Has Remote Service as Target");
-            DataParcelManifest payloadTopicID = packet.getPayload().getPayloadTopicID();
+            DataParcelManifest payloadTopicID = clonedPacket.getPayload().getPayloadTopicID();
             boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
             boolean hasWildcardTarget = false;
             if(hasIntendedTarget(payloadTopicID)){
@@ -226,15 +236,22 @@ public class InterchangeTargetWUPTypeRouter {
         }
         // now create and update a new PetasosEpisodeIdentifier
         PetasosEpisodeIdentifier currentEpisodeID = clonedPacket.getPacketID().getPresentEpisodeIdentifier();
-        PetasosEpisodeIdentifier newEpisodeID = episodeIdentifierFactory.newEpisodeIdentifier(targetWUPNode.getNodeFunctionFDN(),clonedPacket.getPayload().getIngresContent().getPayloadManifest().getContentDescriptor());
+        TopologyNodeFunctionFDN targetWUPNodeNodeFunctionFDN = SerializationUtils.clone(targetWUPNode.getNodeFunctionFDN());
+        DataParcelTypeDescriptor contentDescriptor = SerializationUtils.clone(clonedPacket.getPayload().getIngresContent().getPayloadManifest().getContentDescriptor());
+        PetasosEpisodeIdentifier newEpisodeID = episodeIdentifierFactory.newEpisodeIdentifier(targetWUPNodeNodeFunctionFDN, contentDescriptor);
         clonedPacket.getPacketID().setPresentEpisodeIdentifier(newEpisodeID);
         clonedPacket.getPacketID().setPreviousEpisodeIdentifier(currentEpisodeID);
+
+        // OK, now send the packet onto its "next great adventure"...
         template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
         metricsAgent.incrementDistributedMessageCount(thisComponentID);
-        // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
+        metricsAgent.incrementDistributedMessageEndpointCount(thisComponentID, subscriber.getIntraSubsystemParticipant().getComponentID());
+
         // Now add the downstream WUPFunction to the Parcel Finalisation Registry
-        WUPFunctionToken functionToken = new WUPFunctionToken(targetWUPNode.getNodeFunctionFDN().getFunctionToken());
-        activityServicesController.registerWUAEpisodeDownstreamWUPInterest(packet.getPacketID().getPresentEpisodeIdentifier(), functionToken);
+        TopologyNodeFunctionFDNToken targetFunctionFDNToken = SerializationUtils.clone(targetWUPNodeNodeFunctionFDN.getFunctionToken());
+        WUPFunctionToken functionToken = new WUPFunctionToken(targetFunctionFDNToken);
+        activityServicesController.registerWUAEpisodeDownstreamWUPInterest(clonedPacket.getPacketID().getPresentEpisodeIdentifier(), functionToken);
+
     }
 
     private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorTopologyNode> wupSet) {
