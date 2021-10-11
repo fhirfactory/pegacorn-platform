@@ -53,6 +53,8 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 
 @ApplicationScoped
 public class PetasosMOAServicesBroker {
@@ -75,6 +77,7 @@ public class PetasosMOAServicesBroker {
 
     @Inject
     MOAServicesAuditBroker auditWriter;
+    
 
     /**
      *
@@ -85,6 +88,14 @@ public class PetasosMOAServicesBroker {
     public ParcelStatusElement registerStandardWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW) {
         if ((jobCard == null) || (initialUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
+        }
+        if(!jobCard.getActivityID().hasPresentEpisodeIdentifier()){
+            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(jobCard.getActivityID().getPresentWUPFunctionToken());
+            FDN newWUAFDN = new FDN(nodeFunctionFDN.getFunctionToken().toVersionBasedFDNToken());
+            FDN uowTypeFDN = new FDN(initialUoW.getTypeID());
+            newWUAFDN.appendFDN(uowTypeFDN);
+            PetasosEpisodeIdentifier wuaEpisodeToken = new PetasosEpisodeIdentifier(newWUAFDN.getToken());
+            jobCard.getActivityID().setPresentEpisodeIdentifier(wuaEpisodeToken);
         }
         ResilienceParcel newParcel = parcelServicesIM.registerParcel(jobCard.getActivityID(), initialUoW, false);
         jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());

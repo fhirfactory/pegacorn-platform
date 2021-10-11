@@ -109,7 +109,16 @@ public class ProcessingPlantWUAEpisodeActivityMatrixDM {
             boolean sameEpisodeID = existingStatusElement.getActivityID().getPresentEpisodeIdentifier().equals(activityID.getPresentEpisodeIdentifier());
             boolean sameWUPInstanceID = existingStatusElement.getActivityID().getPresentWUPIdentifier().equals(activityID.getPresentWUPIdentifier());
             boolean sameWUPTypeID = existingStatusElement.getActivityID().getPresentWUPFunctionToken().equals(activityID.getPresentWUPFunctionToken());
-            boolean sameUpstreamEpisodeID = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier().equals(activityID.getPreviousEpisodeIdentifier());
+            boolean sameUpstreamEpisodeID = false;
+            if(existingStatusElement.getActivityID().hasPreviousEpisodeIdentifier() && activityID.hasPreviousWUPIdentifier()){
+                sameUpstreamEpisodeID = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier().equals(activityID.getPreviousEpisodeIdentifier());
+            } else {
+                if(existingStatusElement.getActivityID().hasPreviousEpisodeIdentifier() || activityID.hasPreviousWUPIdentifier()){
+                    sameUpstreamEpisodeID = false;
+                } else {
+                    sameUpstreamEpisodeID = true;
+                }
+            }
             if( sameInstanceID && sameEpisodeID && sameWUPInstanceID && sameWUPTypeID && sameUpstreamEpisodeID ){
                 LOG.trace(".addWUA(): New ActivityID and existing (registered) ID the same, so update the status (maybe) and then exit");
                 existingStatusElement.setParcelStatus(initialProcessingStatus);
