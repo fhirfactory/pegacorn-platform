@@ -76,7 +76,7 @@ public class TaskOversightType extends TaskFulfillmentType {
                 ", finishInstant=" + getFinishInstant() +
                 ", finalisationInstant=" + getFinalisationInstant() +
                 ", lastCheckedInstant=" + getLastCheckedInstant() +
-                ", implementingWorkUnitProcessID=" + getImplementingWorkUnitProcessID() +
+                ", implementingWorkUnitProcessID=" + getFulfillerComponentId() +
                 ", trackingID=" + getTrackingID() +
                 ", status=" + getStatus() +
                 ", resilientActivity=" + isResilientActivity() +

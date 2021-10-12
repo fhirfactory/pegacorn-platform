@@ -99,7 +99,7 @@ public class ProcessingPlantEpisodeActivityMatrixDM {
     		LOG.debug(".addWUA(): activityID (ActivityID).presentParcelIdentifier -->{}", petasosTaskFulfillment.getPresentParcelIdentifier());
     		LOG.debug(".addWUA(): activityID (ActivityID).presentEpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier());
     		LOG.debug(".addWUA(): activityID (ActivityID).presentWUPFunctionTokan --> {}", petasosTaskFulfillment.getPresentWUPFunctionToken());
-    		LOG.debug(".addWUA(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+    		LOG.debug(".addWUA(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getFulfillerComponentId());
     		LOG.debug(".addWUA(): activityID (ContunuityID).createDate --> {}", petasosTaskFulfillment.getCreationDate());
     		LOG.debug(".addWUA(): initialProcessingStatus (ResilienceParcelProcessingStatusEnum) --> {}", initialProcessingStatus);
     	}
@@ -115,7 +115,7 @@ public class ProcessingPlantEpisodeActivityMatrixDM {
             TaskStatusType existingStatusElement = parcelStatusElementCache.get(petasosTaskFulfillment.getPresentParcelIdentifier());
             boolean sameInstanceID = existingStatusElement.getParcelInstanceID().equals(petasosTaskFulfillment.getPresentParcelIdentifier());
             boolean sameEpisodeID = existingStatusElement.getActivityID().getPresentEpisodeIdentifier().equals(petasosTaskFulfillment.getPresentEpisodeIdentifier());
-            boolean sameWUPInstanceID = existingStatusElement.getActivityID().getImplementingWorkUnitProcessID().equals(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+            boolean sameWUPInstanceID = existingStatusElement.getActivityID().getImplementingWorkUnitProcessID().equals(petasosTaskFulfillment.getFulfillerComponentId());
             boolean sameWUPTypeID = existingStatusElement.getActivityID().getPresentWUPFunctionToken().equals(petasosTaskFulfillment.getPresentWUPFunctionToken());
             boolean sameUpstreamEpisodeID = hasSameUpstreamEpisodeID(petasosTaskFulfillment, existingStatusElement);
             if( sameInstanceID && sameEpisodeID && sameWUPInstanceID && sameWUPTypeID && sameUpstreamEpisodeID ){

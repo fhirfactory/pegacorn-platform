@@ -51,17 +51,17 @@ public class PetasosFulfillmentTask extends PetasosTask{
     //
 
     @JsonIgnore
-    public boolean hasFulfillmentSegment(){
+    public boolean hasTaskFulfillment(){
         boolean hasValue = this.taskFulfillment != null;
         return(hasValue);
     }
 
-    public TaskFulfillmentType getFulfillmentSegment() {
+    public TaskFulfillmentType getTaskFulfillment() {
         return taskFulfillment;
     }
 
-    public void setFulfillmentSegment(TaskFulfillmentType petasosTaskFulfillment) {
-        this.taskFulfillment = petasosTaskFulfillment;
+    public void setTaskFulfillment(TaskFulfillmentType taskFulfillment) {
+        this.taskFulfillment = taskFulfillment;
     }
 
     public SerializableObject getTaskFulfillmentLock() {
@@ -78,11 +78,11 @@ public class PetasosFulfillmentTask extends PetasosTask{
         return(hasValue);
     }
 
-    public TaskIdType getFulfilledTaskIdentitySegment() {
+    public TaskIdType getActionableTaskId() {
         return actionableTaskId;
     }
 
-    public void setFulfilledTaskIdentitySegment(TaskIdType fulfilledTaskPetasosTaskIdentity) {
+    public void setActionableTaskId(TaskIdType fulfilledTaskPetasosTaskIdentity) {
         this.actionableTaskId = fulfilledTaskPetasosTaskIdentity;
     }
 

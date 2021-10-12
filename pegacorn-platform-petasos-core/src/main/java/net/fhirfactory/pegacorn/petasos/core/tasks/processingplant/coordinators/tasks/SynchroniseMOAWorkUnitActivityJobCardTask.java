@@ -68,7 +68,7 @@ public class SynchroniseMOAWorkUnitActivityJobCardTask {
 			throw (new IllegalArgumentException(".doTask(): submittedJobCard is null"));
 		}
 		TaskFulfillmentType petasosTaskFulfillment = submittedJobCard.getActivityID();
-        TopologyNodeFDN nodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+        TopologyNodeFDN nodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getFulfillerComponentId());
 		WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode)topologyIM.getNode(nodeFDN);
 		switch (wup.getResilienceMode()) {
 			case RESILIENCE_MODE_MULTISITE: {

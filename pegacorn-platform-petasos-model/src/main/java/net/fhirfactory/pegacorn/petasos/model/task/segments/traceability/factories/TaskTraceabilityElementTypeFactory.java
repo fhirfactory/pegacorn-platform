@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Mark A. Hunter
+ * Copyright (c) 2020 Mark A. Hunter
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,44 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.model.task.segments.performer.datatypes;
+package net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.factories;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosActionableTask;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityElementType;
 
-import java.io.Serializable;
+import javax.enterprise.context.ApplicationScoped;
 
-public class TaskPerformerType implements Serializable {
-    private TopologyNodeFunctionFDN requiredPerformerType;
+@ApplicationScoped
+public class TaskTraceabilityElementTypeFactory {
 
-    //
-    // Constructor(s)
-    //
-
-    public TaskPerformerType(){
-        this.requiredPerformerType = null;
-    }
-
-    //
-    // Getters and Setters
-    //
-
-    public TopologyNodeFunctionFDN getRequiredPerformerType() {
-        return requiredPerformerType;
-    }
-
-    public void setRequiredPerformerType(TopologyNodeFunctionFDN requiredPerformerType) {
-        this.requiredPerformerType = requiredPerformerType;
-    }
-
-    //
-    // To String
-    //
-
-
-    @Override
-    public String toString() {
-        return "TaskPerformerType{" +
-                "requiredPerformerType=" + requiredPerformerType +
-                '}';
+    public TaskTraceabilityElementType newTaskTraceabilityElementFromTask(PetasosActionableTask task){
+        if(task == null){
+            return(null);
+        }
+        TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
+        traceabilityElement.setTaskId(task.getTaskId());
+        if(task.hasActualFulfillerId()) {
+            traceabilityElement.setFulfillerId(task.getActualFulfillerId();
+        }
+        if(task.)
     }
 }

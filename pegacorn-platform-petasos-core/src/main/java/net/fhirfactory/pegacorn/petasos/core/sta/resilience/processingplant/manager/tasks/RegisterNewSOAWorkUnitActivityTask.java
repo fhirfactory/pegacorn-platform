@@ -54,7 +54,7 @@ public class RegisterNewSOAWorkUnitActivityTask {
 		}
 		TaskFulfillmentType petasosTaskFulfillment = submittedJobCard.getActivityID();
 		TaskStatusType newStatusElement;
-		TopologyNodeFDN nodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+		TopologyNodeFDN nodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getFulfillerComponentId());
 		WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode)topologyIM.getNode(nodeFDN);
 		switch (wup.getResilienceMode()) {
 			case RESILIENCE_MODE_MULTISITE: {

@@ -27,24 +27,24 @@ import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.T
 
 import java.io.Serializable;
 
-public class TraceabilityElementType extends TaskInstantDetailSegmentBase implements Serializable {
-    private ComponentID implementationWUPIdentifier;
-    private TaskIdType taskIdentifier;
+public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase implements Serializable {
+    private ComponentID fulfillerId;
+    private TaskIdType taskId;
 
     //
     // Constructors
     //
 
-    public TraceabilityElementType(){
+    public TaskTraceabilityElementType(){
         super();
-        this.implementationWUPIdentifier = null;
-        this.taskIdentifier = null;
+        this.fulfillerId = null;
+        this.taskId = null;
     }
 
-    public TraceabilityElementType(TraceabilityElementType ori){
+    public TaskTraceabilityElementType(TaskTraceabilityElementType ori){
         super(ori);
-        this.implementationWUPIdentifier = null;
-        this.taskIdentifier = null;
+        this.fulfillerId = null;
+        this.taskId = null;
     }
 
     //
@@ -52,29 +52,29 @@ public class TraceabilityElementType extends TaskInstantDetailSegmentBase implem
     //
 
     public boolean hasImplementationWUPIdentifier(){
-        boolean hasValue = this.implementationWUPIdentifier != null;
+        boolean hasValue = this.fulfillerId != null;
         return(hasValue);
     }
 
-    public ComponentID getImplementationWUPIdentifier() {
-        return implementationWUPIdentifier;
+    public ComponentID getFulfillerId() {
+        return fulfillerId;
     }
 
-    public void setImplementationWUPIdentifier(ComponentID implementationWUPIdentifier) {
-        this.implementationWUPIdentifier = implementationWUPIdentifier;
+    public void setFulfillerId(ComponentID fulfillerId) {
+        this.fulfillerId = fulfillerId;
     }
 
     public boolean hasTaskIdentifier(){
-        boolean hasValue = this.taskIdentifier != null;
+        boolean hasValue = this.taskId != null;
         return(hasValue);
     }
 
-    public TaskIdType getTaskIdentifier() {
-        return taskIdentifier;
+    public TaskIdType getTaskId() {
+        return taskId;
     }
 
-    public void setTaskIdentifier(TaskIdType taskIdentifier) {
-        this.taskIdentifier = taskIdentifier;
+    public void setTaskId(TaskIdType taskId) {
+        this.taskId = taskId;
     }
 
     //
@@ -91,8 +91,8 @@ public class TraceabilityElementType extends TaskInstantDetailSegmentBase implem
                 ", finishInstant=" + getFinishInstant() +
                 ", finalisationInstant=" + getFinalisationInstant() +
                 ", lastCheckedInstant=" + getLastCheckedInstant() +
-                ", implementationWUPIdentifier=" + implementationWUPIdentifier +
-                ", taskIdentifier=" + taskIdentifier +
+                ", fulfillerId=" + fulfillerId +
+                ", taskId=" + taskId +
                 '}';
     }
 }

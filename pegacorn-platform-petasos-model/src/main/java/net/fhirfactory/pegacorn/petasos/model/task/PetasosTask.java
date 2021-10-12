@@ -24,11 +24,14 @@ package net.fhirfactory.pegacorn.petasos.model.task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.performer.datatypes.TaskPerformerType;
 import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskOutcomeStatusType;
 import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.petasos.model.task.segments.work.datatypes.TaskWorkItemType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PetasosTask implements Serializable {
 
@@ -43,6 +46,9 @@ public class PetasosTask implements Serializable {
 
     private TaskOutcomeStatusType taskOutcomeStatus;
     private SerializableObject taskOutcomeStatusLock;
+
+    private List<TaskPerformerType> taskPerformerTypes;
+    private SerializableObject taskPerformerTypesLock;
 
     private boolean registered;
 
@@ -60,6 +66,8 @@ public class PetasosTask implements Serializable {
         this.taskOutcomeStatus = null;
         this.taskOutcomeStatusLock = new SerializableObject();
         this.registered = false;
+        this.taskPerformerTypes = new ArrayList<>();
+        this.taskPerformerTypesLock = new SerializableObject();
     }
 
     //
@@ -162,6 +170,22 @@ public class PetasosTask implements Serializable {
         this.registered = registered;
     }
 
+    public List<TaskPerformerType> getTaskPerformerTypes() {
+        return taskPerformerTypes;
+    }
+
+    public void setTaskPerformerTypes(List<TaskPerformerType> taskPerformerTypes) {
+        this.taskPerformerTypes = taskPerformerTypes;
+    }
+
+    public SerializableObject getTaskPerformerTypesLock() {
+        return taskPerformerTypesLock;
+    }
+
+    public void setTaskPerformerTypesLock(SerializableObject taskPerformerTypesLock) {
+        this.taskPerformerTypesLock = taskPerformerTypesLock;
+    }
+
     //
     // To String
     //
@@ -174,6 +198,7 @@ public class PetasosTask implements Serializable {
                 ", taskTraceability=" + taskTraceability +
                 ", taskOutcomeStatus=" + taskOutcomeStatus +
                 ", registered=" + registered +
+                ", taskPerformers=" + taskPerformerTypes +
                 '}';
     }
 }

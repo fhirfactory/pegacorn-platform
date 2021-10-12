@@ -125,7 +125,7 @@ public class ResilienceParcel implements Serializable {
         this.cancellationDateLock = new SerializableObject();
         this.associatedWUPFunctionLock = new SerializableObject();
         // Now, add what we have been supplied
-        this.associatedWUPIdentifier = petasosTaskFulfillment.getImplementingWorkUnitProcessID();
+        this.associatedWUPIdentifier = petasosTaskFulfillment.getFulfillerComponentId();
         this.associatedWUPFunction = new WUPFunctionToken(petasosTaskFulfillment.getPresentWUPFunctionToken());
         this.episodeIdentifier = petasosTaskFulfillment.getPresentEpisodeIdentifier();
         this.typeID = this.buildParcelTypeID(petasosTaskFulfillment, theUoW);
@@ -600,7 +600,7 @@ public class ResilienceParcel implements Serializable {
         }
         FDN newInstanceID;
         if (petasosTaskFulfillment.hasPresentWUPIdentifier()) {
-            newInstanceID = new FDN(petasosTaskFulfillment.getImplementingWorkUnitProcessID().toTypeBasedFDNToken());
+            newInstanceID = new FDN(petasosTaskFulfillment.getFulfillerComponentId().toTypeBasedFDNToken());
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPInstanceID value, bad parameter"));
         }

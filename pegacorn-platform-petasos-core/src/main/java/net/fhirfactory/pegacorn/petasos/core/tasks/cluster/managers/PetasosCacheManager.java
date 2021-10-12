@@ -28,7 +28,7 @@
  * This class creates the clustered cache manager and configures the shared cache.
  * 
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.cluster.coordinators;
+package net.fhirfactory.pegacorn.petasos.core.tasks.cluster.managers;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.inject.Produces;

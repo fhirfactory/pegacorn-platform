@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.coordinators;
 
 import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.cache.PetasosTaskJobCardRegistry;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.coordinators.PetasosActionableTaskManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.managers.PetasosActionableTaskManager;
 import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.cache.PetasosFulfillmentTaskRegistry;
 import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.cache.PetasosOversightTaskRegistry;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosActionableTask;

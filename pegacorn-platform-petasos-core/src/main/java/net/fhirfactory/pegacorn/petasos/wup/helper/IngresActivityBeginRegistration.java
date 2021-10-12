@@ -81,7 +81,7 @@ public class IngresActivityBeginRegistration {
         WUPIdentifier wupID = new WUPIdentifier(wup.getNodeFDN().getToken());
         TaskFulfillmentType newPetasosTaskFulfillment = new TaskFulfillmentType();
         newPetasosTaskFulfillment.setPresentWUPFunctionToken(wupFunctionToken);
-        newPetasosTaskFulfillment.setImplementingWorkUnitProcessID(wupID);
+        newPetasosTaskFulfillment.setFulfillerComponentId(wupID);
         LOG.trace(".registerActivityStart(): newActivityID (ActivityID) --> {}", newPetasosTaskFulfillment);
         LOG.trace(".registerActivityStart(): Creating new JobCard");
         PetasosTaskJobCard activityJobCard = new PetasosTaskJobCard(newPetasosTaskFulfillment, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, wup.getConcurrencyMode(), wup.getResilienceMode(),  Date.from(Instant.now()));

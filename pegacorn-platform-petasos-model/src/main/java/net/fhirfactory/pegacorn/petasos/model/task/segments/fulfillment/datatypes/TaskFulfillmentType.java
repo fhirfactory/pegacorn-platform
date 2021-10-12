@@ -35,14 +35,14 @@ import org.apache.commons.lang3.SerializationUtils;
  * @author Mark A. Hunter
  */
 public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements Serializable {
-    private ComponentID implementingWorkUnitProcessID;
+    private ComponentID fulfillerComponentId;
     private FulfillmentTrackingIdType trackingID;
     private FulfillmentExecutionStatusEnum status;
     private boolean resilientActivity;
 
     public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, ComponentID implementingWUP, Instant registrationInstant) {
         super();
-        this.implementingWorkUnitProcessID = SerializationUtils.clone(implementingWUP);
+        this.fulfillerComponentId = SerializationUtils.clone(implementingWUP);
         this.trackingID = SerializationUtils.clone(trackingID);
         setRegistrationInstant(SerializationUtils.clone(registrationInstant));
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED;
@@ -51,7 +51,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, ComponentID implementingWUP) {
         super();
-        this.implementingWorkUnitProcessID = SerializationUtils.clone(implementingWUP);
+        this.fulfillerComponentId = SerializationUtils.clone(implementingWUP);
         this.trackingID = SerializationUtils.clone(trackingID);
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
@@ -59,7 +59,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType() {
         super();
-        this.implementingWorkUnitProcessID = null;
+        this.fulfillerComponentId = null;
         this.trackingID = null;
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
@@ -67,14 +67,14 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     public TaskFulfillmentType(TaskFulfillmentType ori) {
         super(ori);
-        this.implementingWorkUnitProcessID = null;
+        this.fulfillerComponentId = null;
         this.trackingID = null;
         this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
         this.resilientActivity = false;
 
         // Set Values
         if (ori.hasImplementingWorkUnitProcessID()) {
-            this.implementingWorkUnitProcessID = SerializationUtils.clone(ori.getImplementingWorkUnitProcessID());
+            this.fulfillerComponentId = SerializationUtils.clone(ori.getFulfillerComponentId());
         }
         if (ori.hasTrackingID()) {
             this.trackingID = SerializationUtils.clone(ori.getTrackingID());
@@ -89,16 +89,16 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
 
     @JsonIgnore
     public boolean hasImplementingWorkUnitProcessID(){
-        boolean hasValue = this.implementingWorkUnitProcessID != null;
+        boolean hasValue = this.fulfillerComponentId != null;
         return(hasValue);
     }
 
-    public ComponentID getImplementingWorkUnitProcessID() {
-        return implementingWorkUnitProcessID;
+    public ComponentID getFulfillerComponentId() {
+        return fulfillerComponentId;
     }
 
-    public void setImplementingWorkUnitProcessID(ComponentID implementingWorkUnitProcessID) {
-        this.implementingWorkUnitProcessID = implementingWorkUnitProcessID;
+    public void setFulfillerComponentId(ComponentID fulfillerComponentId) {
+        this.fulfillerComponentId = fulfillerComponentId;
     }
 
     @JsonIgnore
@@ -145,7 +145,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
                 ", finishInstant=" + getFinishInstant() +
                 ", finalisationInstant=" + getFinalisationInstant() +
                 ", lastCheckedInstant=" + getLastCheckedInstant() +
-                ", implementingWorkUnitProcessID=" + implementingWorkUnitProcessID +
+                ", implementingWorkUnitProcessID=" + fulfillerComponentId +
                 ", trackingID=" + trackingID +
                 ", status=" + status +
                 ", resilientActivity=" + resilientActivity +

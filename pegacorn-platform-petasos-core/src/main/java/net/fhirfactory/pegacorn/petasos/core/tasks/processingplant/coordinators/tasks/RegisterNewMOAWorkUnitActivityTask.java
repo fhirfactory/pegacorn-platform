@@ -55,7 +55,7 @@ public class RegisterNewMOAWorkUnitActivityTask {
 		TaskFulfillmentType petasosTaskFulfillment = submittedJobCard.getActivityID();
 		TaskStatusType newStatusElement;
 		LOG.trace(".registerNewWUA(): Getting the topologyNode( WorkUnitProcessorTopologyNode) from the TopologyCache");
-		TopologyNodeFDN topologyNodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+		TopologyNodeFDN topologyNodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getFulfillerComponentId());
 		LOG.trace(".registerNewWUA(): First, extracted the topologyNodeFDN (TopologyNodeFDN) from the activityID's presentWUPIdentifier field, value->{}", topologyNodeFDN);
 		WorkUnitProcessorTopologyNode topologyNode = (WorkUnitProcessorTopologyNode) topologyIM.getNode(topologyNodeFDN);
 		LOG.trace(".registerNewWUA(): Extracted the topologyNode, value -->{}", topologyNode);

@@ -21,7 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentID;
+import net.fhirfactory.pegacorn.internals.SerializableObject;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+
 public class PetasosActionableTask extends PetasosTask{
+
+    private TaskFulfillmentType taskFulfillment;
+    private SerializableObject taskFulfillmentLock;
 
     //
     // Constructor(s)
@@ -29,6 +37,26 @@ public class PetasosActionableTask extends PetasosTask{
 
     public PetasosActionableTask(){
         super();
+        this.taskFulfillment = null;
+        this.taskFulfillmentLock = new SerializableObject();
+    }
+
+    //
+    // Getters and Setters
+    //
+
+    @JsonIgnore
+    public boolean hasActualFulfillerId(){
+        boolean hasValue = this.actualFulfillerId != null;
+        return(hasValue);
+    }
+
+    public ComponentID getActualFulfillerId() {
+        return actualFulfillerId;
+    }
+
+    public void setActualFulfillerId(ComponentID actualFulfillerId) {
+        this.actualFulfillerId = actualFulfillerId;
     }
 
     //
@@ -43,6 +71,7 @@ public class PetasosActionableTask extends PetasosTask{
                 ", historySegment=" + getTaskTraceability() +
                 ", outcomeStatusSegment=" + getTaskOutcomeStatus() +
                 ", registered=" + isRegistered() +
+                ", actualFulfillerId=" + actualFulfillerId +
                 '}';
     }
 }

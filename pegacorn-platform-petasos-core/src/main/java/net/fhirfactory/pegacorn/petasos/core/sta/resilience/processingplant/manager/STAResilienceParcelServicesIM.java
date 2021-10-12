@@ -69,7 +69,7 @@ public class STAResilienceParcelServicesIM {
     		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentParcelIdentifier -->{}", petasosTaskFulfillment.getPresentParcelIdentifier());
     		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentEpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier());
     		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentWUPFunctionTokan --> {}", petasosTaskFulfillment.getPresentWUPFunctionToken());
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getFulfillerComponentId());
     		LOG.debug(".registerSOAParcel(): activityID (ContunuityID).createDate --> {}", petasosTaskFulfillment.getCreationDate());
     		LOG.debug(".registerSOAParcel(): unitOfWork (UoW).instanceID --> {}", unitOfWork.getInstanceID());
     		LOG.debug(".registerSOAParcel(): unitOfWork (UoW).typeID --> {}", unitOfWork.getTypeID());
@@ -90,7 +90,7 @@ public class STAResilienceParcelServicesIM {
         }
         // 1st, lets register the parcel
         LOG.trace(".registerSOAParcel(): check for existing ResilienceParcel instance for this WUP/UoW combination");
-        ResilienceParcel parcelInstance =  parcelCacheDM.getCurrentParcelForWUP(petasosTaskFulfillment.getImplementingWorkUnitProcessID(), unitOfWork.getTypeID());
+        ResilienceParcel parcelInstance =  parcelCacheDM.getCurrentParcelForWUP(petasosTaskFulfillment.getFulfillerComponentId(), unitOfWork.getTypeID());
         if(parcelInstance != null){
             LOG.trace(".registerSOAParcel(): Well, there seems to be a Parcel already for this WUPInstanceID/UoWInstanceID. Odd, but let's use it!");
         } else {

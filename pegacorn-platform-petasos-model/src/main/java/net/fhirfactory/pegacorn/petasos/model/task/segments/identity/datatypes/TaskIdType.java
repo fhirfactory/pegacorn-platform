@@ -21,11 +21,18 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+
 import java.io.Serializable;
+import java.time.Instant;
 
 public class TaskIdType implements Serializable {
-    private String implementationIdentifier;
+    private String id;
     private String version;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant creationInstant;
 
     private static final String DEFAULT_VERSION="1";
 
@@ -34,20 +41,23 @@ public class TaskIdType implements Serializable {
     //
 
     public TaskIdType(){
-        this.implementationIdentifier = null;
+        this.id = null;
         this.version = DEFAULT_VERSION;
+        this.creationInstant = Instant.now();
     }
 
     public TaskIdType(TaskIdType ori){
+        this.id = null;
+        this.version = DEFAULT_VERSION;
+        this.creationInstant = Instant.now();
         if(ori.hasLocalIdentifier()) {
-            this.implementationIdentifier = ori.getImplementationIdentifier();
-        } else {
-            this.implementationIdentifier = null;
+            setId(ori.getId());
         }
         if(ori.hasVersion()) {
-            this.version = ori.getVersion();
-        } else {
-            this.version = DEFAULT_VERSION;
+            setVersion(ori.getVersion());
+        }
+        if(ori.hasCreationInstant()){
+            setCreationInstant(ori.getCreationInstant());
         }
     }
 
@@ -55,19 +65,21 @@ public class TaskIdType implements Serializable {
     // Getters and Setters (Bean Methods)
     //
 
+    @JsonIgnore
     public boolean hasLocalIdentifier(){
-        boolean hasValue = this.implementationIdentifier != null;
+        boolean hasValue = this.id != null;
         return(hasValue);
     }
 
-    public String getImplementationIdentifier() {
-        return implementationIdentifier;
+    public String getId() {
+        return id;
     }
 
-    public void setImplementationIdentifier(String implementationIdentifier) {
-        this.implementationIdentifier = implementationIdentifier;
+    public void setId(String id) {
+        this.id = id;
     }
 
+    @JsonIgnore
     public boolean hasVersion(){
         boolean hasValue = this.version != null;
         return(hasValue);
@@ -81,6 +93,20 @@ public class TaskIdType implements Serializable {
         this.version = version;
     }
 
+    @JsonIgnore
+    public boolean hasCreationInstant(){
+        boolean hasValue = this.creationInstant != null;
+        return(hasValue);
+    }
+
+    public Instant getCreationInstant() {
+        return creationInstant;
+    }
+
+    public void setCreationInstant(Instant creationInstant) {
+        this.creationInstant = creationInstant;
+    }
+
     //
     // To String
     //
@@ -88,8 +114,9 @@ public class TaskIdType implements Serializable {
     @Override
     public String toString() {
         return "IdentitySegment{" +
-                "implementationIdentifier=" + implementationIdentifier +
+                "id=" + id +
                 ", version=" + version +
+                ", creationInstant=" + creationInstant +
                 '}';
     }
 }

@@ -215,14 +215,14 @@ public class WUPContainerIngresProcessor {
         TaskFulfillmentType newPetasosTaskFulfillment = new TaskFulfillmentType();
         FulfillmentTrackingIdType previousPresentParcelInstanceID = SerializationUtils.clone(oldPetasosTaskFulfillment.getPresentParcelIdentifier());
         PetasosEpisodeIdentifier previousPresentEpisodeID =  SerializationUtils.clone(oldPetasosTaskFulfillment.getPresentEpisodeIdentifier());
-        WUPIdentifier previousPresentWUPInstanceID =  SerializationUtils.clone(oldPetasosTaskFulfillment.getImplementingWorkUnitProcessID());
+        WUPIdentifier previousPresentWUPInstanceID =  SerializationUtils.clone(oldPetasosTaskFulfillment.getFulfillerComponentId());
         TopologyNodeFunctionFDNToken previousPresentWUPTypeID =  SerializationUtils.clone(oldPetasosTaskFulfillment.getPresentWUPFunctionToken());
         newPetasosTaskFulfillment.setPreviousParcelIdentifier(previousPresentParcelInstanceID);
         newPetasosTaskFulfillment.setPreviousEpisodeIdentifier(previousPresentEpisodeID);
         newPetasosTaskFulfillment.setPreviousWUPIdentifier(previousPresentWUPInstanceID);
         newPetasosTaskFulfillment.setPreviousWUPFunctionToken(previousPresentWUPTypeID);
         newPetasosTaskFulfillment.setPresentWUPFunctionToken(wupFunctionToken);
-        newPetasosTaskFulfillment.setImplementingWorkUnitProcessID(wupID);
+        newPetasosTaskFulfillment.setFulfillerComponentId(wupID);
         transportPacket.setPacketID(newPetasosTaskFulfillment);
         getLogger().trace(".standardIngresContentProcessor(): [ActivityID Creation] Finish");
 

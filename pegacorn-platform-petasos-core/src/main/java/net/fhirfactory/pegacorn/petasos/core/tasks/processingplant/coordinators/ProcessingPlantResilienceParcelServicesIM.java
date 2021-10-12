@@ -82,7 +82,7 @@ public class ProcessingPlantResilienceParcelServicesIM {
         }
         // 1st, lets register the parcel
         LOG.trace(".registerParcel(): check for existing ResilienceParcel instance for this WUP/UoW combination");
-        ResilienceParcel parcelInstance =  parcelCacheDM.getCurrentParcelForWUP(petasosTaskFulfillment.getImplementingWorkUnitProcessID(), unitOfWork.getTypeID());
+        ResilienceParcel parcelInstance =  parcelCacheDM.getCurrentParcelForWUP(petasosTaskFulfillment.getFulfillerComponentId(), unitOfWork.getTypeID());
         if(parcelInstance != null){
             LOG.trace(".registerParcel(): Well, there seems to be a Parcel already for this WUPInstanceID/UoWInstanceID. Odd, but let's use it!");
         } else {

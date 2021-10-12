@@ -92,7 +92,7 @@ public class STAServiceModuleActivityMatrixDM {
     		LOG.debug(".startTransaction(): activityID (ActivityID).presentParcelIdentifier -->{}", petasosTaskFulfillment.getPresentParcelIdentifier());
     		LOG.debug(".startTransaction(): activityID (ActivityID).presentEpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier());
     		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPFunctionTokan --> {}", petasosTaskFulfillment.getPresentWUPFunctionToken());
-    		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+    		LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getFulfillerComponentId());
     		LOG.debug(".startTransaction(): activityID (ContunuityID).createDate --> {}", petasosTaskFulfillment.getCreationDate());
     		LOG.debug(".startTransaction(): initialProcessingStatus (ResilienceParcelProcessingStatusEnum) --> {}", initialProcessingStatus);
     	}
@@ -110,7 +110,7 @@ public class STAServiceModuleActivityMatrixDM {
             TaskStatusType existingStatusElement = parcelStatusElementCache.get(petasosTaskFulfillment.getPresentParcelIdentifier());
             boolean sameInstanceID = existingStatusElement.getParcelInstanceID().equals(petasosTaskFulfillment.getPresentParcelIdentifier());
             boolean sameEpisodeID = existingStatusElement.getActivityID().getPresentEpisodeIdentifier().equals(petasosTaskFulfillment.getPresentEpisodeIdentifier());
-            boolean sameWUPInstanceID = existingStatusElement.getActivityID().getImplementingWorkUnitProcessID().equals(petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+            boolean sameWUPInstanceID = existingStatusElement.getActivityID().getImplementingWorkUnitProcessID().equals(petasosTaskFulfillment.getFulfillerComponentId());
             boolean sameWUPTypeID = existingStatusElement.getActivityID().getPresentWUPFunctionToken().equals(petasosTaskFulfillment.getPresentWUPFunctionToken());
             boolean sameUpstreamEpisodeID = existingStatusElement.getActivityID().getPreviousEpisodeIdentifier().equals(petasosTaskFulfillment.getPreviousEpisodeIdentifier());
             if( sameInstanceID && sameEpisodeID && sameWUPInstanceID && sameWUPTypeID && sameUpstreamEpisodeID ){
@@ -191,7 +191,7 @@ public class STAServiceModuleActivityMatrixDM {
             LOG.debug(".startTransaction(): activityID (ActivityID).presentParcelIdentifier -->{}", petasosTaskFulfillment.getPresentParcelIdentifier());
             LOG.debug(".startTransaction(): activityID (ActivityID).presentEpisodeIdentifier --> {}", petasosTaskFulfillment.getPresentEpisodeIdentifier());
             LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPFunctionTokan --> {}", petasosTaskFulfillment.getPresentWUPFunctionToken());
-            LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getImplementingWorkUnitProcessID());
+            LOG.debug(".startTransaction(): activityID (ActivityID).presentWUPIdentifier --> {}", petasosTaskFulfillment.getFulfillerComponentId());
             LOG.debug(".startTransaction(): activityID (ContunuityID).createDate --> {}", petasosTaskFulfillment.getCreationDate());
             LOG.debug(".startTransaction(): initialProcessingStatus (ResilienceParcelProcessingStatusEnum) --> {}", status);
         }

@@ -25,12 +25,16 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.PetasosActionableTaskIdentifierFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.coordinators.PetasosActionableTaskManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.managers.PetasosActionableTaskManager;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.reason.valuesets.TaskReasonTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityElementType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.petasos.model.task.segments.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayloadSet;
@@ -111,11 +115,19 @@ public class InterchangeTaskPayload2NewTaskProcessor {
         return (newEgressTransportPacketSet);
     }
 
-    private PetasosActionableTask createNewPetasosActionableTask(PetasosActionableTask oldTask, TaskWorkItemType newWorkSegment){
-        if(oldTask == null || newWorkSegment == null){
+    private PetasosActionableTask createNewPetasosActionableTask(PetasosActionableTask oldTask, TaskWorkItemType newWorkItem){
+        if(oldTask == null || newWorkItem == null){
             return(null);
         }
 
-        actionableTaskIdentifierFactory.newEpisodeIdentifier()
+        TaskIdType newActionableTaskId = actionableTaskIdentifierFactory.newActionableTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, newWorkItem.getIngresContent().getPayloadManifest().getContentDescriptor());
+        PetasosActionableTask task = new PetasosActionableTask();
+
+        TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
+        traceabilityElement.setTaskId(oldTask.getTaskId());
+        traceabilityElement.set
+        TaskTraceabilityType taskTraceability = oldTask.getTaskTraceability();
+        taskTraceability.getTaskJourney()
+
     }
 }

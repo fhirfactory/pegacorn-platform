@@ -21,22 +21,20 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes;
 
-import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TraceabilityElementType;
-
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskTraceabilityType {
-    ConcurrentHashMap<Integer, TraceabilityElementType> taskJourney;
+    ConcurrentHashMap<Integer, TaskTraceabilityElementType> taskJourney;
 
     public TaskTraceabilityType(){
         this.taskJourney = new ConcurrentHashMap<>();
     }
 
-    public ConcurrentHashMap<Integer, TraceabilityElementType> getTaskJourney() {
+    public ConcurrentHashMap<Integer, TaskTraceabilityElementType> getTaskJourney() {
         return taskJourney;
     }
 
-    public void setTaskJourney(ConcurrentHashMap<Integer, TraceabilityElementType> taskJourney) {
+    public void setTaskJourney(ConcurrentHashMap<Integer, TaskTraceabilityElementType> taskJourney) {
         this.taskJourney = taskJourney;
     }
 }

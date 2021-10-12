@@ -6,6 +6,8 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.segments.reason.valuesets.TaskReasonTypeEnum;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
@@ -69,6 +71,54 @@ public class PetasosActionableTaskIdentifierFactory {
 
         PetasosEpisodeIdentifier id = new PetasosEpisodeIdentifier();
         id.setValue(idBuilder.toString());
+        id.setCreationInstant(Instant.now());
+        return(id);
+    }
+
+    public TaskIdType newActionableTaskId(TaskReasonTypeEnum taskReason, DataParcelTypeDescriptor contentDescriptor){
+        StringBuilder idBuilder = new StringBuilder();
+        idBuilder.append(taskReason.getTaskReasonDisplayName());
+        idBuilder.append("(");
+        if(contentDescriptor.hasDataParcelDefiner()){
+            String definer = contentDescriptor.getDataParcelDefiner();
+            String definerValue = definer.replaceAll(" ", "");
+            idBuilder.append(definerValue);
+        }
+        if(contentDescriptor.hasDataParcelCategory()){
+            String category = contentDescriptor.getDataParcelCategory();
+            idBuilder.append("."+category);
+        }
+        if(contentDescriptor.hasDataParcelSubCategory()){
+            String subCategory = contentDescriptor.getDataParcelSubCategory();
+            idBuilder.append("."+subCategory);
+        }
+        if(contentDescriptor.hasDataParcelResource()){
+            String resource = contentDescriptor.getDataParcelResource();
+            idBuilder.append("."+resource);
+        }
+        if(contentDescriptor.hasDataParcelSegment()){
+            String segment = contentDescriptor.getDataParcelSegment();
+            idBuilder.append("."+segment);
+        }
+        if(contentDescriptor.hasDataParcelAttribute()){
+            String attribute = contentDescriptor.getDataParcelAttribute();
+            idBuilder.append("."+attribute);
+        }
+        if(contentDescriptor.hasDataParcelDiscriminatorType()){
+            String descType = contentDescriptor.getDataParcelDiscriminatorType();
+            idBuilder.append("."+descType);
+        }
+        if(contentDescriptor.hasDataParcelDiscriminatorValue()){
+            String descValue = contentDescriptor.getDataParcelDiscriminatorValue();
+            idBuilder.append("."+descValue);
+        }
+        idBuilder.append(")");
+        long leastSignificantBits = UUID.randomUUID().getLeastSignificantBits();
+        String hexString = Long.toHexString(leastSignificantBits);
+        idBuilder.append("::");
+        idBuilder.append(hexString);
+        TaskIdType id = new TaskIdType();
+        id.setId(idBuilder.toString());
         id.setCreationInstant(Instant.now());
         return(id);
     }
