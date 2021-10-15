@@ -8,7 +8,6 @@
         <groupId>net.fhirfactory.pegacorn</groupId>
         <artifactId>pegacorn-platform</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pegacorn-platform</relativePath>
     </parent>
 
     <artifactId>pegacorn-platform-commoncode</artifactId>

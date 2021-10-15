@@ -6,16 +6,15 @@
 
     <parent>
         <groupId>net.fhirfactory.pegacorn</groupId>
-        <artifactId>pegacorn-platform</artifactId>
+        <artifactId>pegacorn-platform-petasos</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pegacorn-platform</relativePath>
     </parent>
 
-    <artifactId>pegacorn-platform-samples</artifactId>
+    <artifactId>pegacorn-platform-petasos-datasets</artifactId>
     <packaging>jar</packaging>
 
-    <name>Pegacorn :: Platform :: Sample Resources</name>
-    <description>A sample set of reference FHIR elements</description> 
+    <name>Pegacorn :: Platform :: Petasos :: Data Sets</name>
+    <description>The UoW and Information Topic Data Set Registry</description>
 
     <properties>
         <JBOSS_HOME>${project.basedir}/target/wildfly-${version-org.wildfly}</JBOSS_HOME>
@@ -75,6 +74,7 @@
             <version>${version-com.fasterxml.jackson.core-jackson-core}</version>
         </dependency>
 
+
         <!-- Pegacorn Common Code -->
         <dependency>
             <groupId>net.fhirfactory.pegacorn</groupId>
@@ -91,21 +91,7 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <!-- Pegacorn Deployment Properties -->
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-properties</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.fhirfactory.pegacorn</groupId>
-            <artifactId>pegacorn-deployment-topology</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
+
 
         <!-- Infinispan -->
         <dependency>
@@ -131,6 +117,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -165,20 +156,31 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+
+        <!--         -->
+        <!-- Logging -->
+        <!--         -->
         <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>${version-org.apache.maven-surefire-plugin}</version>
-            <scope>test</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-logger-api</artifactId>
-            <version>${version-org.apache.maven-surefire-plugin}</version>
-            <scope>test</scope>
-            <optional>true</optional>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version-ch.qos.logback-classic}</version>
+            <scope>compile</scope>
         </dependency>
+
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>Pegacorn SWDevel</id>
+            <url>file:///home/mhunter/swdevel/deploy/files</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -257,27 +259,10 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>${version-org.apache.maven-antrun-plugin}</version>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <version>${version-org.wildfly-maven-plugin}</version>
                         <executions>
-                            <execution>
-                                <id>set-wildfly-xml</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <echo>ANT TASK - Copying standalone-full-ha.xml from ${project.basedir}/src/test/resources/wildfly/${version-org.wildfly} to ${project.basedir}/target/wildfly-${version-org.wildfly}/standalone/configuration</echo>
-                                        <copy todir="${project.basedir}/target/wildfly-${version-org.wildfly}/standalone/configuration" overwrite="true" flatten="true">
-                                            <fileset dir="${project.basedir}/src/test/resources/wildfly/${version-org.wildfly}/">
-                                                <include name="standalone-full-ha.xml"/>
-                                            </fileset>
-                                        </copy>
-                                    </target>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                     <plugin>

@@ -8,7 +8,6 @@
         <groupId>net.fhirfactory.pegacorn</groupId>
         <artifactId>pegacorn-platform-petasos</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pegacorn-platform-petasos</relativePath>
     </parent>
 
     <artifactId>pegacorn-platform-petasos-caches</artifactId>

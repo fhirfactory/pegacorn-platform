@@ -20,7 +20,7 @@
     </properties>
     
     <modules>
-        <module>../pegacorn-platform-commoncode</module>
-        <module>../pegacorn-platform-petasos</module>
+        <module>commoncode</module>
+        <module>petasos</module>
     </modules>
 </project>

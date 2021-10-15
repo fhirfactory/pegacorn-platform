@@ -8,7 +8,6 @@
         <groupId>net.fhirfactory.pegacorn</groupId>
         <artifactId>pegacorn-platform</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pegacorn-platform</relativePath>
     </parent>
         
     <artifactId>pegacorn-platform-petasos</artifactId>
@@ -22,11 +21,11 @@
     </properties>
     
     <modules>
-        <module>../pegacorn-platform-petasos-model</module>
-        <module>../pegacorn-platform-petasos-datasets</module>
-        <module>../pegacorn-platform-petasos-core</module>
-        <module>../pegacorn-platform-petasos-audit</module>
-	    <module>../pegacorn-platform-petasos-caches</module>
-        <module>../pegacorn-platform-petasos-itops</module>
+        <module>model</module>
+        <module>datasets</module>
+        <module>core</module>
+        <module>audit</module>
+        <module>caches</module>
+        <module>itops</module>
     </modules>
 </project>
