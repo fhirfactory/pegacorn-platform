@@ -74,24 +74,47 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         return(period);
     }
 
-    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(ResilienceParcel parcel){
+    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(ResilienceParcel parcel, UoW uow){
         if(parcel == null){
             return(AuditEvent.AuditEventOutcome._8);
         }
-        switch(parcel.getProcessingStatus()) {
-            case PARCEL_STATUS_REGISTERED:
-            case PARCEL_STATUS_ACTIVE:
-            case PARCEL_STATUS_INITIATED:
-                return(null);
-            case PARCEL_STATUS_FINISHED:
-            case PARCEL_STATUS_FINALISED:
-                return(AuditEvent.AuditEventOutcome._0);
-            case PARCEL_STATUS_CANCELLED:
-                return(AuditEvent.AuditEventOutcome._4);
-            case PARCEL_STATUS_FAILED:
-            default:
-                return(AuditEvent.AuditEventOutcome._8);
+        if(uow == null) {
+            switch (parcel.getProcessingStatus()) {
+                case PARCEL_STATUS_REGISTERED:
+                case PARCEL_STATUS_ACTIVE:
+                case PARCEL_STATUS_INITIATED:
+                    return (null);
+                case PARCEL_STATUS_FINISHED:
+                case PARCEL_STATUS_FINALISED:
+                    return (AuditEvent.AuditEventOutcome._0);
+                case PARCEL_STATUS_CANCELLED:
+                    return (AuditEvent.AuditEventOutcome._4);
+                case PARCEL_STATUS_FAILED:
+                default:
+                    return (AuditEvent.AuditEventOutcome._8);
+            }
+        } else {
+            if(uow.hasProcessingOutcome()) {
+                switch (uow.getProcessingOutcome()) {
+                    case UOW_OUTCOME_FAILED:
+                        return (AuditEvent.AuditEventOutcome._8);
+                    case UOW_OUTCOME_SUCCESS:
+                        return (AuditEvent.AuditEventOutcome._0);
+                    case UOW_OUTCOME_INCOMPLETE:
+                    case UOW_OUTCOME_NOTSTARTED:
+                    case UOW_OUTCOME_NO_PROCESSING_REQUIRED:
+                    default:
+                        return (null);
+                }
+            } else {
+                return (AuditEvent.AuditEventOutcome._0);
+            }
         }
+    }
+
+    protected AuditEvent.AuditEventOutcome extractAuditEventOutcome(ResilienceParcel parcel){
+        AuditEvent.AuditEventOutcome outcome = extractAuditEventOutcome(parcel, null);
+        return(outcome);
     }
 
     protected AuditEventTypeEnum extractAuditEventType(ResilienceParcel parcel){
@@ -112,8 +135,16 @@ public abstract class Pegacorn2FHIRAuditEventBase {
     }
 
     protected AuditEventSubTypeEnum extractAuditEventSubType(ResilienceParcel parcel){
+        AuditEventSubTypeEnum outcomeAuditEventSubType = extractAuditEventSubType(parcel, false);
+        return(outcomeAuditEventSubType);
+    }
+
+    protected AuditEventSubTypeEnum extractAuditEventSubType(ResilienceParcel parcel, boolean isInteractDone){
         if(parcel == null){
             return(AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STOPPED) ;
+        }
+        if(isInteractDone){
+            return(AuditEventSubTypeEnum.DICOM_APPLICATION_LOCAL_SERVICE_OPERATION_STOPPED);
         }
         switch(parcel.getProcessingStatus()) {
             case PARCEL_STATUS_REGISTERED:

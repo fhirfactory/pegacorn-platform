@@ -75,9 +75,14 @@ public class MOAServicesAuditBroker {
         return(entry);
     }
 
-    public void logMLLPTransactions(ResilienceParcel parcelAuditInstance, UoW uow, boolean requiresSynchronousWrite){
+    public void logMLLPTransactions(ResilienceParcel parcelAuditInstance, UoW uow, String activity, boolean requiresSynchronousWrite){
         if(parcelAuditInstance.hasAssociatedPortType() && parcelAuditInstance.hasAssociatedPortValue()) {
-            AuditEvent uowEntry = uow2auditevent.transform(parcelAuditInstance, uow);
+            AuditEvent uowEntry = null;
+            if(uow.hasEgressContent()) {
+                uowEntry = uow2auditevent.transform(parcelAuditInstance, uow, activity, true);
+            } else {
+                uowEntry = uow2auditevent.transform(parcelAuditInstance, uow, activity, false);
+            }
             AuditEvent resultUoWEntry;
             if (requiresSynchronousWrite) {
                 resultUoWEntry = auditWriter.logAuditEventSynchronously(uowEntry);

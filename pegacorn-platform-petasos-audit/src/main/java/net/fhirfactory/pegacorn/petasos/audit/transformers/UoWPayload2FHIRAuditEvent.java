@@ -40,6 +40,7 @@ import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
@@ -71,8 +72,17 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
 //        jsonMapper = new ObjectMapper();
     }
 
-
     public AuditEvent transform(ResilienceParcel parcel, UoW uow){
+        AuditEvent outcomeAuditEvent = transform(parcel, uow, false);
+        return(outcomeAuditEvent);
+    }
+
+    public AuditEvent transform(ResilienceParcel parcel, UoW uow, boolean isInteractDone){
+        AuditEvent outcomeAuditEvent = transform(parcel, uow, null, false);
+        return(outcomeAuditEvent);
+    }
+
+    public AuditEvent transform(ResilienceParcel parcel, UoW uow, String activity, boolean isInteractDone){
         if(parcel == null){
             return(null);
         }
@@ -91,12 +101,24 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
             }
         }
 
+        String descriptionText = null;
+        if(StringUtils.isNotEmpty(activity)) {
+            if (activity.equalsIgnoreCase("MLLPEgress")) {
+                descriptionText = "Interact.Egress: MLLP Message Forwarding";
+            } else if (activity.equalsIgnoreCase("MLLPIngres")) {
+                descriptionText = "Interact.Ingres: MLLP Message Reception";
+            }
+        }
+        if(StringUtils.isEmpty(descriptionText)){
+            descriptionText = "Ingres and Egress content fromm UoW (Unit of Work) Processors";
+        }
+
         AuditEvent.AuditEventEntityComponent auditEventEntityComponent = auditEventEntityFactory.newAuditEventEntity(
                 AuditEventEntityTypeEnum.PEGACORN_MLLP_MSG,
                 AuditEventEntityRoleEnum.HL7_JOB,
                 AuditEventEntityLifecycleEnum.HL7_TRANSMIT,
                 auditEventEntityName,
-                "Ingres and Egress content fromm UoW (Unit of Work) Processors",
+                descriptionText,
                 detailList);
 
         String portValue = parcel.getAssociatedPortValue();
@@ -107,6 +129,10 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         } else {
             sourceSite = processingPlant.getIPCServiceName();
         }
+
+        AuditEvent.AuditEventOutcome auditEventOutcome = extractAuditEventOutcome(parcel, uow);
+        String outcomeString = getOutcomeDescription(auditEventOutcome, uow);
+
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
                 processingPlant.getSimpleInstanceName(),
@@ -115,14 +141,31 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
                 null,
                 AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
                 extractAuditEventType(parcel),
-                extractAuditEventSubType(parcel),
+                extractAuditEventSubType(parcel, isInteractDone),
                 AuditEvent.AuditEventAction.C,
-                extractAuditEventOutcome(parcel),
-                null,
+                auditEventOutcome,
+                outcomeString,
                 extractProcessingPeriod(parcel),
                 auditEventEntityComponent);
 
         return(auditEvent);
+    }
+
+    protected String getOutcomeDescription(AuditEvent.AuditEventOutcome outcome, UoW uow){
+        if(outcome == null){
+            return(null);
+        }
+        String addedText = null;
+        if(uow != null){
+            if(uow.hasFailureDescription()){
+                addedText = uow.getFailureDescription();
+            }
+        }
+        String outcomeString = outcome.getDisplay();
+        if(StringUtils.isNotEmpty(addedText)){
+            outcomeString = outcomeString + " (" + addedText + ")";
+        }
+        return(outcomeString);
     }
 
 
