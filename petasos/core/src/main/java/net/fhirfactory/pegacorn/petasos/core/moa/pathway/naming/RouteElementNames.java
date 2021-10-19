@@ -38,7 +38,7 @@ public class RouteElementNames {
         return(LOG);
     }
 
-    private TopologyNodeFDNToken nodeFDNToken;
+    private ComponentIdType componentId;
     private boolean mustBeDirect;
     private String wupTypeName;
     private String wupVersion;
@@ -47,33 +47,26 @@ public class RouteElementNames {
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
     private static final String SEDA_INTER_FUNCTION_CONFIGURATION_PARAMETERS = "?blockWhenFull=true&size=10000";
 
-    public RouteElementNames(TopologyNodeFDNToken functionToken, boolean mustBeDirect){
-        getLogger().debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
-        this.nodeFDNToken = functionToken;
+    public RouteElementNames(ComponentIdType idType, boolean mustBeDirect){
+        getLogger().debug(".RouteElementNames(): Entry, idType->{}, mustBeDirect->{}", idType, mustBeDirect);
+        this.componentId = idType;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
     }
 
-    public RouteElementNames(TopologyNodeFDNToken functionToken){
-        getLogger().debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
-        this.nodeFDNToken = functionToken;
+    public RouteElementNames(ComponentIdType idType){
+        getLogger().debug(".RouteElementNames(): Entry, idType->{}", idType);
+        this.componentId = idType;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = false;
     }
 
     public String simplifyName(){
-        getLogger().debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFDNToken);
-        TopologyNodeFDN wupFunctionFDN = new TopologyNodeFDN(this.nodeFDNToken);
-        getLogger().trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
-        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
-        getLogger().trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
-        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
-        getLogger().trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
-        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WUP);
-        getLogger().trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
-        String nodeVersion = wupFunctionRDN.getNodeVersion();
+        getLogger().debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.componentId);
+        String nodeId = componentId.getDisplayName();
+        String nodeVersion = componentId.getVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");
-        String wupName = processingPlantRDN.getNodeName()+"."+workshopRDN.getNodeName()+"."+wupFunctionRDN.getNodeName()+"."+nodeVersionSimplified;
+        String wupName = componentId.getDisplayName()+"."+nodeVersionSimplified;
         getLogger().trace(".simplifyName(): wupName (String) --> {}", wupName);
         return(wupName);
     }

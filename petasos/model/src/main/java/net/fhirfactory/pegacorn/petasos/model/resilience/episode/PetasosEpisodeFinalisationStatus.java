@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.finalisation.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 
 /**
@@ -34,7 +35,7 @@ public class PetasosEpisodeFinalisationStatus {
     private PetasosEpisodeIdentifier downstreamEpisodeID;
     private WUPFunctionToken downstreamWUPFunction;
     private Object registrationStatusLock;
-    private PetasosEpisodeFinalisationStatusEnum registrationStatus;
+    private TaskFinalisationStatusEnum registrationStatus;
 
 
     public PetasosEpisodeFinalisationStatus(PetasosEpisodeIdentifier episodeID, WUPFunctionToken downstreamWUPID){
@@ -42,10 +43,10 @@ public class PetasosEpisodeFinalisationStatus {
         this.episodeID = episodeID;
         this.downstreamEpisodeID = null;
         this.registrationStatusLock = new Object();
-        this.registrationStatus = PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_NOT_REGISTERED;
+        this.registrationStatus = TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED;
     }
 
-    public PetasosEpisodeFinalisationStatusEnum getRegistrationStatus(){
+    public TaskFinalisationStatusEnum getRegistrationStatus(){
         return(this.registrationStatus);
     }
 
@@ -56,7 +57,7 @@ public class PetasosEpisodeFinalisationStatus {
     public void setDownstreamEpisodeID(PetasosEpisodeIdentifier downstreamEpisodeID){
         synchronized (registrationStatusLock){
             this.downstreamEpisodeID = downstreamEpisodeID;
-            this.registrationStatus = PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_REGISTERED;
+            this.registrationStatus = TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED;
         }
     }
 
@@ -76,7 +77,7 @@ public class PetasosEpisodeFinalisationStatus {
         this.downstreamWUPFunction = downstreamWUPFunction;
     }
 
-    public void setRegistrationStatus(PetasosEpisodeFinalisationStatusEnum registrationStatus) {
+    public void setRegistrationStatus(TaskFinalisationStatusEnum registrationStatus) {
         this.registrationStatus = registrationStatus;
     }
 }

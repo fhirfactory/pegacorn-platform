@@ -28,9 +28,9 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
@@ -95,18 +95,18 @@ public class IngresActivityBeginRegistration {
             statusElement = servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         }
         LOG.trace(".registerActivityStart(): Updated metrics");
-        metricsAgent.touchActivityStartInstant(wup.getComponentID());
-        metricsAgent.touchLastActivityInstant(wup.getComponentID());
-        metricsAgent.incrementIngresMessageCount(wup.getComponentID());
-        metricsAgent.incrementRegisteredTasks(wup.getComponentID());
-        metricsAgent.incrementStartedTasks(wup.getComponentID());
+        metricsAgent.touchActivityStartInstant(wup.getComponentType());
+        metricsAgent.touchLastActivityInstant(wup.getComponentType());
+        metricsAgent.incrementIngresMessageCount(wup.getComponentType());
+        metricsAgent.incrementRegisteredTasks(wup.getComponentType());
+        metricsAgent.incrementStartedTasks(wup.getComponentType());
         LOG.trace(".registerActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
         LOG.trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
         PetasosTaskOld wupTP = new PetasosTaskOld(activityJobCard.getActivityID(), Date.from(Instant.now()), theUoW);
         wupTP.setCurrentJobCard(activityJobCard);
         wupTP.setCurrentParcelStatus(statusElement);
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, wupTP);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, wupTP);
         LOG.debug(".registerActivityStart(): exit, my work is done!");
         return(theUoW);
     }

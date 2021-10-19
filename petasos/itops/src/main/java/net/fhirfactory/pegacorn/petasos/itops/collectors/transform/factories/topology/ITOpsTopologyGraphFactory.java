@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.itops.collectors.transform.factories.topology;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.petasos.model.itops.topology.ITOpsMonitoredProcessingPlant;
@@ -51,16 +51,16 @@ public class ITOpsTopologyGraphFactory {
         LOG.debug(".newTopologyGraph(): Looking for SolutionNode (processingPlant->{})", processingPlant);
         if(processingPlant.getSolutionNode() != null) {
             LOG.debug(".newTopologyGraph(): Looking for ComponentID");
-            if(processingPlant.getSolutionNode().getComponentID() != null) {
+            if(processingPlant.getSolutionNode().getComponentType() != null) {
                 LOG.debug(".newTopologyGraph(): Retrieving the ComponentID");
-                solutionName = processingPlant.getSolutionNode().getComponentID();
+                solutionName = processingPlant.getSolutionNode().getComponentType();
             }
         }
         LOG.debug(".newTopologyGraph(): Setting Solution Name");
         graph.setDeploymentName(solutionName);
         LOG.debug(".newTopologyGraph(): Iterating Through nodeList");
         for(TopologyNode currentNode: nodeList){
-            if(currentNode.getComponentType().equals(TopologyNodeTypeEnum.PROCESSING_PLANT)){
+            if(currentNode.getComponentType().equals(ComponentTypeTypeEnum.PROCESSING_PLANT)){
                 ProcessingPlantTopologyNode currentProcessingPlantTopologyNode = (ProcessingPlantTopologyNode)currentNode;
                 ITOpsMonitoredProcessingPlant processingPlant = processingPlantFactory.newProcessingPlant(currentProcessingPlantTopologyNode);
                 graph.addProcessingPlant(processingPlant);

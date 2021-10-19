@@ -22,8 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupframework.worker.buildingblocks;
 
+import net.fhirfactory.pegacorn.components.auditing.AuditEventCaptureLevelEnum;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import org.apache.camel.Exchange;
@@ -42,7 +46,13 @@ import javax.inject.Inject;
 public class WUPIngresConduit {
 
     @Inject
-    PetasosPathwayExchangePropertyNames exchangePropertyNames;
+    private PetasosPathwayExchangePropertyNames exchangePropertyNames;
+
+    @Inject
+    private MOAServicesAuditBroker auditBroker;
+
+    @Inject
+    private ProcessingPlantInterface processingPlant;
     
     private static final Logger LOG = LoggerFactory.getLogger(WUPIngresConduit.class);
     protected Logger getLogger(){
@@ -55,14 +65,14 @@ public class WUPIngresConduit {
      * returns this for forwarding into the WUP itself. This way, the only thing the Business Logic developer need
      * worry about is the UoW on which they are acting.
      *
-     * @param ingresPacket The WorkUnitTransportPacket for the associated UoW - containing the WUPJobCard & ParcelStatusElement for the activity
+     * @param fulfillmentTask The WorkUnitTransportPacket for the associated UoW - containing the WUPJobCard & ParcelStatusElement for the activity
      * @param camelExchange The Apache Camel Exchange object, for injecting the WUPJobCard & ParcelStatusElement into
      * @return A UoW (Unit of Work) object for injection into the WUP for processing by the Business Logic
      */
-    public UoW forwardIntoWUP(PetasosTaskOld ingresPacket, Exchange camelExchange){
-        getLogger().debug(".forwardIntoWUP(): Entry, ingresParcel->{}", ingresPacket);
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME, ingresPacket);
-        UoW theUoW = SerializationUtils.clone(ingresPacket.getPayload());
+    public UoW forwardIntoWUP(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange){
+        getLogger().debug(".forwardIntoWUP(): Entry, ingresParcel->{}", fulfillmentTask);
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_PROPERTY_NAME, fulfillmentTask);
+        UoW theUoW = SerializationUtils.clone(fulfillmentTask.getTaskWorkItem());
         //
         // Because auditing is not running yet
         // Remove once Auditing is in place
@@ -70,8 +80,14 @@ public class WUPIngresConduit {
         getLogger().trace("ProcessingMessage->{}", theUoW.getIngresContent().getPayload());
         //
         //
-        //
 
+        //
+        // Audit Trail
+        if(processingPlant.getAuditingLevel().getAuditLevel() >= AuditEventCaptureLevelEnum.LEVEL_5_COMPONENT_ALL.getAuditLevel()){
+            auditBroker.logActivity(fulfillmentTask, false);
+        }
+        //
+        // We're done
         getLogger().debug(".forwardIntoWUP(): Exit, returning the UoW --> {}", theUoW);
         return(theUoW);
     }

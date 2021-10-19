@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.model.sost;
 
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
 
 import java.util.ArrayList;
 

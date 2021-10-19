@@ -45,7 +45,7 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
         super(context);
         getLogger().debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
         this.wupTopologyNode = nodeElement;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getComponentId());
     }
 
     @Override
@@ -69,7 +69,8 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
         fromWithStandardExceptionHandling(nameSet.getEndPointInterchangeRouterIngres())
                 .routeId(nameSet.getRouteInterchangeRouter())
                 .process(nodeDetailInjector)
-                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange)");
+                .bean(InterchangeTaskRegistration.class, "registerActionableTask(*, Exchange)")
+                .bean(InterchangeTaskDistributor.class, "distributeTasksToWorkUnitProcessors(*, Exchange)");
     }
 
     protected class NodeDetailInjector implements Processor {

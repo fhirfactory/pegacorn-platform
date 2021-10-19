@@ -30,6 +30,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
@@ -72,29 +73,24 @@ public class WUPContainerEgressGatekeeper {
      * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
      * WUPJobCard.isToBeDiscarded boolean.
      *
-     * @param wupTransportPacket The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange   The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
      * @return Should either return the ingres point into the associated Interchange Payload Transformer or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> egressGatekeeper(PetasosTaskOld wupTransportPacket, Exchange camelExchange) {
-        getLogger().debug(".egressGatekeeper(): Enter, wupTransportPacket (WorkUnitTransportPacket) --> {}, wupFDNTokenValue (String) --> {}", wupTransportPacket );
-        // Get my Petasos Context
+    public List<String> egressGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+        getLogger().debug(".egressGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask );
+
         getLogger().trace(".egressGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        metricsAgent.touchLastActivityInstant(node.getComponentID());
-        metricsAgent.touchActivityFinishInstant(node.getComponentID());
-        getLogger().trace(".egressGatekeeper(): Node Element retrieved --> {}", node);
-        TopologyNodeFDNToken wupFunctionToken = node.getNodeFDN().getToken();
-        getLogger().trace(".egressGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         // Now, continue with business logic
-        RouteElementNames nameSet = new RouteElementNames( wupFunctionToken);
+        RouteElementNames nameSet = new RouteElementNames(node.getComponentId());
         getLogger().trace(".egressGatekeeper(): Created the nameSet (RouteElementNames) for the activity --> {}", nameSet);
         ArrayList<String> targetList = new ArrayList<String>();
-        if(!wupTransportPacket.hasCurrentJobCard()) {
+        if(!fulfillmentTask.hasTaskJobCard()) {
             getLogger().warn(".egressGatekeeper(): CurrentJobCard is null!");
         }
-        if (wupTransportPacket.getCurrentJobCard().getIsToBeDiscarded()) {
+        if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
             getLogger().trace(".egressGatekeeper(): The isToBeDiscarded attribute is true, so we return null (and discard the packet");
             getLogger().debug(".egressGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (targetList);
@@ -103,7 +99,7 @@ public class WUPContainerEgressGatekeeper {
             getLogger().trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
             String targetEndpoint = nameSet.getEndPointInterchangePayloadTransformerIngres();
             targetList.add(targetEndpoint);
-            metricsAgent.incrementEgressMessageCount(node.getComponentID());
+            metricsAgent.incrementEgressMessageCount(node.getComponentId().getId());
             getLogger().debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);
         }

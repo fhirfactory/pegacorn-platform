@@ -28,7 +28,7 @@ import java.io.Serializable;
 public class TopologyNodeRDN implements Serializable {
     private String nodeName;
     private String nodeVersion;
-    private TopologyNodeTypeEnum nodeType;
+    private ComponentTypeTypeEnum nodeType;
 
     public TopologyNodeRDN(){
         this.nodeVersion = null;
@@ -36,7 +36,7 @@ public class TopologyNodeRDN implements Serializable {
         this.nodeType = null;
     }
 
-    public TopologyNodeRDN(TopologyNodeTypeEnum newNodeType, String newNodeName, String newNodeVersion){
+    public TopologyNodeRDN(ComponentTypeTypeEnum newNodeType, String newNodeName, String newNodeVersion){
         this.nodeName = newNodeName;
         this.nodeType = newNodeType;
         this.nodeVersion = newNodeVersion;
@@ -58,17 +58,17 @@ public class TopologyNodeRDN implements Serializable {
         this.nodeVersion = nodeVersion;
     }
 
-    public TopologyNodeTypeEnum getNodeType() {
+    public ComponentTypeTypeEnum getNodeType() {
         return nodeType;
     }
 
-    public void setNodeType(TopologyNodeTypeEnum nodeType) {
+    public void setNodeType(ComponentTypeTypeEnum nodeType) {
         this.nodeType = nodeType;
     }
 
     @JsonIgnore
     public String getTag(){
-        String newTag = getNodeType().getNodeElementType() + "[" + getNodeName() + "(" + getNodeVersion() +")]";
+        String newTag = getNodeType().getDisplayName() + "[" + getNodeName() + "(" + getNodeVersion() +")]";
         return(newTag);
     }
 

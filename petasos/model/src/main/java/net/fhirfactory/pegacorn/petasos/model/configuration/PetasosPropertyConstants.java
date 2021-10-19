@@ -65,7 +65,7 @@ public final class PetasosPropertyConstants {
     public final static long RESILIENCE_ACTIVITY_WATCHDOG_PERIOD = 10000L;
 
     public final static String WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME = "WUPTopologyNode";
-    public final static String WUP_TRANSPORT_PACKET_EXCHANGE_PROPERTY_NAME = "WUPTransportPacket";
+    public final static String WUP_FULFILLMENT_TASK_PROPERTY_NAME = "WUPTransportPacket";
     public final static String WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME = "WUPJobCard";
     public final static String WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME = "WUPPetasosParcel";
     public final static String WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME = "WUPCurrentUnitOfWork";

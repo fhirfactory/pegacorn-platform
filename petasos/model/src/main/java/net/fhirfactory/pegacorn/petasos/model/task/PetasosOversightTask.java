@@ -23,10 +23,12 @@ package net.fhirfactory.pegacorn.petasos.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.reporting.datatypes.TaskReportingType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskOversightStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.reporting.datatypes.TaskReportingType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskOversightStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -63,6 +65,7 @@ public class PetasosOversightTask extends PetasosTask{
         this.taskOversightStatusLock =  new SerializableObject();
         this.actionableTaskId = null;
         this.actionableTaskIdLock = new SerializableObject();
+        setTaskType(new TaskTypeType(TaskTypeTypeEnum.OVERSIGHT_TASK_TYPE));
     }
 
     //
@@ -70,21 +73,35 @@ public class PetasosOversightTask extends PetasosTask{
     //
 
     @JsonIgnore
-    public boolean hasActiveFulfillmentSegment(){
+    public boolean hasActiveTaskFulfillment(){
         boolean hasValue = this.activeTaskFulfillment != null;
         return(hasValue);
     }
 
-    public TaskFulfillmentType getActiveFulfillmentSegment() {
+    public TaskFulfillmentType getActiveTaskFulfillment() {
         return activeTaskFulfillment;
     }
 
-    public void setActiveFulfillmentSegment(TaskFulfillmentType activePetasosTaskFulfillment) {
-        this.activeTaskFulfillment = activePetasosTaskFulfillment;
+    public void setActiveTaskFulfillment(TaskFulfillmentType activeTaskFulfillment) {
+        this.activeTaskFulfillment = activeTaskFulfillment;
     }
 
     @JsonIgnore
-    boolean hasReportingSegment(){
+    public boolean hasActionableTaskId() {
+        boolean hasValue = this.actionableTaskId != null;
+        return(hasValue);
+    }
+
+    public TaskIdType getActionableTaskId() {
+        return actionableTaskId;
+    }
+
+    public void setActionableTaskId(TaskIdType actionableTaskId) {
+        this.actionableTaskId = actionableTaskId;
+    }
+
+    @JsonIgnore
+    boolean hasTaskReporting(){
         boolean hasValue = this.taskReporting != null;
         return(hasValue);
     }
@@ -112,7 +129,7 @@ public class PetasosOversightTask extends PetasosTask{
     }
 
     @JsonIgnore
-    public boolean hasStatusSegment(){
+    public boolean hasTaskOversightStatus(){
         boolean hasValue = this.taskOversightStatus != null;
         return(hasValue);
     }
@@ -157,20 +174,6 @@ public class PetasosOversightTask extends PetasosTask{
         this.taskOversightStatusLock = taskOversightStatusLock;
     }
 
-    @JsonIgnore
-    public boolean hasFulfilledTaskIdentitySegment() {
-        boolean hasValue = this.actionableTaskId != null;
-        return(hasValue);
-    }
-
-    public TaskIdType getFulfilledTaskIdentitySegment() {
-        return actionableTaskId;
-    }
-
-    public void setFulfilledTaskIdentitySegment(TaskIdType fulfilledTaskPetasosTaskIdentity) {
-        this.actionableTaskId = fulfilledTaskPetasosTaskIdentity;
-    }
-
     public SerializableObject getActionableTaskIdLock() {
         return actionableTaskIdLock;
     }
@@ -183,18 +186,22 @@ public class PetasosOversightTask extends PetasosTask{
     // To String
     //
 
-
     @Override
     public String toString() {
         return "PetasosOversightTask{" +
-                "activeFulfillmentSegment=" + activeTaskFulfillment +
-                ", reportingSegment=" + taskReporting +
+                "activeTaskFulfillment=" + activeTaskFulfillment +
+                ", taskReporting=" + taskReporting +
                 ", fulfillmentMap=" + fulfillmentMap +
-                ", statusSegment=" + taskOversightStatus +
-                ", fulfilledTaskIdentitySegment=" + actionableTaskId +
-                ", id=" + getTaskId() +
-                ", work=" + getTaskWorkItem() +
-                ", history=" + getTaskTraceability() +
+                ", taskOversightStatus=" + taskOversightStatus +
+                ", actionableTaskId=" + actionableTaskId +
+                ", taskId=" + getTaskId() +
+                ", taskType=" + getTaskType() +
+                ", taskWorkItem=" + getTaskWorkItem() +
+                ", taskTraceability=" + getTaskTraceability() +
+                ", taskOutcomeStatus=" + getTaskOutcomeStatus() +
+                ", registered=" + isRegistered() +
+                ", taskPerformerTypes=" + getTaskPerformerTypes() +
+                ", taskReason=" + getTaskReason() +
                 '}';
     }
 }

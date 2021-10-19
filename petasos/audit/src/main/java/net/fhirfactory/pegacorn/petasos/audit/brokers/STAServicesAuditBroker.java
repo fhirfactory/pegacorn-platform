@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
 import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
-import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.PetasosFulfillmentTask2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -42,7 +42,7 @@ public class STAServicesAuditBroker {
     PetasosAuditWriterInterface auditWriter;
 
     @Inject
-    DefaultResilienceParcel2FHIRAuditEvent parcel2auditevent;
+    PetasosFulfillmentTask2FHIRAuditEvent parcel2auditevent;
 
     public void logAPIActivity(TransactionStatusElement transactionStatus) {
         LOG.debug(".logAPIActivity(): Entry, transactionStatus->{}", transactionStatus);

@@ -49,7 +49,7 @@ public class ExternalIngresWUPContainerRoute extends BaseRouteBuilder {
         super(camelCTX);
         getLogger().debug(".ExternalIngresWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode );
         this.wupTopologyNode = wupNode;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getComponentId());
     }
 
     @Override

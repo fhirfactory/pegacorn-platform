@@ -190,27 +190,4 @@ class FDNTest {
 		}
 	}
 
-
-	/**
-	 * Test method for
-	 * {@link FDN#equals(FDN)}.
-	 */
-	@Test
-	void testEqualsFDN() {
-		LOG.debug(".testEqualsFDN(): Entry...");
-		FDN firstFDN = new FDN();
-		firstFDN.appendRDN(new RDN("TestType0","TestValue0"));
-		firstFDN.appendRDN(new RDN("TestType1","TestValue1"));
-		firstFDN.appendRDN(new RDN("TestType2","TestValue2"));
-		firstFDN.appendRDN(new RDN("TestType3","TestValue3"));
-		FDN secondFDN = new FDN();
-		secondFDN.appendRDN(new RDN("TestType0","TestValue0"));
-		secondFDN.appendRDN(new RDN("TestType1","TestValue1"));
-		secondFDN.appendRDN(new RDN("TestType2","TestValue2"));
-		secondFDN.appendRDN(new RDN("TestType3","TestValue3"));
-		if(!firstFDN.equals(secondFDN)){
-			fail("FDN::equals failed");
-		}
-	}
-
 }

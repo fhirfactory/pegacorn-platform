@@ -32,7 +32,7 @@ public abstract class ITOpsMonitoredNodeFactory {
 
     protected ITOpsMonitoredNode newITOpsMonitoredNode(ITOpsMonitoredNode monitoredNode, TopologyNode topologyNode){
         getLogger().debug(".newITOpsMonitoredNode(): Entry, monitoredNode->{}, topologyNode->{}", monitoredNode, topologyNode);
-        monitoredNode.setComponentID(topologyNode.getComponentID());
+        monitoredNode.setComponentID(topologyNode.getComponentType());
         monitoredNode.setComponentName(topologyNode.getNodeRDN().getNodeName());
         ITOpsMonitoredNodeTypeEnum nodeTypeEnum = ITOpsMonitoredNodeTypeEnum.nodeTypeFromTopologyNodeType(topologyNode.getComponentType());
         monitoredNode.setNodeType(nodeTypeEnum);

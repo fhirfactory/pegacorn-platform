@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import org.slf4j.Logger;
@@ -205,7 +204,7 @@ public class TopologyNodeFDN implements Serializable {
         }
     }
 
-    public TopologyNodeRDN extractRDNForNodeType(TopologyNodeTypeEnum nodeType){
+    public TopologyNodeRDN extractRDNForNodeType(ComponentTypeTypeEnum nodeType){
         getLogger().debug(".TopologyNodeFDN(): Entry, nodeType->{}", nodeType);
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
             if(nodeRDN.getNodeType().equals(nodeType)){
@@ -219,7 +218,7 @@ public class TopologyNodeFDN implements Serializable {
     public FDN toTypeBasedFDN(){
         FDN newFDN = new FDN();
         for(TopologyNodeRDN nodeRDN: hierarchicalNameSet){
-            newFDN.appendRDN(new RDN(nodeRDN.getNodeType().getNodeElementType(),nodeRDN.getNodeName()));
+            newFDN.appendRDN(new RDN(nodeRDN.getNodeType().getDisplayName(),nodeRDN.getNodeName()));
         }
         return(newFDN);
     }

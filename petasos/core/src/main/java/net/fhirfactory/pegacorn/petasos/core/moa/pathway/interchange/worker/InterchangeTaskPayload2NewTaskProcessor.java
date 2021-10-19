@@ -24,30 +24,24 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.PetasosActionableTaskIdentifierFactory;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.managers.PetasosActionableTaskManager;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosActionableTask;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
-import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.reason.valuesets.TaskReasonTypeEnum;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityElementType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.traceability.factories.TaskTraceabilityElementTypeFactory;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayloadSet;
+import net.fhirfactory.pegacorn.petasos.tasks.factories.PetasosActionableTaskFactory;
+import net.fhirfactory.pegacorn.petasos.tasks.operations.cluster.im.PetasosActionableTaskIM;
 import org.apache.camel.Exchange;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -62,13 +56,17 @@ public class InterchangeTaskPayload2NewTaskProcessor {
     TopologyIM topologyProxy;
 
     @Inject
-    private PetasosActionableTaskManager actionableTaskManager;
+    private PetasosActionableTaskIM actionableTaskIM;
 
     @Inject
     private WorkUnitProcessorMetricsCollectionAgent metricsAgent;
 
     @Inject
-    private PetasosActionableTaskIdentifierFactory actionableTaskIdentifierFactory;
+    private PetasosActionableTaskFactory actionableTaskFactory;
+
+    @Inject
+    private TaskTraceabilityElementTypeFactory traceabilityElementFactory;
+
     
     /**
      * This method performs tree key tasks:
@@ -80,18 +78,18 @@ public class InterchangeTaskPayload2NewTaskProcessor {
      * 3. It then returns a List<> of these new WorkUnitTransportPackets for distribution.
      * 
      * It generates the 
-     * @param actionableTask
+     * @param fulfillmentTask
      * @param camelExchange
      * @return A List<> of WorkUnitTransportPackets - one for each egress UoWPayload element within the incoming UoW.
      */
 
-    public List<PetasosActionableTask> extractUoWPayloadAndCreateNewActionableTaskSet(PetasosActionableTask actionableTask, Exchange camelExchange) {
-        getLogger().debug(".extractUoWPayloadAndCreateNewActionableTaskSet(): Entry, actionableTask->{}", actionableTask);
+    public List<PetasosActionableTask> extractUoWPayloadAndCreateNewActionableTaskSet(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+        getLogger().debug(".extractUoWPayloadAndCreateNewActionableTaskSet(): Entry, fulfillmentTask->{}", fulfillmentTask);
         // Get my Petasos Context
         getLogger().trace(".extractUoWPayloadAndCreateNewActionableTaskSet(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
-        metricsAgent.touchEventDistributionStartInstant(node.getComponentID());
-        TaskWorkItemType incomingWork = actionableTask.getTaskWorkItem();
+        metricsAgent.touchEventDistributionStartInstant(node.getComponentId().getId());
+        TaskWorkItemType incomingWork = fulfillmentTask.getTaskWorkItem();
         UoWPayloadSet egressContent = incomingWork.getEgressContent();
         Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
         if (getLogger().isDebugEnabled()) {
@@ -102,32 +100,21 @@ public class InterchangeTaskPayload2NewTaskProcessor {
                 counter++;
             }
         }
-        ArrayList<PetasosTaskOld> newEgressTransportPacketSet = new ArrayList<PetasosTaskOld>();
+        ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<PetasosActionableTask>();
+        //
+        // Get Current ActionableTask
+        PetasosActionableTask currentActionableTask = actionableTaskIM.getActionableTask(fulfillmentTask.getActionableTaskId());
+        if(currentActionableTask == null){
+            return(newActionableTaskList);
+        }
         for(UoWPayload currentPayload: egressPayloadList) {
-            TaskWorkItemType newUoW = new TaskWorkItemType(currentPayload);
-            getLogger().trace(".extractUoWPayloadAndCreateNewActionableTaskSet(): newUoW->{}", newUoW);
-            TaskFulfillmentType clonedPetasosTaskFulfillment = SerializationUtils.clone(actionableTask.getPacketID());
-            PetasosTaskOld transportPacket = new PetasosTaskOld(clonedPetasosTaskFulfillment, Date.from(Instant.now()), newUoW);
-            newEgressTransportPacketSet.add(transportPacket);
+            getLogger().trace(".extractUoWPayloadAndCreateNewActionableTaskSet(): newUoW->{}", currentPayload);
+            TaskTraceabilityElementType traceabilityElement = traceabilityElementFactory.newTaskTraceabilityElementFromTask(currentActionableTask.getTaskId(), fulfillmentTask.getTaskFulfillment());
+            PetasosActionableTask actionableTask = actionableTaskFactory.newMessageBasedActionableTask(currentActionableTask, traceabilityElement, currentPayload);
+            newActionableTaskList.add(actionableTask);
         }
-        getLogger().debug(".extractUoWPayloadAndCreateNewActionableTaskSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newEgressTransportPacketSet.size());
+        getLogger().debug(".extractUoWPayloadAndCreateNewActionableTaskSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
 
-        return (newEgressTransportPacketSet);
-    }
-
-    private PetasosActionableTask createNewPetasosActionableTask(PetasosActionableTask oldTask, TaskWorkItemType newWorkItem){
-        if(oldTask == null || newWorkItem == null){
-            return(null);
-        }
-
-        TaskIdType newActionableTaskId = actionableTaskIdentifierFactory.newActionableTaskId(TaskReasonTypeEnum.TASK_REASON_MESSAGE_PROCESSING, newWorkItem.getIngresContent().getPayloadManifest().getContentDescriptor());
-        PetasosActionableTask task = new PetasosActionableTask();
-
-        TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
-        traceabilityElement.setTaskId(oldTask.getTaskId());
-        traceabilityElement.set
-        TaskTraceabilityType taskTraceability = oldTask.getTaskTraceability();
-        taskTraceability.getTaskJourney()
-
+        return (newActionableTaskList);
     }
 }

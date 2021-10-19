@@ -26,11 +26,11 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,7 @@ public class FinaliseSOAWorkUnitActivityTask {
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).toBeDiscarded (boolean) --> {}", submittedJobCard.getIsToBeDiscarded());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).requestedStatus (WUPActivityStatusEnum) --> {}", submittedJobCard.getRequestedStatus());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).systemMode (ResilienceModeEnum) --> {}", submittedJobCard.getSystemMode());
-        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).updateDate (Date) --> {}", submittedJobCard.getUpdateInstant());
+        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).updateDate (Date) --> {}", submittedJobCard.getLocalUpdateInstant());
         }
 		TaskFulfillmentType petasosTaskFulfillment = submittedJobCard.getActivityID();
         TopologyNodeFDN nodeFDN = new TopologyNodeFDN(petasosTaskFulfillment.getFulfillerComponentId());
@@ -132,7 +132,7 @@ public class FinaliseSOAWorkUnitActivityTask {
 						TaskStatusType statusElement = activityMatrixDM.getTransactionElement(parcelInstanceID);
 						LOG.trace(".standaloneModeSynchroniseJobCard(): Retrieved ParcelStatusElement --> {}", statusElement);
 						submittedJobCard.setGrantedStatus(submittedJobCard.getCurrentStatus());
-						submittedJobCard.setUpdateInstant(Date.from(Instant.now()));
+						submittedJobCard.setLocalUpdateInstant(Date.from(Instant.now()));
 						switch (submittedJobCard.getCurrentStatus()) {
 							case WUP_ACTIVITY_STATUS_FINISHED:
 								activityMatrixDM.finishTransaction(petasosTaskFulfillment, FulfillmentExecutionStatusEnum.PARCEL_STATUS_FINALISED);

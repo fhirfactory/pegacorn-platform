@@ -52,14 +52,14 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 		super(camelCTX);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+		nameSet = new RouteElementNames(wupTopologyNode.getComponentId());
 	}
 
 	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, boolean requiresDirect) {
 		super(camelCTX);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken(), requiresDirect);
+		nameSet = new RouteElementNames(wupTopologyNode.getComponentId(), requiresDirect);
 	}
 
 	@Override

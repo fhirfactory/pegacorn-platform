@@ -24,12 +24,11 @@ package net.fhirfactory.pegacorn.petasos.audit.transformers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.common.Pegacorn2FHIRAuditEventBase;
-import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.task.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
@@ -96,14 +95,14 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         String portType = parcel.getAssociatedPortType();
         String sourceSite;
         if(portValue != null && portType != null) {
-            sourceSite = processingPlant.getIPCServiceName() + ":" + portValue;
+            sourceSite = processingPlant.getIPCServiceRoutingName() + ":" + portValue;
         } else {
-            sourceSite = processingPlant.getIPCServiceName();
+            sourceSite = processingPlant.getIPCServiceRoutingName();
         }
         AuditEvent auditEvent = auditEventFactory.newAuditEvent(
                 null,
                 processingPlant.getSimpleInstanceName(),
-                processingPlant.getHostName(),
+                processingPlant.getDeploymentPlatformName(),
                 sourceSite,
                 null,
                 AuditEventSourceTypeEnum.HL7_APPLICATION_SERVER,
@@ -124,7 +123,7 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
     //  To Do
     //
 
-    public AuditEvent transform(PetasosParcelAuditTrailEntry parcel){
+    public AuditEvent transform(PetasosFulfillerTaskAuditEntry parcel){
         AuditEvent auditEvent = new AuditEvent();
         return(auditEvent);
     }

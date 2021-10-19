@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupframework.manager;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupframework.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupframework.worker.archetypes.ExternalIngresWUPContainerRoute;
@@ -153,7 +153,7 @@ public class WorkUnitProcessorFrameworkManager {
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
         IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
         localSubscriber.setIdentifier(identifier);
-        localSubscriber.setComponentID(wupNode.getComponentID());
+        localSubscriber.setComponentID(wupNode.getComponentType());
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         return(subscriber);
     }

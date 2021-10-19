@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 
 import java.io.Serializable;
 import java.util.ArrayList;

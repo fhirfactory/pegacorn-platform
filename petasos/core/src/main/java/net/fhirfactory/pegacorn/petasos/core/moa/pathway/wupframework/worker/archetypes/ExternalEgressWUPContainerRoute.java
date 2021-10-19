@@ -54,7 +54,7 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 		super(camelCTX);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
-		nameSet = new RouteElementNames(wupNode.getNodeFDN().getToken());
+		nameSet = new RouteElementNames(wupNode.getComponentId());
 	}
 
 	@Override

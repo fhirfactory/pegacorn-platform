@@ -21,6 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.finalisation.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class PetasosEpisodeFinalisationStatusSet {
         synchronized (updateLock) {
             if(!this.statusSet.containsKey(wupFunction)) {
                 PetasosEpisodeFinalisationStatus newStatusElement = new PetasosEpisodeFinalisationStatus(episodeID, wupFunction);
-                newStatusElement.setRegistrationStatus(PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_NOT_REGISTERED);
+                newStatusElement.setRegistrationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
                 newStatusElement.setDownstreamWUPFunction(wupFunction);
             }
         }
@@ -51,11 +52,11 @@ public class PetasosEpisodeFinalisationStatusSet {
         synchronized (updateLock){
             if(this.statusSet.containsKey(wupFunction)){
                 PetasosEpisodeFinalisationStatus existingStatusElement = this.statusSet.get(wupFunction);
-                existingStatusElement.setRegistrationStatus(PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_REGISTERED);
+                existingStatusElement.setRegistrationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
                 existingStatusElement.setDownstreamEpisodeID(episodeID);
             } else {
                 PetasosEpisodeFinalisationStatus newStatusElement = new PetasosEpisodeFinalisationStatus(episodeID, wupFunction);
-                newStatusElement.setRegistrationStatus(PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_REGISTERED);
+                newStatusElement.setRegistrationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
                 newStatusElement.setDownstreamEpisodeID(episodeID);
             }
         }
@@ -76,7 +77,7 @@ public class PetasosEpisodeFinalisationStatusSet {
             while(keys.hasMoreElements()){
                 WUPFunctionToken wupFunctionToken = keys.nextElement();
                 PetasosEpisodeFinalisationStatus petasosEpisodeFinalisationStatus = this.statusSet.get(wupFunctionToken);
-                if(petasosEpisodeFinalisationStatus.getRegistrationStatus().equals(PetasosEpisodeFinalisationStatusEnum.DOWNSTREAM_EPISODE_ID_NOT_REGISTERED)){
+                if(petasosEpisodeFinalisationStatus.getRegistrationStatus().equals(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED)){
                     isAllFinalised = false;
                     break;
                 }

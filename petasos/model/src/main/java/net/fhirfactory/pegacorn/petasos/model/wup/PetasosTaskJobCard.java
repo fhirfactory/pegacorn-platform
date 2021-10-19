@@ -26,10 +26,12 @@ import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
@@ -45,10 +47,16 @@ public class PetasosTaskJobCard implements Serializable {
     private TaskIdType fulfillmentTaskIdentifier;
     private TaskIdType actionableTaskIdentifier;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
-    private Instant updateInstant;
+    private Instant localUpdateInstant;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
+    private Instant coordinatorUpdateInstant;
+    private ComponentIdType processingPlant;
+    private ComponentIdType workUnitProcessor;
     private PetasosJobActivityStatusEnum currentStatus;
     private PetasosJobActivityStatusEnum requestedStatus;
     private PetasosJobActivityStatusEnum grantedStatus;
+    private FulfillmentExecutionStatusEnum localFulfillmentStatus;
+    private FulfillmentExecutionStatusEnum globalFulfillmentStatus;
     private ConcurrencyModeEnum clusterMode;
     private ResilienceModeEnum systemMode;
     private boolean isToBeDiscarded;
@@ -61,7 +69,8 @@ public class PetasosTaskJobCard implements Serializable {
     public PetasosTaskJobCard(){
         this.fulfillmentTaskIdentifier = null;
         this.actionableTaskIdentifier = null;
-        this.updateInstant = null;
+        this.localUpdateInstant = null;
+        this.coordinatorUpdateInstant = null;
         this.currentStatus = null;
         this.requestedStatus = null;
         this.clusterMode = null;
@@ -69,6 +78,10 @@ public class PetasosTaskJobCard implements Serializable {
         this.grantedStatus = null;
         this.isToBeDiscarded = false;
         this.currentStateReason = null;
+        this.localFulfillmentStatus = null;
+        this.globalFulfillmentStatus = null;
+        this.processingPlant = null;
+        this.workUnitProcessor = null;
     }
 
     public PetasosTaskJobCard(
@@ -78,12 +91,13 @@ public class PetasosTaskJobCard implements Serializable {
             PetasosJobActivityStatusEnum requestedStatus,
             ConcurrencyModeEnum clusterMode, 
             ResilienceModeEnum systemMode, 
-            Instant updateInstant) {
+            Instant localUpdateInstant) {
         //
         // Clear the deck
         this.fulfillmentTaskIdentifier = null;
         this.actionableTaskIdentifier = null;
-        this.updateInstant = null;
+        this.localUpdateInstant = null;
+        this.coordinatorUpdateInstant = null;
         this.currentStatus = null;
         this.requestedStatus = null;
         this.clusterMode = null;
@@ -91,6 +105,10 @@ public class PetasosTaskJobCard implements Serializable {
         this.grantedStatus = null;
         this.isToBeDiscarded = false;
         this.currentStateReason = null;
+        this.localFulfillmentStatus = null;
+        this.globalFulfillmentStatus = null;
+        this.processingPlant = null;
+        this.workUnitProcessor = null;
 
         //
         // Assign provided values
@@ -105,7 +123,7 @@ public class PetasosTaskJobCard implements Serializable {
         } else {
             setActionableTaskIdentifier(actionableTaskIdentifier);
         }
-        setUpdateInstant(updateInstant);
+        setLocalUpdateInstant(localUpdateInstant);
         setCurrentStatus(currentStatus);
         setClusterMode(clusterMode);
         setRequestedStatus(requestedStatus);
@@ -118,7 +136,8 @@ public class PetasosTaskJobCard implements Serializable {
         // Clear the deck
         this.fulfillmentTaskIdentifier = null;
         this.actionableTaskIdentifier = null;
-        this.updateInstant = null;
+        this.localUpdateInstant = null;
+        this.coordinatorUpdateInstant = null;
         this.currentStatus = null;
         this.requestedStatus = null;
         this.clusterMode = null;
@@ -126,6 +145,10 @@ public class PetasosTaskJobCard implements Serializable {
         this.grantedStatus = null;
         this.isToBeDiscarded = false;
         this.currentStateReason = null;
+        this.processingPlant = null;
+        this.workUnitProcessor = null;
+        this.localFulfillmentStatus = null;
+        this.globalFulfillmentStatus = null;
         //
         // Assign provided values
         if(ori.hasActionableTaskIdentifier()){
@@ -149,7 +172,28 @@ public class PetasosTaskJobCard implements Serializable {
         if(ori.hasSystemMode()){
             setSystemMode(ori.getSystemMode());
         }
+        if(ori.hasWorkUnitProcessor()){
+            setWorkUnitProcessor(SerializationUtils.clone(ori.getWorkUnitProcessor()));
+        }
+        if(ori.hasProcessingPlant()){
+            setProcessingPlant(SerializationUtils.clone(ori.getProcessingPlant()));
+        }
         setToBeDiscarded(ori.isToBeDiscarded);
+        if(ori.hasLocalUpdateInstant()){
+            setLocalUpdateInstant(SerializationUtils.clone(ori.getLocalUpdateInstant()));
+        }
+        if(ori.hasCoordinatorUpdateInstant()){
+            setCoordinatorUpdateInstant(SerializationUtils.clone(ori.getCoordinatorUpdateInstant()));
+        }
+        if(ori.hasLocalFulfillmentStatus()){
+            setLocalFulfillmentStatus(ori.getLocalFulfillmentStatus());
+        }
+        if(ori.hasGlobalFulfillmentStatus()){
+            setGlobalFulfillmentStatus(ori.getGlobalFulfillmentStatus());
+        }
+        if(ori.hasCurrentStateReason()){
+            setCurrentStateReason(ori.getCurrentStateReason());
+        }
     }
 
     //
@@ -185,17 +229,31 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasUpdateInstant(){
-        boolean hasValue = this.updateInstant != null;
+    public boolean hasLocalUpdateInstant(){
+        boolean hasValue = this.localUpdateInstant != null;
         return(hasValue);
     }
 
-    public Instant getUpdateInstant() {
-        return updateInstant;
+    public Instant getLocalUpdateInstant() {
+        return localUpdateInstant;
     }
 
-    public void setUpdateInstant(Instant updateInstant) {
-        this.updateInstant = updateInstant;
+    public void setLocalUpdateInstant(Instant localUpdateInstant) {
+        this.localUpdateInstant = localUpdateInstant;
+    }
+
+    @JsonIgnore
+    public boolean hasCoordinatorUpdateInstant(){
+        boolean hasValue = this.coordinatorUpdateInstant != null;
+        return(hasValue);
+    }
+
+    public Instant getCoordinatorUpdateInstant() {
+        return coordinatorUpdateInstant;
+    }
+
+    public void setCoordinatorUpdateInstant(Instant coordinatorUpdateInstant) {
+        this.coordinatorUpdateInstant = coordinatorUpdateInstant;
     }
 
     @JsonIgnore
@@ -290,6 +348,62 @@ public class PetasosTaskJobCard implements Serializable {
         this.currentStateReason = currentStateReason;
     }
 
+    @JsonIgnore
+    public boolean  hasLocalFulfillmentStatus(){
+        boolean hasValue = this.localFulfillmentStatus != null;
+        return(hasValue);
+    }
+
+    public FulfillmentExecutionStatusEnum getLocalFulfillmentStatus() {
+        return localFulfillmentStatus;
+    }
+
+    public void setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum localFulfillmentStatus) {
+        this.localFulfillmentStatus = localFulfillmentStatus;
+    }
+
+    @JsonIgnore
+    public boolean  hasGlobalFulfillmentStatus(){
+        boolean hasValue = this.globalFulfillmentStatus != null;
+        return(hasValue);
+    }
+
+    public FulfillmentExecutionStatusEnum getGlobalFulfillmentStatus() {
+        return globalFulfillmentStatus;
+    }
+
+    public void setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum localFulfillmentStatus) {
+        this.globalFulfillmentStatus = localFulfillmentStatus;
+    }
+
+    @JsonIgnore
+    public boolean hasProcessingPlant(){
+        boolean hasValue = this.processingPlant != null;
+        return(hasValue);
+    }
+
+    public ComponentIdType getProcessingPlant() {
+        return processingPlant;
+    }
+
+    public void setProcessingPlant(ComponentIdType processingPlant) {
+        this.processingPlant = processingPlant;
+    }
+
+    @JsonIgnore
+    public boolean hasWorkUnitProcessor(){
+        boolean hasValue = this.workUnitProcessor != null;
+        return(hasValue);
+    }
+
+    public ComponentIdType getWorkUnitProcessor() {
+        return workUnitProcessor;
+    }
+
+    public void setWorkUnitProcessor(ComponentIdType workUnitProcessor) {
+        this.workUnitProcessor = workUnitProcessor;
+    }
+
     //
     // To String
     //
@@ -299,14 +413,18 @@ public class PetasosTaskJobCard implements Serializable {
         return "PetasosTaskJobCard{" +
                 "fulfillmentTaskIdentifier=" + fulfillmentTaskIdentifier +
                 ", actionableTaskIdentifier=" + actionableTaskIdentifier +
-                ", updateInstant=" + updateInstant +
+                ", updateInstant=" + localUpdateInstant +
                 ", currentStatus=" + currentStatus +
                 ", requestedStatus=" + requestedStatus +
                 ", grantedStatus=" + grantedStatus +
+                ", localFulfillmentStatus=" + localFulfillmentStatus +
+                ", globalFulfillmentStatus=" + globalFulfillmentStatus +
                 ", clusterMode=" + clusterMode +
                 ", systemMode=" + systemMode +
                 ", isToBeDiscarded=" + isToBeDiscarded +
-                ", currentStateReason=" + currentStateReason +
+                ", currentStateReason='" + currentStateReason + '\'' +
+                ", workUnitProcessor=" + getWorkUnitProcessor() +
+                ", processingPlant=" + getProcessingPlant() +
                 '}';
     }
 }

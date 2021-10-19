@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.itops.metrics;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.petasos.model.itops.metrics.common.NodeMetricsBase;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -51,8 +52,8 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
     private int startedTasks;
     private int registeredTasks;
     private int cancelledTasks;
-    private PetasosEpisodeIdentifier currentEpisode;
-    private PetasosEpisodeIdentifier lastEpisode;
+    private TaskIdType currentActionableTask;
+    private TaskIdType lastActionableTask;
     private int nodeIngresQueueSize;
 
 
@@ -78,8 +79,8 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
         this.lastEventProcessingDuration = 0L;
         this.eventProcessingStartInstant = Instant.EPOCH;
         this.eventProcessingFinishInstant = null;
-        this.currentEpisode = null;
-        this.lastEpisode = null;
+        this.currentActionableTask = null;
+        this.lastActionableTask = null;
         this.nodeIngresQueueSize = 0;
         this.distributionCountMap = new HashMap<>();
         this.setMetricsType(WORK_UNIT_PROCESSOR_METRICS_TYPE);
@@ -105,8 +106,8 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
         this.lastEventProcessingDuration = 0L;
         this.eventProcessingStartInstant = Instant.EPOCH;
         this.eventProcessingFinishInstant = null;
-        this.currentEpisode = null;
-        this.lastEpisode = null;
+        this.currentActionableTask = null;
+        this.lastActionableTask = null;
         this.nodeIngresQueueSize = 0;
         this.distributionCountMap = new HashMap<>();
         this.setMetricsType(WORK_UNIT_PROCESSOR_METRICS_TYPE);
@@ -339,20 +340,20 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
         this.cancelledTasks = cancelledTasks;
     }
 
-    public PetasosEpisodeIdentifier getCurrentEpisode() {
-        return currentEpisode;
+    public TaskIdType getCurrentActionableTask() {
+        return currentActionableTask;
     }
 
-    public void setCurrentEpisode(PetasosEpisodeIdentifier currentEpisode) {
-        this.currentEpisode = currentEpisode;
+    public void setCurrentActionableTask(TaskIdType currentActionableTask) {
+        this.currentActionableTask = currentActionableTask;
     }
 
-    public PetasosEpisodeIdentifier getLastEpisode() {
-        return lastEpisode;
+    public TaskIdType getLastActionableTask() {
+        return lastActionableTask;
     }
 
-    public void setLastEpisode(PetasosEpisodeIdentifier lastEpisode) {
-        this.lastEpisode = lastEpisode;
+    public void setLastActionableTask(TaskIdType lastActionableTask) {
+        this.lastActionableTask = lastActionableTask;
     }
 
     public int getNodeIngresQueueSize() {
@@ -471,8 +472,8 @@ public class WorkUnitProcessorNodeMetrics extends NodeMetricsBase {
                 ", startedTasks=" + startedTasks +
                 ", registeredTasks=" + registeredTasks +
                 ", cancelledTasks=" + cancelledTasks +
-                ", currentEpisode=" + currentEpisode +
-                ", lastEpisode=" + lastEpisode +
+                ", currentActionableTask=" + currentActionableTask +
+                ", lastActionableTask=" + lastActionableTask +
                 ", nodeIngresQueueSize=" + nodeIngresQueueSize +
                 ", nodeStatus=" + getNodeStatus() +
                 ", metricsType=" + getMetricsType()+

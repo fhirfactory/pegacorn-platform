@@ -22,14 +22,22 @@
 package net.fhirfactory.pegacorn.petasos.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentID;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeType;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.finalisation.datatypes.TaskFinalisationStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
+
+import java.util.List;
 
 public class PetasosActionableTask extends PetasosTask{
 
     private TaskFulfillmentType taskFulfillment;
     private SerializableObject taskFulfillmentLock;
+    private TaskFinalisationStatusType taskFinalisation;
+    private SerializableObject taskFinalisationLock;
 
     //
     // Constructor(s)
@@ -39,6 +47,9 @@ public class PetasosActionableTask extends PetasosTask{
         super();
         this.taskFulfillment = null;
         this.taskFulfillmentLock = new SerializableObject();
+        this.taskFinalisation = null;
+        this.taskFinalisationLock = new SerializableObject();
+        setTaskType(new TaskTypeType(TaskTypeTypeEnum.ACTIONABLE_TASK_TYPE));
     }
 
     //
@@ -46,32 +57,67 @@ public class PetasosActionableTask extends PetasosTask{
     //
 
     @JsonIgnore
-    public boolean hasActualFulfillerId(){
-        boolean hasValue = this.actualFulfillerId != null;
+    public boolean hasTaskFulfillment(){
+        boolean hasValue = this.taskFulfillment != null;
         return(hasValue);
     }
 
-    public ComponentID getActualFulfillerId() {
-        return actualFulfillerId;
+    public TaskFulfillmentType getTaskFulfillment() {
+        return taskFulfillment;
     }
 
-    public void setActualFulfillerId(ComponentID actualFulfillerId) {
-        this.actualFulfillerId = actualFulfillerId;
+    public void setTaskFulfillment(TaskFulfillmentType taskFulfillment) {
+        this.taskFulfillment = taskFulfillment;
+    }
+
+    public SerializableObject getTaskFulfillmentLock() {
+        return taskFulfillmentLock;
+    }
+
+    public void setTaskFulfillmentLock(SerializableObject taskFulfillmentLock) {
+        this.taskFulfillmentLock = taskFulfillmentLock;
+    }
+
+    @JsonIgnore
+    public boolean hasTaskFinalisation(){
+        boolean hasValue = this.taskFinalisation != null;
+        return(hasValue);
+    }
+
+    public TaskFinalisationStatusType getTaskFinalisation() {
+        return taskFinalisation;
+    }
+
+    public void setTaskFinalisation(TaskFinalisationStatusType taskFinalisation) {
+        this.taskFinalisation = taskFinalisation;
+    }
+
+    public SerializableObject getTaskFinalisationLock() {
+        return taskFinalisationLock;
+    }
+
+    public void setTaskFinalisationLock(SerializableObject taskFinalisationLock) {
+        this.taskFinalisationLock = taskFinalisationLock;
     }
 
     //
     // To String
     //
 
+
     @Override
     public String toString() {
         return "PetasosActionableTask{" +
-                "idSegment=" + getTaskId() +
-                ", workSegment=" + getTaskWorkItem() +
-                ", historySegment=" + getTaskTraceability() +
-                ", outcomeStatusSegment=" + getTaskOutcomeStatus() +
-                ", registered=" + isRegistered() +
-                ", actualFulfillerId=" + actualFulfillerId +
+                "taskFulfillment=" + taskFulfillment +
+                ", taskFulfillmentLock=" + taskFulfillmentLock +
+                ", hasTaskFulfillment=" + hasTaskFulfillment() +
+                ", taskId=" + getTaskId() +
+                ", taskType=" + getTaskType() +
+                ", taskWorkItem=" + getTaskWorkItem() +
+                ", taskTraceability=" + getTaskTraceability() +
+                ", taskOutcomeStatus=" + getTaskOutcomeStatus() +
+                ", taskPerformerTypes=" + getTaskPerformerTypes() +
+                ", taskFinalisation=" + getTaskFinalisation() +
                 '}';
     }
 }

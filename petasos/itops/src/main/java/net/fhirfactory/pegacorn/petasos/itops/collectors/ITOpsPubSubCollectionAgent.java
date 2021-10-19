@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.itops.collectors;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+import net.fhirfactory.pegacorn.components.topology.interfaces.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DistributedPubSubSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.itops.caches.ITOpsPubSubMapLocalDM;
@@ -73,7 +73,7 @@ public class ITOpsPubSubCollectionAgent implements ITOpsPubSubCollectionAgentInt
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Create a ProcessingPlantSubscriptionSummary skeleton");
         ProcessingPlantSubscriptionSummary processingPlantSubscriptionSummary = new ProcessingPlantSubscriptionSummary();
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Assign the ProcessintPlant ComponentID (processingPlantNode->{})", processingPlant.getProcessingPlantNode());
-        processingPlantSubscriptionSummary.setComponentID(processingPlant.getProcessingPlantNode().getComponentID());
+        processingPlantSubscriptionSummary.setComponentID(processingPlant.getProcessingPlantNode().getComponentType());
         LOG.trace(".refreshLocalProcessingPlantPubSubMap(): Check if there are any subscriptions, if not, exit out");
         if(allPublisherServiceSubscriptions.isEmpty()){
             LOG.debug(".refreshLocalProcessingPlantPubSubMap(): Exit, publisher service subscriptions is empty");

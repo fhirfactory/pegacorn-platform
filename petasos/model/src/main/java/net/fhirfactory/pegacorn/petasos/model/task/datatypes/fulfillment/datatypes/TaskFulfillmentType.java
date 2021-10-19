@@ -1,0 +1,154 @@
+/*
+ * Copyright (c) 2020 Mark A. Hunter
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.common.TaskInstantDetailSegmentBase;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import org.apache.commons.lang3.SerializationUtils;
+
+import java.io.Serializable;
+import java.time.Instant;
+
+/**
+ *
+ * @author Mark A. Hunter
+ */
+public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements Serializable {
+    private TopologyNode fulfillerComponent;
+    private FulfillmentTrackingIdType trackingID;
+    private FulfillmentExecutionStatusEnum status;
+    private boolean resilientActivity;
+
+    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, TopologyNode fulfillerCommponent, Instant registrationInstant) {
+        super();
+        this.fulfillerComponent = fulfillerComponent;
+        this.trackingID = SerializationUtils.clone(trackingID);
+        setRegistrationInstant(SerializationUtils.clone(registrationInstant));
+        this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_REGISTERED;
+        this.resilientActivity = false;
+    }
+
+    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, TopologyNode fulfillerCommponent) {
+        super();
+        this.fulfillerComponent = fulfillerComponent;
+        this.trackingID = SerializationUtils.clone(trackingID);
+        this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
+        this.resilientActivity = false;
+    }
+
+    public TaskFulfillmentType() {
+        super();
+        this.fulfillerComponent = null;
+        this.trackingID = null;
+        this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
+        this.resilientActivity = false;
+    }
+
+    public TaskFulfillmentType(TaskFulfillmentType ori) {
+        super(ori);
+        this.fulfillerComponent = null;
+        this.trackingID = null;
+        this.status = FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED;
+        this.resilientActivity = false;
+
+        // Set Values
+        if (ori.hasFulfillerComponent()) {
+            this.fulfillerComponent = ori.getFulfillerComponent();
+        }
+        if (ori.hasTrackingID()) {
+            this.trackingID = SerializationUtils.clone(ori.getTrackingID());
+        }
+        this.status = ori.getStatus();
+        this.resilientActivity = ori.isResilientActivity();
+    }
+
+    //
+    // Getters and Setters (Bean Methods)
+    //
+
+    @JsonIgnore
+    public boolean hasFulfillerComponent(){
+        boolean hasValue = this.fulfillerComponent != null;
+        return(hasValue);
+    }
+
+    public TopologyNode getFulfillerComponent() {
+        return fulfillerComponent;
+    }
+
+    public void setFulfillerComponent(TopologyNode fulfillerComponent) {
+        this.fulfillerComponent = fulfillerComponent;
+    }
+
+    @JsonIgnore
+    boolean hasTrackingID(){
+        boolean hasValue = this.trackingID != null;
+        return(hasValue);
+    }
+
+    public FulfillmentTrackingIdType getTrackingID() {
+        return trackingID;
+    }
+
+    public void setTrackingID(FulfillmentTrackingIdType trackingID) {
+        this.trackingID = trackingID;
+    }
+
+    public FulfillmentExecutionStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(FulfillmentExecutionStatusEnum status) {
+        this.status = status;
+    }
+
+    public boolean isResilientActivity() {
+        return resilientActivity;
+    }
+
+    public void setResilientActivity(boolean resilientActivity) {
+        this.resilientActivity = resilientActivity;
+    }
+
+    //
+    // To String
+    //
+
+
+    @Override
+    public String toString() {
+        return "FulfillmentSegment{" +
+                "registrationInstant=" + getRegistrationInstant() +
+                ", readyInstant=" + getReadyInstant() +
+                ", startInstant=" + getStartInstant() +
+                ", finishInstant=" + getFinishInstant() +
+                ", finalisationInstant=" + getFinalisationInstant() +
+                ", lastCheckedInstant=" + getLastCheckedInstant() +
+                ", fulfillerComponent=" + fulfillerComponent +
+                ", trackingID=" + trackingID +
+                ", status=" + status +
+                ", resilientActivity=" + resilientActivity +
+                '}';
+    }
+}

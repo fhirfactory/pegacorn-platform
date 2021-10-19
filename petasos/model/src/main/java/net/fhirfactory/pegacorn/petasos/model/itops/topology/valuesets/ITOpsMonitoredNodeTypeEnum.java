@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.itops.topology.valuesets;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 
 public enum ITOpsMonitoredNodeTypeEnum {
     ITOPS_MONITORED_SUBSYSTEM("itops.monitored_node_type.subsystem"),
@@ -42,7 +42,7 @@ public enum ITOpsMonitoredNodeTypeEnum {
         return nodeType;
     }
 
-    public static ITOpsMonitoredNodeTypeEnum nodeTypeFromTopologyNodeType(TopologyNodeTypeEnum nodeType){
+    public static ITOpsMonitoredNodeTypeEnum nodeTypeFromTopologyNodeType(ComponentTypeTypeEnum nodeType){
         switch(nodeType){
             case WORKSHOP:
             case OAM_WORKSHOP:{

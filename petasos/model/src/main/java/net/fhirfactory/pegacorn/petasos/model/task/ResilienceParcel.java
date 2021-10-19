@@ -21,18 +21,18 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.task;
 
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeType;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +58,9 @@ public class ResilienceParcel implements Serializable {
     private SerializableObject episodeIdentifierLock;
     private UoW actualUoW;
     private SerializableObject actualUoWLock;
-    private WUPIdentifier associatedWUPIdentifier;
+    private ComponentIdType associatedWUPIdentifier;
     private SerializableObject associatedWUPIdentifierLock;
-    private WUPFunctionToken associatedWUPFunction;
+    private ComponentTypeType associatedWUPFunction;
     private SerializableObject associatedWUPFunctionLock;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private SerializableObject downstreamEpisodeIdentifierSetLock;
@@ -126,13 +126,12 @@ public class ResilienceParcel implements Serializable {
         this.associatedWUPFunctionLock = new SerializableObject();
         // Now, add what we have been supplied
         this.associatedWUPIdentifier = petasosTaskFulfillment.getFulfillerComponentId();
-        this.associatedWUPFunction = new WUPFunctionToken(petasosTaskFulfillment.getPresentWUPFunctionToken());
-        this.episodeIdentifier = petasosTaskFulfillment.getPresentEpisodeIdentifier();
-        this.typeID = this.buildParcelTypeID(petasosTaskFulfillment, theUoW);
+        this.episodeIdentifier = null;
+        this.typeID = null;
         this.identifier = this.buildParcelInstanceIdentifier(petasosTaskFulfillment, theUoW);
         this.actualUoW = theUoW;
         this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
-        this.upstreamEpisodeIdentifier = petasosTaskFulfillment.getPreviousEpisodeIdentifier();
+//        this.upstreamEpisodeIdentifier = petasosTaskFulfillment.getPreviousEpisodeIdentifier();
         this.registrationDate = Date.from(Instant.now());
         this.finalisationStatus = ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED;
     }
@@ -175,7 +174,7 @@ public class ResilienceParcel implements Serializable {
             this.cancellationDate = originalParcel.getCancellationDate();
         }
         if (originalParcel.hasAssociatedWUPIdentifier()) {
-            this.associatedWUPIdentifier = originalParcel.getAssociatedWUPIdentifier();
+ //           this.associatedWUPIdentifier = originalParcel.getAssociatedWUPIdentifier();
         }
         if (originalParcel.hasAssociatedWUPFunction()) {
             this.associatedWUPFunction = originalParcel.getAssociatedWUPFunction();
@@ -229,11 +228,11 @@ public class ResilienceParcel implements Serializable {
         return(hasValue);
     }
 
-    public WUPFunctionToken getAssociatedWUPFunction() {
+    public ComponentTypeType getAssociatedWUPFunction() {
         return associatedWUPFunction;
     }
 
-    public void setAssociatedWUPFunction(WUPFunctionToken associatedWUPFunction) {
+    public void setAssociatedWUPFunction(ComponentTypeType associatedWUPFunction) {
         this.associatedWUPFunction = associatedWUPFunction;
     }
 
@@ -497,11 +496,11 @@ public class ResilienceParcel implements Serializable {
         return (true);
     }
 
-    public WUPIdentifier getAssociatedWUPIdentifier() {
+    public ComponentIdType getAssociatedWUPIdentifier() {
         return associatedWUPIdentifier;
     }
 
-    public void setAssociatedWUPIdentifier(WUPIdentifier associatedWUPIdentifier) {
+    public void setAssociatedWUPIdentifier(ComponentIdType associatedWUPIdentifier) {
         synchronized (associatedWUPIdentifierLock) {
             this.associatedWUPIdentifier = associatedWUPIdentifier;
         }
@@ -561,7 +560,7 @@ public class ResilienceParcel implements Serializable {
         }
     }
 
-    public FDNToken buildParcelTypeID(TaskFulfillmentType petasosTaskFulfillment, UoW theUoW) {
+    public FDNToken buildParcelTypeID(PetasosFulfillmentTask petasosTaskFulfillment, UoW theUoW) {
         if (theUoW == null) {
             throw (new IllegalArgumentException(".buildEpisodeID(): null UoW passed as parameter"));
         }
@@ -574,14 +573,8 @@ public class ResilienceParcel implements Serializable {
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): UoW has no type value, bad parameter"));
         }
-        FDN newTypeID;
-        if (petasosTaskFulfillment.hasPresentWUPFunctionToken()) {
-            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(petasosTaskFulfillment.getPresentWUPFunctionToken());
-            newTypeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
-        } else {
-            throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
-        }
-        newTypeID.appendFDN(uowTypeFDN);
+        FDN newTypeID = new FDN();
+
         return (newTypeID.getToken());
     }
 
@@ -598,14 +591,7 @@ public class ResilienceParcel implements Serializable {
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): UoW has no instance value, bad parameter"));
         }
-        FDN newInstanceID;
-        if (petasosTaskFulfillment.hasPresentWUPIdentifier()) {
-            newInstanceID = new FDN(petasosTaskFulfillment.getFulfillerComponentId().toTypeBasedFDNToken());
-        } else {
-            throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPInstanceID value, bad parameter"));
-        }
-        newInstanceID.appendFDN(uowInstanceFDN);
-        FulfillmentTrackingIdType parcelIdentifier = new FulfillmentTrackingIdType(newInstanceID.getToken());
+        FulfillmentTrackingIdType parcelIdentifier = new FulfillmentTrackingIdType();
         return (parcelIdentifier);
     }
 

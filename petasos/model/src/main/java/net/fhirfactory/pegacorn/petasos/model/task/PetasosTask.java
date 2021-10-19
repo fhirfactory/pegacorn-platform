@@ -23,11 +23,13 @@ package net.fhirfactory.pegacorn.petasos.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.performer.datatypes.TaskPerformerType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskOutcomeStatusType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.traceability.datatypes.TaskTraceabilityType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.work.datatypes.TaskWorkItemType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.performer.datatypes.TaskPerformerTypeType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.reason.datatypes.TaskReasonType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskOutcomeStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.traceability.datatypes.TaskTraceabilityType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.work.datatypes.TaskWorkItemType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,6 +40,9 @@ public class PetasosTask implements Serializable {
     private TaskIdType taskId;
     private SerializableObject taskIdLock;
 
+    private TaskTypeType taskType;
+    private SerializableObject taskTypeLock;
+
     private TaskWorkItemType taskWorkItem;
     private SerializableObject taskWorkItemLock;
 
@@ -47,8 +52,11 @@ public class PetasosTask implements Serializable {
     private TaskOutcomeStatusType taskOutcomeStatus;
     private SerializableObject taskOutcomeStatusLock;
 
-    private List<TaskPerformerType> taskPerformerTypes;
+    private List<TaskPerformerTypeType> taskPerformerTypes;
     private SerializableObject taskPerformerTypesLock;
+
+    private TaskReasonType taskReason;
+    private SerializableObject taskReasonLock;
 
     private boolean registered;
 
@@ -68,6 +76,10 @@ public class PetasosTask implements Serializable {
         this.registered = false;
         this.taskPerformerTypes = new ArrayList<>();
         this.taskPerformerTypesLock = new SerializableObject();
+        this.taskType = null;
+        this.taskTypeLock = new SerializableObject();
+        this.taskReason = null;
+        this.taskReasonLock = new SerializableObject();
     }
 
     //
@@ -75,7 +87,7 @@ public class PetasosTask implements Serializable {
     //
 
     @JsonIgnore
-    public boolean hasIdSegment(){
+    public boolean hasTaskId(){
         boolean hasValue = this.taskId != null;
         return(hasValue);
     }
@@ -97,7 +109,29 @@ public class PetasosTask implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasWorkSegment(){
+    public boolean hasTaskType(){
+        boolean hasValue = this.taskType != null;
+        return(hasValue);
+    }
+
+    public TaskTypeType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskTypeType taskType) {
+        this.taskType = taskType;
+    }
+
+    public SerializableObject getTaskTypeLock() {
+        return taskTypeLock;
+    }
+
+    public void setTaskTypeLock(SerializableObject taskTypeLock) {
+        this.taskTypeLock = taskTypeLock;
+    }
+
+    @JsonIgnore
+    public boolean hasTaskWorkItem(){
         boolean hasValue = this.taskWorkItem != null;
         return(hasValue);
     }
@@ -119,7 +153,7 @@ public class PetasosTask implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasHistorySegment(){
+    public boolean hasTaskTraceability(){
         boolean hasValue = this.taskTraceability != null;
         return(hasValue);
     }
@@ -141,7 +175,7 @@ public class PetasosTask implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasOutcomeStatusSegment(){
+    public boolean hasTaskOutcomeStatus(){
         boolean hasValue = this.taskOutcomeStatus != null;
         return(hasValue);
     }
@@ -170,11 +204,17 @@ public class PetasosTask implements Serializable {
         this.registered = registered;
     }
 
-    public List<TaskPerformerType> getTaskPerformerTypes() {
+    @JsonIgnore
+    public boolean hasTaskPerformerTypes(){
+        boolean hasValue = this.taskPerformerTypes != null;
+        return(hasValue);
+    }
+
+    public List<TaskPerformerTypeType> getTaskPerformerTypes() {
         return taskPerformerTypes;
     }
 
-    public void setTaskPerformerTypes(List<TaskPerformerType> taskPerformerTypes) {
+    public void setTaskPerformerTypes(List<TaskPerformerTypeType> taskPerformerTypes) {
         this.taskPerformerTypes = taskPerformerTypes;
     }
 
@@ -186,6 +226,28 @@ public class PetasosTask implements Serializable {
         this.taskPerformerTypesLock = taskPerformerTypesLock;
     }
 
+    @JsonIgnore
+    public boolean hasTaskReason(){
+        boolean hasValue = this.taskReason != null;
+        return(hasValue);
+    }
+
+    public TaskReasonType getTaskReason() {
+        return taskReason;
+    }
+
+    public void setTaskReason(TaskReasonType taskReason) {
+        this.taskReason = taskReason;
+    }
+
+    public SerializableObject getTaskReasonLock() {
+        return taskReasonLock;
+    }
+
+    public void setTaskReasonLock(SerializableObject taskReasonLock) {
+        this.taskReasonLock = taskReasonLock;
+    }
+
     //
     // To String
     //
@@ -194,11 +256,13 @@ public class PetasosTask implements Serializable {
     public String toString() {
         return "PetasosTask{" +
                 "taskId=" + taskId +
+                ", taskType=" + taskType +
                 ", taskWorkItem=" + taskWorkItem +
                 ", taskTraceability=" + taskTraceability +
                 ", taskOutcomeStatus=" + taskOutcomeStatus +
                 ", registered=" + registered +
                 ", taskPerformers=" + taskPerformerTypes +
+                ", taskReason=" + taskReason +
                 '}';
     }
 }

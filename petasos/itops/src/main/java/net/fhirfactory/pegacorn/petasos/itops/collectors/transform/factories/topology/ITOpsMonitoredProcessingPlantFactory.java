@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.itops.collectors.transform.factories.to
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
@@ -62,14 +62,14 @@ public class ITOpsMonitoredProcessingPlantFactory extends ITOpsMonitoredNodeFact
         processingPlant.setTopologyNodeFDN(nodeFDN);
         String platformNodeName = "Unknown";
         for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
-            if(currentRDN.getNodeType().equals(TopologyNodeTypeEnum.PLATFORM)){
+            if(currentRDN.getNodeType().equals(ComponentTypeTypeEnum.PLATFORM)){
                 platformNodeName = currentRDN.getNodeName();
                 break;
             }
         }
         String siteName = "Unknown";
         for(TopologyNodeRDN currentRDN: nodeFDN.getHierarchicalNameSet()){
-            if(currentRDN.getNodeType().equals(TopologyNodeTypeEnum.SITE)){
+            if(currentRDN.getNodeType().equals(ComponentTypeTypeEnum.SITE)){
                 siteName = currentRDN.getNodeName();
                 break;
             }

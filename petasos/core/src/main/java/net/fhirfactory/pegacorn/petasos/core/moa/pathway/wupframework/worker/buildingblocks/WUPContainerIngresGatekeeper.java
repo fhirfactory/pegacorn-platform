@@ -28,6 +28,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcesso
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.WorkUnitProcessorMetricsCollectionAgent;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosTaskOld;
 import org.apache.camel.Exchange;
 import org.apache.camel.RecipientList;
@@ -63,25 +64,24 @@ public class WUPContainerIngresGatekeeper {
      * within another WUP). At the moment, it reaches the "discard" decisions purely by checking the
      * WUPJobCard.isToBeDiscarded boolean.
      *
-     * @param ingresPacket     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
+     * @param fulfillmentTask     The WorkUnitTransportPacket that is to be forwarded to the Intersection (if all is OK)
      * @param camelExchange    The Apache Camel Exchange object, used to store a Semaphore as we iterate through Dynamic Route options
      * @return Should either return the ingres point into the associated WUP Ingres Conduit or null (if the packet is to be discarded)
      */
     @RecipientList
-    public List<String> ingresGatekeeper(PetasosTaskOld ingresPacket, Exchange camelExchange) {
-        getLogger().debug(".ingresGatekeeper(): Enter, ingresPacket->{}", ingresPacket);
-        // Get my Petasos Context
+    public List<String> ingresGatekeeper(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
+        getLogger().debug(".ingresGatekeeper(): Enter, fulfillmentTask->{}", fulfillmentTask);
+        // Get my WorkUnitProcessor details
         getLogger().trace(".ingresGatekeeper(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         getLogger().trace(".ingresGatekeeper(): Node Element retrieved --> {}", node);
-        TopologyNodeFDNToken wupToken = node.getNodeFDN().getToken();
-        getLogger().trace(".ingresGatekeeper(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupToken);
+
         // Now, continue with business logic
-        RouteElementNames nameSet = new RouteElementNames(wupToken);
+        RouteElementNames nameSet = new RouteElementNames(node.getComponentId());
         ArrayList<String> targetList = new ArrayList<String>();
         getLogger().trace(".ingresGatekeeper(): So, we will now determine if the Packet should be forwarded or discarded");
-        if (ingresPacket.getCurrentJobCard().getIsToBeDiscarded()) {
-            metricsAgent.touchActivityFinishInstant(node.getComponentID());
+        if (fulfillmentTask.getTaskJobCard().isToBeDiscarded()) {
+            metricsAgent.touchActivityFinishInstant(node.getComponentId().getId());
             getLogger().debug(".ingresGatekeeper(): Returning null, as message is to be discarded (isToBeDiscarded == true)");
             return (null);
         } else {

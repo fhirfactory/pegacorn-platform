@@ -30,19 +30,18 @@ import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.core.PetasosActionableTaskIdentifierFactory;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.factories.TaskIdTypeFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupframework.manager.WorkUnitProcessorFrameworkManager;
-import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.coordinators.PetasosOversightTaskManager;
-import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.coordinators.ProcessingPlantResilienceParcelServicesIM;
+import net.fhirfactory.pegacorn.petasos.tasks.operations.processingplant.im.PetasosOversightTaskIM;
+import net.fhirfactory.pegacorn.petasos.tasks.operations.processingplant.im.PetasosFulfillmentTaskIM;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.status.datatypes.TaskStatusType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes.TaskStatusType;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.task.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.FulfillmentTrackingIdType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
@@ -56,18 +55,16 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 
 @ApplicationScoped
 public class PetasosMOAServicesBroker {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMOAServicesBroker.class);
 
     @Inject
-    private ProcessingPlantResilienceParcelServicesIM parcelServicesIM;
+    private PetasosFulfillmentTaskIM parcelServicesIM;
 
     @Inject
-    private PetasosOversightTaskManager rasController;
+    private PetasosOversightTaskIM rasController;
 
     @Inject
     private WorkUnitProcessorFrameworkManager wupFrameworkManager;
@@ -82,7 +79,7 @@ public class PetasosMOAServicesBroker {
     private MOAServicesAuditBroker auditWriter;
 
     @Inject
-    private PetasosActionableTaskIdentifierFactory episodeIdentifierFactory;
+    private TaskIdTypeFactory episodeIdentifierFactory;
 
     /**
      *
@@ -265,7 +262,7 @@ public class PetasosMOAServicesBroker {
         }
     }
 
-    public PetasosParcelAuditTrailEntry transactionFailedPriorOnInitialValidation(WUPIdentifier wup, String action, UoW theUoW) {
+    public PetasosFulfillerTaskAuditEntry transactionFailedPriorOnInitialValidation(WUPIdentifier wup, String action, UoW theUoW) {
         if (LOG.isDebugEnabled()) {
             LOG.debug(".transactionAuditEntry(): Entry, ");
             LOG.debug(".transactionAuditEntry(): Entry, wup (WUPIdentifier) --> {}", wup);
@@ -275,7 +272,7 @@ public class PetasosMOAServicesBroker {
         if ((wup == null) || (action == null) || (theUoW == null)) {
             throw (new IllegalArgumentException(".writeAuditEntry(): wup, action or theUoW are null"));
         }
-        PetasosParcelAuditTrailEntry newAuditEntry = new PetasosParcelAuditTrailEntry();
+        PetasosFulfillerTaskAuditEntry newAuditEntry = new PetasosFulfillerTaskAuditEntry();
         newAuditEntry.setAuditTrailEntryDate(Date.from(Instant.now()));
         newAuditEntry.setActualUoW(theUoW);
         FDN auditEntryType = new FDN();

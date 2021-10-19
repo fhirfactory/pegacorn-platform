@@ -23,16 +23,24 @@ package net.fhirfactory.pegacorn.petasos.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.fulfillment.datatypes.TaskFulfillmentType;
-import net.fhirfactory.pegacorn.petasos.model.task.segments.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.PetasosTaskJobCard;
 
 public class PetasosFulfillmentTask extends PetasosTask{
 
     private TaskFulfillmentType taskFulfillment;
     private SerializableObject taskFulfillmentLock;
 
+    private PetasosTaskJobCard taskJobCard;
+    private SerializableObject taskJobCardLock;
+
     private TaskIdType actionableTaskId;
     private SerializableObject actionableTaskIdLock;
+
+    private boolean aRetry;
 
     //
     // Constructor(s)
@@ -44,6 +52,10 @@ public class PetasosFulfillmentTask extends PetasosTask{
         this.actionableTaskIdLock = new SerializableObject();
         this.taskFulfillment = null;
         this.taskFulfillmentLock = new SerializableObject();
+        this.taskJobCard = null;
+        this.taskJobCardLock = new SerializableObject();
+        this.aRetry = false;
+        setTaskType(new TaskTypeType(TaskTypeTypeEnum.FULFILLMENT_TASK_TYPE));
     }
 
     //
@@ -73,7 +85,7 @@ public class PetasosFulfillmentTask extends PetasosTask{
     }
 
     @JsonIgnore
-    public boolean hasFulfilledTaskIdentitySegment(){
+    public boolean hasActionableTaskId(){
         boolean hasValue = this.actionableTaskId != null;
         return(hasValue);
     }
@@ -94,16 +106,55 @@ public class PetasosFulfillmentTask extends PetasosTask{
         this.actionableTaskIdLock = actionableTaskIdLock;
     }
 
+    @JsonIgnore
+    public boolean hasTaskJobCard(){
+        boolean hasValue = this.taskJobCard != null;
+        return(hasValue);
+    }
+
+    public PetasosTaskJobCard getTaskJobCard() {
+        return taskJobCard;
+    }
+
+    public void setTaskJobCard(PetasosTaskJobCard taskJobCard) {
+        this.taskJobCard = taskJobCard;
+    }
+
+    public SerializableObject getTaskJobCardLock() {
+        return taskJobCardLock;
+    }
+
+    public void setTaskJobCardLock(SerializableObject taskJobCardLock) {
+        this.taskJobCardLock = taskJobCardLock;
+    }
+
+    public boolean isaRetry() {
+        return aRetry;
+    }
+
+    public void setaRetry(boolean aRetry) {
+        this.aRetry = aRetry;
+    }
+
+    //
+    // ToString
+    //
+
     @Override
     public String toString() {
         return "PetasosFulfillmentTask{" +
                 "taskFulfillment=" + taskFulfillment +
+                ", taskJobCard=" + taskJobCard +
                 ", actionableTaskId=" + actionableTaskId +
                 ", taskId=" + getTaskId() +
+                ", hasTaskType=" + hasTaskType() +
+                ", taskType=" + getTaskType() +
                 ", taskWorkItem=" + getTaskWorkItem() +
                 ", taskTraceability=" + getTaskTraceability() +
                 ", taskOutcomeStatus=" + getTaskOutcomeStatus() +
-                ", isRegistered=" + isRegistered() +
+                ", registered=" + isRegistered() +
+                ", taskPerformerTypes=" + getTaskPerformerTypes() +
+                ", isARetry=" + isaRetry() +
                 '}';
     }
 }

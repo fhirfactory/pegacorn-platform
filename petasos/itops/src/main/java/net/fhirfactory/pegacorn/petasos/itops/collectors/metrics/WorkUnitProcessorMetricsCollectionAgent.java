@@ -21,15 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.itops.collectors.metrics;
 
-import net.fhirfactory.pegacorn.petasos.itops.caches.ITOpsMetricsLocalDM;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.petasos.itops.collectors.metrics.common.ITOpsMetricsCollectionAgentBase;
 import net.fhirfactory.pegacorn.petasos.model.itops.metrics.WorkUnitProcessorNodeMetrics;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 @ApplicationScoped
 public class WorkUnitProcessorMetricsCollectionAgent extends ITOpsMetricsCollectionAgentBase {
@@ -132,20 +132,20 @@ public class WorkUnitProcessorMetricsCollectionAgent extends ITOpsMetricsCollect
         getLogger().debug(".incrementDistributedMessageCount(): Exit");
     }
 
-    public void updateCurrentEpisode(String componentID, PetasosEpisodeIdentifier episodeID){
+    public void updateCurrentActionableTask(String componentID, TaskIdType episodeID){
         getLogger().debug(".updatePresentEpisodeID(): Entry, componentID->{}, episodeID->{}", componentID, episodeID);
         WorkUnitProcessorNodeMetrics nodeMetrics = getNodeMetrics(componentID);
         synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
-            nodeMetrics.setCurrentEpisode(episodeID);
+            nodeMetrics.setCurrentActionableTask(episodeID);
         }
         getLogger().debug(".updatePresentEpisodeID(): Exit");
     }
 
-    public void updatePreviousEpisodeID(String componentID, PetasosEpisodeIdentifier episodeID){
+    public void updatePreviousEpisodeID(String componentID, TaskIdType episodeID){
         getLogger().debug(".updatePreviousEpisodeID(): Entry, componentID->{}, episodeID->{}", componentID, episodeID);
         WorkUnitProcessorNodeMetrics nodeMetrics = getNodeMetrics(componentID);
         synchronized(getMetricsDM().getNodeMetricsLock(componentID)) {
-            nodeMetrics.setLastEpisode(episodeID);
+            nodeMetrics.setLastActionableTask(episodeID);
         }
         getLogger().debug(".updatePreviousEpisodeID(): Exit");
     }
