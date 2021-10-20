@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 MAHun
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
-import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresGatekeeper;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.WUPContainerIngresProcessor;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @since 2020-07-1
  */
 
-public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
+public class ExternalEgressWUPContainerRoute extends BasePetasosContainerRoute {
 	private static final Logger LOG = LoggerFactory.getLogger(ExternalEgressWUPContainerRoute.class);
     protected Logger getLogger(){
         return(LOG);
@@ -49,8 +50,8 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 	private WorkUnitProcessorTopologyNode wupTopologyNode;
 	private RouteElementNames nameSet;
 
-	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode) {
-		super(camelCTX);
+	public ExternalEgressWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupNode, MOAServicesAuditBroker auditTrailBroker) {
+		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode);
 		this.wupTopologyNode = wupNode;
 		nameSet = new RouteElementNames(wupNode.getNodeFDN().getToken());
@@ -65,6 +66,8 @@ public class ExternalEgressWUPContainerRoute extends BaseRouteBuilder {
 		getLogger().info("StandardWUPContainerRoute :: EndPointWUPIngresConduitIngres --> {}", nameSet.getEndPointWUPIngresConduitIngres());
 		getLogger().info("StandardWUPContainerRoute :: EndPointWUPIngres --> {}", nameSet.getEndPointWUPIngres());
 		getLogger().info("StandardWUPContainerRoute :: EndPointWUPEgress --> {}", nameSet.getEndPointWUPEgress());
+
+		specifyCamelExecutionExceptionHandler();
 
 		ExternalEgressWUPContainerRoute.NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 

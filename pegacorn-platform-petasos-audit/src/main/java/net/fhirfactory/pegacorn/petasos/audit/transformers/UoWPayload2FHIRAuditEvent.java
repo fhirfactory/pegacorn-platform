@@ -78,11 +78,11 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
     }
 
     public AuditEvent transform(ResilienceParcel parcel, UoW uow, boolean isInteractDone){
-        AuditEvent outcomeAuditEvent = transform(parcel, uow, null, false);
+        AuditEvent outcomeAuditEvent = transform(parcel, uow, null, "false", false);
         return(outcomeAuditEvent);
     }
 
-    public AuditEvent transform(ResilienceParcel parcel, UoW uow, String activity, boolean isInteractDone){
+    public AuditEvent transform(ResilienceParcel parcel, UoW uow, String activity, String filteredState, boolean isInteractDone){
         if(parcel == null){
             return(null);
         }
@@ -92,13 +92,20 @@ public class UoWPayload2FHIRAuditEvent extends Pegacorn2FHIRAuditEventBase {
         List<AuditEvent.AuditEventEntityDetailComponent> detailList = new ArrayList<>();
         AuditEvent.AuditEventEntityDetailComponent ingresDetailComponent = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Ingress.Payload", uow.getIngresContent().getPayload());
         detailList.add(ingresDetailComponent);
-        if(uow.hasEgressContent()) {
-            int counter = 0;
-            for (UoWPayload currentPayload : uow.getEgressContent().getPayloadElements()) {
-                AuditEvent.AuditEventEntityDetailComponent currentEgressDetail = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Egress.Payload[" + counter + "]", currentPayload.getPayload());
-                detailList.add(currentEgressDetail);
-                counter += 1;
+        if(StringUtils.isNotEmpty(filteredState)){
+            if(filteredState.equalsIgnoreCase("false")) {
+                if (uow.hasEgressContent()) {
+                    int counter = 0;
+                    for (UoWPayload currentPayload : uow.getEgressContent().getPayloadElements()) {
+                        AuditEvent.AuditEventEntityDetailComponent currentEgressDetail = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Egress.Payload[" + counter + "]", currentPayload.getPayload());
+                        detailList.add(currentEgressDetail);
+                        counter += 1;
+                    }
+                }
             }
+        } else {
+            AuditEvent.AuditEventEntityDetailComponent currentEgressDetail = auditEventEntityFactory.newAuditEventEntityDetailComponent("UoW.Egress.Payload[0]", "Content Not Sent (Filtered)");
+            detailList.add(currentEgressDetail);
         }
 
         String descriptionText = null;

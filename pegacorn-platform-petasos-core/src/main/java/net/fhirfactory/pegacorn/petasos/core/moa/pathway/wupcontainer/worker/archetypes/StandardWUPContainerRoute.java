@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 MAHun
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,25 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.ar
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.*;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import org.apache.camel.*;
+import org.apache.camel.model.OnExceptionDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.net.ConnectException;
 
 /**
  * @author Mark A. Hunter
  * @since 2020-07-1
  */
 
-public class StandardWUPContainerRoute extends BaseRouteBuilder {
+public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 	private static final Logger LOG = LoggerFactory.getLogger(StandardWUPContainerRoute.class);
     protected Logger getLogger(){
         return(LOG);
@@ -47,19 +51,27 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 	private WorkUnitProcessorTopologyNode wupTopologyNode;
 	private RouteElementNames nameSet;
 
-	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode) {
-		super(camelCTX);
+	//
+	// Constructor(s)
+	//
+
+	public StandardWUPContainerRoute( CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, MOAServicesAuditBroker auditTrailBroker) {
+		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
 	}
 
-	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, boolean requiresDirect) {
-		super(camelCTX);
+	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, MOAServicesAuditBroker auditTrailBroker, boolean requiresDirect) {
+		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken(), requiresDirect);
+		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken(), requiresDirect);
 	}
+
+	//
+	// Business Methods (Routes)
+	//
 
 	@Override
 	public void configure() {
@@ -74,6 +86,8 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorIngres --> {}", nameSet.getEndPointWUPContainerEgressProcessorIngres());
 		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressProcessorEgress --> {}", nameSet.getEndPointWUPContainerEgressProcessorEgress());
 		getLogger().debug("StandardWUPContainerRoute :: EndPointWUPContainerEgressGatekeeperIngres --> {}", nameSet.getEndPointWUPContainerEgressGatekeeperIngres());
+
+		specifyCamelExecutionExceptionHandler();
 
 		NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 
@@ -125,6 +139,10 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 
 	}
 
+	//
+	// Content Injectors
+	//
+
 	protected class NodeDetailInjector implements Processor {
 		@Override
 		public void process(Exchange exchange) throws Exception {
@@ -142,7 +160,15 @@ public class StandardWUPContainerRoute extends BaseRouteBuilder {
 		}
 	}
 
+	//
+	// Getters (and Setters)
+	//
+
 	public WorkUnitProcessorTopologyNode getWupTopologyNode() {
 		return wupTopologyNode;
+	}
+
+	protected RouteElementNames getNameSet() {
+		return nameSet;
 	}
 }

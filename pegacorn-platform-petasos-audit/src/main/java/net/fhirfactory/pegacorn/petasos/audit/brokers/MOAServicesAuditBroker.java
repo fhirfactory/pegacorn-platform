@@ -22,11 +22,14 @@
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
 import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
+import net.fhirfactory.pegacorn.petasos.audit.transformers.Exception2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.UoWPayload2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import org.apache.camel.CamelExecutionException;
+import org.apache.camel.Exchange;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,9 @@ public class MOAServicesAuditBroker {
 
     @Inject
     UoWPayload2FHIRAuditEvent uow2auditevent;
+
+    @Inject
+    Exception2FHIRAuditEvent exception2FHIRAuditEvent;
 
     public AuditEvent logActivity(ResilienceParcel parcelInstance) {
         AuditEvent entry = logActivity(parcelInstance, false);
@@ -75,13 +81,13 @@ public class MOAServicesAuditBroker {
         return(entry);
     }
 
-    public void logMLLPTransactions(ResilienceParcel parcelAuditInstance, UoW uow, String activity, boolean requiresSynchronousWrite){
+    public void logMLLPTransactions(ResilienceParcel parcelAuditInstance, UoW uow, String activity, String filteredState, boolean requiresSynchronousWrite){
         if(parcelAuditInstance.hasAssociatedPortType() && parcelAuditInstance.hasAssociatedPortValue()) {
             AuditEvent uowEntry = null;
             if(uow.hasEgressContent()) {
-                uowEntry = uow2auditevent.transform(parcelAuditInstance, uow, activity, true);
+                uowEntry = uow2auditevent.transform(parcelAuditInstance, uow, activity, filteredState, true);
             } else {
-                uowEntry = uow2auditevent.transform(parcelAuditInstance, uow, activity, false);
+                uowEntry = uow2auditevent.transform(parcelAuditInstance, uow, activity, filteredState, false);
             }
             AuditEvent resultUoWEntry;
             if (requiresSynchronousWrite) {
@@ -89,6 +95,14 @@ public class MOAServicesAuditBroker {
             } else {
                 resultUoWEntry = auditWriter.logAuditEventAsynchronously(uowEntry);
             }
+        }
+    }
+
+    public void logCamelExecutionException(Object object, Exchange camelExchange){
+        CamelExecutionException camelExecutionException = camelExchange.getProperty(Exchange.EXCEPTION_CAUGHT, CamelExecutionException.class);
+        if(camelExecutionException != null) {
+            AuditEvent auditEvent = exception2FHIRAuditEvent.transformCamelExecutionException(camelExecutionException);
+            AuditEvent resultAuditEvent = auditWriter.logAuditEventSynchronously(auditEvent);
         }
     }
 }
