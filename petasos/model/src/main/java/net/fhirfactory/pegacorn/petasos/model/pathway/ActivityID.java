@@ -29,7 +29,7 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 
 /**
  *

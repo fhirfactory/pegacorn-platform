@@ -33,7 +33,7 @@ import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConst
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 import org.apache.camel.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

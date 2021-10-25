@@ -22,54 +22,101 @@
 
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
+
+import java.io.Serializable;
 
 /**
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class PetasosEpisodeIdentifier extends FDNToken implements Serializable {
-	
+@Deprecated
+public class PetasosEpisodeIdentifier extends TaskIdType implements Serializable {
+
+
+	//
+	// Constructor(s)
+	//
+
+	@JsonIgnore @Deprecated
+	public PetasosEpisodeIdentifier(PetasosEpisodeIdentifier originalId) {
+		super(originalId);
+	}
+
+	@JsonIgnore @Deprecated
+	public PetasosEpisodeIdentifier(TaskIdType taskId){
+		super(taskId);
+	}
+
+	@JsonIgnore @Deprecated
     public PetasosEpisodeIdentifier(FDNToken originalToken) {
-        this.setContent(new String(originalToken.getContent()));
+		super();
+		this.setId(originalToken.getContent());
     }
 
-    public PetasosEpisodeIdentifier(){
-    	super();
-	}
-	
-	@Override
-	public String toString() {
-	        FDN tempFDN = new FDN(this);
-	        String simpleString = "WUPIdentifier{";
-	        ArrayList<RDN> rdnSet = tempFDN.getRDNSet();
-	        int setSize = rdnSet.size();
-	        for (int counter = 0; counter < setSize; counter++) {
-	            RDN currentRDN = rdnSet.get(counter);
-	            String currentNameValue = currentRDN.getValue();
-	            if(currentNameValue.contains(".")){
-	                String outputString = currentNameValue.replace(".", "_");
-	                simpleString = simpleString + outputString;
-	            } else {
-	                simpleString = simpleString + currentNameValue;
-	            }
-	            if(counter < (setSize - 1)){
-	                simpleString = simpleString + ".";
-	            }
-	        }
-	        simpleString = simpleString + "}";
-	        return(simpleString);
+	public PetasosEpisodeIdentifier(){
+		super();
 	}
 
 	public PetasosEpisodeIdentifier(TopologyNodeFunctionFDN functionFDN){
-    	super();
-    	this.setContent(functionFDN.toTypeBasedFDNWithVersion().getToken().getContent());
+		super();
+		this.setContent(functionFDN.toTypeBasedFDNWithVersion().getToken().getContent());
 	}
 
+	//
+	// Getters and Setters
+	//
+
+	@JsonIgnore @Deprecated
+	public String getContent(){
+		return(getId());
+	}
+
+	@JsonIgnore @Deprecated
+	public void setContent(FDNToken token){
+		setId(token.getContent());
+	}
+
+	@JsonIgnore @Deprecated
+	public void setContent(String content){
+		setId(content);
+	}
+
+	@JsonIgnore @Deprecated
+	public void setValue(FDNToken token){
+		setId(token.getContent());
+	}
+
+	@JsonIgnore @Deprecated
+	public void setValue(String content){
+		setId(content);
+	}
+
+	@JsonIgnore @Deprecated
+	public FDNToken getFDNToken(){
+		FDNToken token = new FDNToken(getId());
+		return(token);
+	}
+
+	@JsonIgnore @Deprecated
+	public String getUnqualifiedToken(){
+		String unqualifiedToken = getFDNToken().getUnqualifiedToken();
+		return(unqualifiedToken);
+	}
+
+	//
+	// To String
+	//
+
+	@Override
+	public String toString() {
+		return "PetasosEpisodeIdentifier{" +
+				"id='" + getId() + '\'' +
+				", version='" + getVersion() + '\'' +
+				", creationInstant=" + getCreationInstant() +
+				'}';
+	}
 }

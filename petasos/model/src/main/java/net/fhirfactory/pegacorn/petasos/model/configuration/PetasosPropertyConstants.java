@@ -68,4 +68,6 @@ public final class PetasosPropertyConstants {
     public final static String WUP_INTERACT_PORT_VALUE = "WUPInteractIngresPortValue";
     public final static String WUP_INTERACT_PORT_TYPE = "WUPInteractIngresPortType";
 
+    public final static String DEFAULT_TIMEZONE="Australia/Sydney";
+
 }

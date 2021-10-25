@@ -66,10 +66,10 @@ public class FinaliseSOAWorkUnitActivityTask {
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ActivityID).presentWUPIdentifier --> {}", submittedJobCard.getActivityID().getPresentWUPIdentifier());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).cardID (ContunuityID).createDate --> {}", submittedJobCard.getActivityID().getCreationDate());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).clusterMode (ConcurrencyModeEnum) -->{}", submittedJobCard.getClusterMode());
-        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).currentStatus (WUPActivityStatusEnum) --> {}", submittedJobCard.getCurrentStatus());
-        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).grantedStatus (WUPActivityStatusEnum) --> {}", submittedJobCard.getGrantedStatus());
+        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).currentStatus (PetasosJobActivityStatusEnum) --> {}", submittedJobCard.getCurrentStatus());
+        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).grantedStatus (PetasosJobActivityStatusEnum) --> {}", submittedJobCard.getGrantedStatus());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).toBeDiscarded (boolean) --> {}", submittedJobCard.getIsToBeDiscarded());
-        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).requestedStatus (WUPActivityStatusEnum) --> {}", submittedJobCard.getRequestedStatus());
+        	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).requestedStatus (PetasosJobActivityStatusEnum) --> {}", submittedJobCard.getRequestedStatus());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).systemMode (ResilienceModeEnum) --> {}", submittedJobCard.getSystemMode());
         	LOG.debug(".synchroniseJobCard(): submittedJobCard (WUPJobCard).updateDate (Date) --> {}", submittedJobCard.getUpdateDate());
         }

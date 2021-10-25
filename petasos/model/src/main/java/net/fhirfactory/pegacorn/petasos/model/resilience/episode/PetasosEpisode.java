@@ -27,9 +27,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.audit.JsonDateSerializer;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 
 import java.time.Instant;
 import java.util.Date;
@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PetasosEpisode {
     private ConcurrentHashMap<WUPIdentifier, ResilienceParcel> episodeParcelMap;
     private PetasosEpisodeIdentifier episodeIdentifier;
-    private ResilienceParcelFinalisationStatusEnum episodeFinalisationStatus;
+    private TaskFinalisationStatusEnum episodeFinalisationStatus;
     private ResilienceParcelProcessingStatusEnum episodeProcessingStatus;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
@@ -196,11 +196,11 @@ public class PetasosEpisode {
         }
     }
 
-    public ResilienceParcelFinalisationStatusEnum getEpisodeFinalisationStatus() {
+    public TaskFinalisationStatusEnum getEpisodeFinalisationStatus() {
         return episodeFinalisationStatus;
     }
 
-    public void setEpisodeFinalisationStatus(ResilienceParcelFinalisationStatusEnum episodeFinalisationStatus) {
+    public void setEpisodeFinalisationStatus(TaskFinalisationStatusEnum episodeFinalisationStatus) {
         synchronized(this.episodeLock) {
             this.episodeFinalisationStatus = episodeFinalisationStatus;
             updateEpisodeLastUpdateTime();

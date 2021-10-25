@@ -1,17 +1,17 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.wup.common;
 
 import ca.uhn.fhir.parser.IParser;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public abstract class GenericSTAWUPTemplate {
         getLogger().debug(".buildSTAClientNode(): Entry");
         TopologyNodeFDN staClientTypeFDN = new TopologyNodeFDN(getWorkshop().getNodeFDN());
         getLogger().trace(".buildSTAClientNode(): Now construct the Work Unit Processing Node");
-        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), TopologyNodeTypeEnum.WUP);
+        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), ComponentTypeTypeEnum.WUP);
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Concurrency Mode");
         wup.setConcurrencyMode(getWorkshop().getConcurrencyMode());
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Resillience Mode");

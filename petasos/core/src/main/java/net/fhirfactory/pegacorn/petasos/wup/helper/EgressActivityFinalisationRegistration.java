@@ -28,7 +28,7 @@ import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayEx
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class EgressActivityFinalisationRegistration {
         LOG.trace(".registerActivityFinishAndFinalisation(): Extract the UoW");
         switch(theUoW.getProcessingOutcome()){
             case UOW_OUTCOME_SUCCESS:{
-                jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
+                jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FINISHED);
                 servicesBroker.notifyFinishOfWorkUnitActivity(jobCard, theUoW);
                 servicesBroker.notifyFinalisationOfWorkUnitActivity(jobCard);
                 break;
@@ -77,7 +77,7 @@ public class EgressActivityFinalisationRegistration {
             case UOW_OUTCOME_INCOMPLETE:
             case UOW_OUTCOME_NOTSTARTED:
             case UOW_OUTCOME_FAILED:{
-                jobCard.setCurrentStatus(WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
+                jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_FAILED);
                 servicesBroker.notifyFailureOfWorkUnitActivity(jobCard, theUoW);
             }
         }

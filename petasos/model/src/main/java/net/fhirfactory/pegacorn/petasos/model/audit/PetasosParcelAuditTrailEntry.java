@@ -27,6 +27,7 @@ import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 
 import java.time.Instant;
@@ -34,15 +35,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 
 public class PetasosParcelAuditTrailEntry {
     private Date auditTrailEntryDate;
     private UoW actualUoW;
     private ResilienceParcelIdentifier identifier;
-    private ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus;
+    private TaskFinalisationStatusEnum parcelFinalsationStatus;
     private ResilienceParcelProcessingStatusEnum processingStatus;
     private HashSet<WUPIdentifier> alternativeWUPIdentifierSet;
     private HashSet<ResilienceParcelIdentifier> alternativeParcelIdentifiersSet;
@@ -103,9 +103,6 @@ public class PetasosParcelAuditTrailEntry {
         if( theParcel.hasActualUoW()) {
             this.actualUoW = theParcel.getActualUoW();
         }
-        if(theParcel.hasDownstreamEpisodeIdentifierSet()){
-            this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
-        }
         if(theParcel.hasUpstreamEpisodeIdentifier()){
             this.upstreamEpisodeIdentifier = theParcel.getUpstreamEpisodeIdentifier();
         }
@@ -115,7 +112,7 @@ public class PetasosParcelAuditTrailEntry {
         if(theParcel.hasFinalisationDate()){
             this.parcelFinalisedDate = theParcel.getFinalisationDate();
         }
-        if(theParcel.hasInstanceIdentifier()){
+        if(theParcel.hasIdentifier()){
             this.identifier = theParcel.getIdentifier();
         }
         if(theParcel.hasFinishedDate()){
@@ -132,9 +129,6 @@ public class PetasosParcelAuditTrailEntry {
         }
         if(theParcel.hasProcessingStatus()){
             this.processingStatus = theParcel.getProcessingStatus();
-        }
-        if(theParcel.hasFinalisationStatus()){
-            this.parcelFinalsationStatus = theParcel.getFinalisationStatus();
         }
         if(theParcel.hasAssociatedWUPIdentifier()){
             this.primaryWUPIdentifier = theParcel.getAssociatedWUPIdentifier();
@@ -363,14 +357,15 @@ public class PetasosParcelAuditTrailEntry {
     }
 
     public void setIdentifier(ResilienceParcelIdentifier identifier) {
+        ResilienceParcelIdentifier id = new ResilienceParcelIdentifier(identifier);
         this.identifier = identifier;
     }
 
-    public ResilienceParcelFinalisationStatusEnum getParcelFinalsationStatus() {
+    public TaskFinalisationStatusEnum getParcelFinalsationStatus() {
         return parcelFinalsationStatus;
     }
 
-    public void setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus) {
+    public void setParcelFinalsationStatus(TaskFinalisationStatusEnum parcelFinalsationStatus) {
         this.parcelFinalsationStatus = parcelFinalsationStatus;
     }
 

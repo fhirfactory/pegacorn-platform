@@ -23,13 +23,13 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager;
 
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeFinalisationCacheDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.SharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.RegisterNewMOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.SynchroniseMOAWorkUnitActivityJobCardTask;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class ProcessingPlantResilienceActivityServicesController {
     ProcessingPlantWUAEpisodeActivityMatrixDM activityMatrixDM;
 
     @Inject
-    ProcessingPlantWUAEpisodeFinalisationCacheDM finalisationCacheDM;
+    SharedActionableTaskCache finalisationCacheDM;
     
     //task Specific Classes
 

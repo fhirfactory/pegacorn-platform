@@ -21,10 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,8 @@ import org.slf4j.LoggerFactory;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 
 
-public class WUPJobCard {
+@Deprecated
+public class WUPJobCard implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(WUPJobCard.class);
     protected Logger getLogger(){
         return(LOG);
@@ -42,11 +45,11 @@ public class WUPJobCard {
     private Object activityIDLock;
     private Date updateDate;
     private Object updateDateLock;
-    private WUPActivityStatusEnum currentStatus;
+    private PetasosJobActivityStatusEnum currentStatus;
     private Object currentStatusLock;
-    private WUPActivityStatusEnum requestedStatus;
+    private PetasosJobActivityStatusEnum requestedStatus;
     private Object requestedStatusLock;
-    private WUPActivityStatusEnum grantedStatus;
+    private PetasosJobActivityStatusEnum grantedStatus;
     private Object grantedStatusLock;
     private ConcurrencyModeEnum clusterMode;
     private Object clusterModeLock;
@@ -60,8 +63,8 @@ public class WUPJobCard {
 
     public WUPJobCard(
             ActivityID activityID,
-            WUPActivityStatusEnum currentStatus, 
-            WUPActivityStatusEnum requestedStatus, 
+            PetasosJobActivityStatusEnum currentStatus,
+            PetasosJobActivityStatusEnum requestedStatus,
             ConcurrencyModeEnum clusterMode, 
             ResilienceModeEnum systemMode, 
             Date updateDate) {
@@ -135,11 +138,11 @@ public class WUPJobCard {
         }
     }
 
-    public WUPActivityStatusEnum getGrantedStatus() {
+    public PetasosJobActivityStatusEnum getGrantedStatus() {
         return grantedStatus;
     }
 
-    public void setGrantedStatus(WUPActivityStatusEnum grantedStatus) {
+    public void setGrantedStatus(PetasosJobActivityStatusEnum grantedStatus) {
         synchronized (grantedStatusLock) {
             this.grantedStatus = grantedStatus;
             generateToString();
@@ -204,11 +207,11 @@ public class WUPJobCard {
         }
     }
 
-    public WUPActivityStatusEnum getCurrentStatus() {
+    public PetasosJobActivityStatusEnum getCurrentStatus() {
         return currentStatus;
     }
 
-    public void setCurrentStatus(WUPActivityStatusEnum currentStatus) {
+    public void setCurrentStatus(PetasosJobActivityStatusEnum currentStatus) {
         synchronized (currentStatusLock) {
             this.currentStatus = currentStatus;
             generateToString();
@@ -301,11 +304,11 @@ public class WUPJobCard {
         }
     }
 
-    public WUPActivityStatusEnum getRequestedStatus() {
+    public PetasosJobActivityStatusEnum getRequestedStatus() {
         return requestedStatus;
     }
 
-    public void setRequestedStatus(WUPActivityStatusEnum requestedStatus) {
+    public void setRequestedStatus(PetasosJobActivityStatusEnum requestedStatus) {
         synchronized (requestedStatusLock) {
             this.requestedStatus = requestedStatus;
             generateToString();

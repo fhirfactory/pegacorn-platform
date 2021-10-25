@@ -21,19 +21,27 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.common.model.componentid.*;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.traceability.datatypes.TaskTraceabilityElementType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.work.datatypes.TaskWorkItemType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,42 +50,15 @@ import java.util.Set;
  * @author Mark A. Hunter
  * @author Scott Yeadon
  */
-public class ResilienceParcel implements Serializable {
+@Deprecated
+public class ResilienceParcel extends PetasosFulfillmentTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResilienceParcel.class);
 
-    private ResilienceParcelIdentifier identifier;
-    private SerializableObject instanceIDLock;
-    private FDNToken typeID;
-    private SerializableObject typeIDLock;
-    private PetasosEpisodeIdentifier episodeIdentifier;
-    private SerializableObject episodeIdentifierLock;
-    private UoW actualUoW;
-    private SerializableObject actualUoWLock;
-    private WUPIdentifier associatedWUPIdentifier;
-    private SerializableObject associatedWUPIdentifierLock;
-    private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
-    private SerializableObject downstreamEpisodeIdentifierSetLock;
-    private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
-    private SerializableObject upstreamEpisodeIdentifierLock;
     private final static String INSTANCE_QUALIFIER_TYPE = "ParcelInstance";
     private final static String TYPE_QUALIFIER_TYPE = "ParcelType";
-    private ResilienceParcelFinalisationStatusEnum finalisationStatus;
-    private SerializableObject finalisationStatusLock;
     private ResilienceParcelProcessingStatusEnum processingStatus;
     private SerializableObject processingStatusLock;
-    private Date registrationDate;
-    private SerializableObject registrationDateLock;
-    private Date startDate;
-    private SerializableObject startDateLock;
-    private Date finishedDate;
-    private SerializableObject finishedDateLock;
-    private Date finalisationDate;
-    private SerializableObject finalisationDateLock;
-    private Date cancellationDate;
-    private SerializableObject cancellationDateLock;
-
-    private boolean anInteractWUP;
     private String associatedPortValue;
     private String associatedPortType;
 
@@ -85,455 +66,451 @@ public class ResilienceParcel implements Serializable {
     // Constructors
     //
     public ResilienceParcel(ActivityID activityID, UoW theUoW) {
+        super();
         // Clean the slate
-        this.identifier = null;
-        this.typeID = null;
-        this.associatedWUPIdentifier = null;
-        this.actualUoW = null;
-        this.downstreamEpisodeIdentifierSet = null;
-        this.upstreamEpisodeIdentifier = null;
-        this.registrationDate = null;
-        this.startDate = null;
-        this.finishedDate = null;
-        this.finalisationDate = null;
-        this.finalisationStatus = null;
-        this.episodeIdentifier = null;
-        this.cancellationDate = null;
-        this.anInteractWUP = false;
         this.associatedPortType = null;
         this.associatedPortValue = null;
-        this.instanceIDLock = new SerializableObject();
-        this.typeIDLock = new SerializableObject();
-        this.episodeIdentifierLock = new SerializableObject();
-        this.actualUoWLock = new SerializableObject();
-        this.associatedWUPIdentifierLock = new SerializableObject();
-        this.downstreamEpisodeIdentifierSetLock = new SerializableObject();
-        this.upstreamEpisodeIdentifierLock = new SerializableObject();
-        this.finalisationStatusLock = new SerializableObject();
         this.processingStatusLock = new SerializableObject();
-        this.registrationDateLock = new SerializableObject();
-        this.startDateLock = new SerializableObject();
-        this.finishedDateLock = new SerializableObject();
-        this.finalisationDateLock = new SerializableObject();
-        this.cancellationDateLock = new SerializableObject();
         // Now, add what we have been supplied
-        this.associatedWUPIdentifier = activityID.getPresentWUPIdentifier();
-        this.episodeIdentifier = this.buildEpisodeID(activityID, theUoW);
-        this.typeID = this.buildParcelTypeID(activityID, theUoW);
-        this.identifier = this.buildParcelInstanceIdentifier(activityID, theUoW);
-        this.actualUoW = theUoW;
-        this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
-        this.upstreamEpisodeIdentifier = activityID.getPreviousEpisodeIdentifier();
-        this.registrationDate = Date.from(Instant.now());
-        this.finalisationStatus = ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED;
+        setAssociatedWUPIdentifier(activityID.getPresentWUPIdentifier());
+        setEpisodeIdentifier(this.buildEpisodeID(activityID, theUoW));
     }
 
     public ResilienceParcel(ResilienceParcel originalParcel) {
+        super();
         // Clean the slate
-        this.identifier = null;
-        this.typeID = null;
-        this.associatedWUPIdentifier = null;
-        this.actualUoW = null;
-        this.downstreamEpisodeIdentifierSet = null;
-        this.upstreamEpisodeIdentifier = null;
-        this.registrationDate = null;
-        this.startDate = null;
-        this.finishedDate = null;
-        this.finalisationDate = null;
-        this.episodeIdentifier = null;
-        this.cancellationDate = null;
-        this.anInteractWUP = false;
         this.associatedPortType = null;
         this.associatedPortValue = null;
-        this.instanceIDLock = new SerializableObject();
-        this.typeIDLock = new SerializableObject();
-        this.episodeIdentifierLock = new SerializableObject();
-        this.actualUoWLock = new SerializableObject();
-        this.associatedWUPIdentifierLock = new SerializableObject();
-        this.downstreamEpisodeIdentifierSetLock = new SerializableObject();
-        this.upstreamEpisodeIdentifierLock = new SerializableObject();
-        this.finalisationStatusLock = new SerializableObject();
         this.processingStatusLock = new SerializableObject();
-        this.registrationDateLock = new SerializableObject();
-        this.startDateLock = new SerializableObject();
-        this.finishedDateLock = new SerializableObject();
-        this.finalisationDateLock = new SerializableObject();
-        this.cancellationDateLock = new SerializableObject();
         // Now, add what we have been supplied
         if (originalParcel.hasCancellationDate()) {
-            this.cancellationDate = originalParcel.getCancellationDate();
+            setCancellationDate(SerializationUtils.clone(getCancellationDate()));
         }
         if (originalParcel.hasAssociatedWUPIdentifier()) {
-            this.associatedWUPIdentifier = originalParcel.getAssociatedWUPIdentifier();
+            setAssociatedWUPIdentifier(SerializationUtils.clone(originalParcel.getAssociatedWUPIdentifier()));
         }
         if (originalParcel.hasActualUoW()) {
-            this.actualUoW = originalParcel.getActualUoW();
+            setActualUoW(SerializationUtils.clone(originalParcel.getActualUoW()));
         }
         if (originalParcel.hasFinalisationDate()) {
-            this.finalisationDate = originalParcel.getFinalisationDate();
+            setFinalisationDate(SerializationUtils.clone(originalParcel.getFinalisationDate()));
         }
         if (originalParcel.hasFinishedDate()) {
-            this.finishedDate = originalParcel.getFinishedDate();
+            setFinishedDate(SerializationUtils.clone(originalParcel.getFinishedDate()));
         }
-        if (originalParcel.hasInstanceIdentifier()) {
-            this.identifier = originalParcel.getIdentifier();
+        if (originalParcel.hasIdentifier()) {
+           setIdentifier(originalParcel.getIdentifier());
         }
         if (originalParcel.hasRegistrationDate()) {
-            this.registrationDate = originalParcel.getRegistrationDate();
+            setRegistrationDate(originalParcel.getRegistrationDate());
         }
         if (originalParcel.hasStartDate()) {
-            this.startDate = originalParcel.getStartDate();
+            setStartDate(originalParcel.getStartDate());
         }
         if (originalParcel.hasTypeID()) {
-            this.typeID = originalParcel.getTypeID();
+            setTypeID(originalParcel.getTypeID());
         }
         if (originalParcel.hasUpstreamEpisodeIdentifier()) {
-            this.upstreamEpisodeIdentifier = originalParcel.getUpstreamEpisodeIdentifier();
-        }
-        if (originalParcel.hasDownstreamEpisodeIdentifierSet()) {
-            this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
-            this.downstreamEpisodeIdentifierSet.addAll(originalParcel.getDownstreamEpisodeIdentifierSet());
+            setUpstreamEpisodeIdentifier(originalParcel.getUpstreamEpisodeIdentifier());
         }
         if (originalParcel.hasEpisodeIdentifier()) {
-            this.episodeIdentifier = originalParcel.getEpisodeIdentifier();
+            setEpisodeIdentifier(originalParcel.getEpisodeIdentifier());
         }
         if(originalParcel.hasAssociatedPortValue()){
-            this.associatedPortValue = originalParcel.getAssociatedPortValue();
+            setAssociatedPortValue(originalParcel.getAssociatedPortValue());
         }
         if(originalParcel.hasAssociatedPortType()){
-            this.associatedPortType = originalParcel.getAssociatedPortType();
+            setAssociatedPortType(originalParcel.getAssociatedPortType());
         }
-        this.anInteractWUP = originalParcel.isAnInteractWUP();
     }
 
     //
     // Bean/Attribute Methods
     //
 
-
+    //
+    // Is An Interact Task
+    @JsonIgnore @Deprecated
     public boolean isAnInteractWUP() {
-        return anInteractWUP;
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasFulfillerComponent()){
+                TopologyNodeFDN nodeFDN = getTaskFulfillment().getFulfillerComponent().getNodeFDN();
+                TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
+                if(topologyNodeRDN != null){
+                    if(topologyNodeRDN.getNodeName().equalsIgnoreCase(DefaultWorkshopSetEnum.INTERACT_WORKSHOP.getWorkshop())){
+                        return(true);
+                    }
+                }
+            }
+        }
+        return(false);
     }
 
-    public void setAnInteractWUP(boolean anInteractWUP) {
-        this.anInteractWUP = anInteractWUP;
-    }
-
+    @JsonIgnore @Deprecated
     public boolean hasAssociatedPortValue(){
         boolean hasValue = this.associatedPortValue != null;
         return(hasValue);
     }
 
+    @JsonIgnore @Deprecated
     public String getAssociatedPortValue() {
         return associatedPortValue;
     }
 
+    @JsonIgnore @Deprecated
     public void setAssociatedPortValue(String associatedPortValue) {
         this.associatedPortValue = associatedPortValue;
     }
 
+    @JsonIgnore @Deprecated
     public boolean hasAssociatedPortType(){
         boolean hasValue = this.associatedPortType != null;
         return(hasValue);
     }
 
+    @JsonIgnore @Deprecated
     public String getAssociatedPortType() {
         return associatedPortType;
     }
 
+    @JsonIgnore @Deprecated
     public void setAssociatedPortType(String associatedPortType) {
         this.associatedPortType = associatedPortType;
     }
 
-    // Helper methods for the this.cancellationDate attribute
-    public boolean hasCancellationDate() {
-        if (this.cancellationDate == null) {
-            return (false);
-        } else {
-            return (true);
-        }
-    }
+    //
+    // UoW / WorkItem Methods
 
-    public Date getCancellationDate() {
-        return (this.cancellationDate);
-    }
-
-    public void setCancellationDate(Date newCancellationDate) {
-        synchronized (cancellationDateLock) {
-            this.cancellationDate = newCancellationDate;
-        }
-    }
-
-    // Helper methods for the this.actualUoW attribute
+    @JsonIgnore @Deprecated
     public boolean hasActualUoW() {
-        if (this.actualUoW == null) {
-            return (false);
-        } else {
-            return (true);
-        }
+        return(hasTaskWorkItem());
     }
 
-    /**
-     * @return the containedUoW
-     */
+    @JsonIgnore @Deprecated
     public UoW getActualUoW() {
-        return actualUoW;
+        return (getTaskWorkItem());
     }
 
-    /**
-     * @param actualUoW the containedUoW to set
-     */
+    @JsonIgnore @Deprecated
     public void setActualUoW(UoW actualUoW) {
-        synchronized (actualUoWLock) {
-            this.actualUoW = new UoW(actualUoW);
+        TaskWorkItemType workItem = new TaskWorkItemType(actualUoW);
+        synchronized (getTaskWorkItemLock()) {
+            setTaskWorkItem(workItem);
         }
     }
 
-    // Helper methods for the this.actualUoW attribute
-    public boolean hasDownstreamEpisodeIdentifierSet() {
-        if (this.downstreamEpisodeIdentifierSet == null) {
-            return (false);
-        }
-        if (this.downstreamEpisodeIdentifierSet.isEmpty()) {
-            return (false);
-        }
-        return (true);
+    //
+    // Current Episode Identifier
+
+
+    @JsonIgnore @Deprecated
+    public boolean hasEpisodeIdentifier() {
+        boolean hasValue = hasActionableTaskId();
+        return(hasValue);
     }
 
-    /**
-     * @return the downstreamParcelIDSet
-     */
-    public Set<PetasosEpisodeIdentifier> getDownstreamEpisodeIdentifierSet() {
-        if (this.downstreamEpisodeIdentifierSet == null) {
-            return (null);
-        } else {
-            return (this.downstreamEpisodeIdentifierSet);
+    @JsonIgnore @Deprecated
+    public PetasosEpisodeIdentifier getEpisodeIdentifier() {
+        if(hasActionableTaskId()) {
+            TaskIdType actionableTaskId = getActionableTaskId();
+            PetasosEpisodeIdentifier episodeIdentifier = new PetasosEpisodeIdentifier(actionableTaskId);
+            return (episodeIdentifier);
+        }
+        return(null);
+    }
+
+    @JsonIgnore @Deprecated
+    public void setEpisodeIdentifier(PetasosEpisodeIdentifier episodeIdentifier) {
+        synchronized (getActionableTaskIdLock()) {
+            setActionableTaskId(episodeIdentifier);
         }
     }
 
-    /**
-     * @param downstreamEpisodeIdentifierSet the Parcels that continue on the work from
-     * this Parcel
-     */
-    public void setDownstreamEpisodeIdentifierSet(HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet) {
-        synchronized (downstreamEpisodeIdentifierSetLock) {
-            if (downstreamEpisodeIdentifierSet == null) {
-                this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
+    //
+    // Upstream Episode Methods
+
+    @JsonIgnore @Deprecated
+    public boolean hasUpstreamEpisodeIdentifier() {
+        if(hasTaskTraceability()){
+            if(getTaskTraceability().hasUpstreamActionableTaskId()){
+                return(true);
+            }
+        }
+        return(false);
+    }
+
+    @JsonIgnore @Deprecated
+    public PetasosEpisodeIdentifier getUpstreamEpisodeIdentifier() {
+        if(hasUpstreamEpisodeIdentifier()){
+            TaskIdType upstreamActionableTaskId = getTaskTraceability().getUpstreamActionableTaskId();
+            PetasosEpisodeIdentifier episodeId = new PetasosEpisodeIdentifier(upstreamActionableTaskId);
+            return(episodeId);
+        }
+        return(null);
+    }
+
+    @JsonIgnore @Deprecated
+    public void setUpstreamEpisodeIdentifier(PetasosEpisodeIdentifier upstreamEpisodeIdentifier) {
+        synchronized (getTaskTraceabilityLock()) {
+            if(getTaskTraceability().getTaskJourney().isEmpty()){
+                TaskTraceabilityElementType traceabilityElement = new TaskTraceabilityElementType();
+                traceabilityElement.setActionableTaskId(upstreamEpisodeIdentifier);
+                getTaskTraceability().addToTaskJourney(traceabilityElement);
+            } else {
+                int historySize = getTaskTraceability().getTaskJourney().size();
+                getTaskTraceability().getTaskJourney().get(historySize-1).getActionableTaskId().setId(upstreamEpisodeIdentifier.getId());
             }
         }
     }
 
-    // Helper methods for the this.upstreamEpisodeID attribute
-    public boolean hasUpstreamEpisodeIdentifier() {
-        if (this.upstreamEpisodeIdentifier == null) {
-            return (false);
+    //
+    // Identifier Methods
+
+    @JsonIgnore @Deprecated
+    public boolean hasIdentifier() {
+        if(hasTaskId()) {
+            boolean hasValue = getTaskId().hasId();
+            return (hasValue);
         }
-        return (true);
+        return(false);
     }
 
-    /**
-     * @return the upstreamParcelInstanceID
-     */
-    public PetasosEpisodeIdentifier getUpstreamEpisodeIdentifier() {
-
-        return this.upstreamEpisodeIdentifier;
-
-    }
-
-    /**
-     * @param upstreamEpisodeIdentifier the "Upstream" or "Precursor" Parcel to set
-     */
-    public void setUpstreamEpisodeIdentifier(PetasosEpisodeIdentifier upstreamEpisodeIdentifier) {
-        synchronized (upstreamEpisodeIdentifierLock) {
-            this.upstreamEpisodeIdentifier = upstreamEpisodeIdentifier;
-        }
-    }
-
-    // Helper methods for the this.parcelInstanceID attribute
-    public boolean hasInstanceIdentifier() {
-        if (this.identifier == null) {
-            return (false);
-        }
-        return (true);
-    }
-
+    @JsonIgnore @Deprecated
     public ResilienceParcelIdentifier getIdentifier() {
-        return this.identifier;
+        if(hasTaskId()){
+            ResilienceParcelIdentifier resilienceParcelIdentifier = new ResilienceParcelIdentifier(getTaskId());
+            return(resilienceParcelIdentifier);
+        }
+        return(null);
     }
 
+
+    @JsonIgnore @Deprecated
     public void setIdentifier(ResilienceParcelIdentifier parcelInstance) {
-        synchronized (instanceIDLock) {
-            this.identifier = parcelInstance;
+        synchronized (getTaskIdLock()) {
+            setTaskId(parcelInstance);
         }
     }
 
-    // Helper methods for the this.parcelTypeID attribute
+    //
+    // Task / Parcel Type Id Methods
+
+    @JsonIgnore @Deprecated
     public boolean hasTypeID() {
-        if (this.typeID == null) {
-            return (false);
+        if(hasTaskType()){
+            if(getTaskType().hasTaskSubType()){
+                return(true);
+            }
         }
-        return (true);
+        return(false);
     }
 
+    @JsonIgnore @Deprecated
     public FDNToken getTypeID() {
-        return this.typeID;
+        if (hasTypeID()) {
+            FDNToken token = new FDNToken(getTaskType().getTaskSubType());
+            return(token);
+        }
+        return(null);
     }
 
+    @JsonIgnore @Deprecated
     public void setTypeID(FDNToken typeID) {
-        synchronized (typeIDLock) {
-            this.typeID = typeID;
+        synchronized (getTaskTypeLock()) {
+            if(!hasTaskType()){
+                TaskTypeType taskType = new TaskTypeType();
+                taskType.setTaskType(TaskTypeTypeEnum.FULFILLMENT_TASK_TYPE);
+                taskType.setTaskSubType(typeID.getContent());
+            }
         }
     }
 
-    public void setParcelTypeFDN(FDNToken parcelType) {
-        synchronized (typeIDLock) {
-            this.typeID = parcelType;
+    //
+    // Date / Time Getters and Setters
+
+    @JsonIgnore @Deprecated
+    public boolean hasCancellationDate(){
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasCancellationDate()){
+                return(true);
+            }
+        }
+        return(false);
+    }
+
+
+    @JsonIgnore @Deprecated
+    public Date getCancellationDate() {
+        if(hasTaskFulfillment()) {
+            if(getTaskFulfillment().hasCancellationDate()){
+                return(getTaskFulfillment().getCancellationDate());
+            }
+        }
+        return(null);
+    }
+
+    @JsonIgnore @Deprecated
+    public void setCancellationDate(Date newCancellationDate) {
+        synchronized (getTaskFulfillmentLock()) {
+            getTaskFulfillment().setCancellationDate(newCancellationDate);
         }
     }
 
-    // Helper methods for the this.parcelRegistrationDate attribute
+    @JsonIgnore @Deprecated
     public boolean hasRegistrationDate() {
-        if (registrationDate == null) {
-            return (false);
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasRegistrationDate()){
+                return(true);
+            }
         }
-        return (true);
+        return(false);
     }
 
+    @JsonIgnore @Deprecated
     public Date getRegistrationDate() {
-        return registrationDate;
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasRegistrationDate()){
+                return(getTaskFulfillment().getRegistrationDate());
+            }
+        }
+        return(null);
     }
 
+    @JsonIgnore @Deprecated
     public void setRegistrationDate(Date registrationDate) {
-        synchronized (registrationDateLock) {
-            this.registrationDate = registrationDate;
+        synchronized (getTaskFulfillmentLock()) {
+            getTaskFulfillment().setRegistrationDate(registrationDate);
         }
     }
 
-    // Helper methods for the this.parcelStartDate attribute
+    @JsonIgnore @Deprecated
     public boolean hasStartDate() {
-        if (this.startDate == null) {
-            return (false);
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasStartDate()){
+                return(true);
+            }
         }
-        return (true);
+        return(false);
     }
 
+    @JsonIgnore @Deprecated
     public Date getStartDate() {
-        return startDate;
+        if(hasTaskOutcomeStatus()){
+            return(getTaskFulfillment().getStartDate());
+        }
+        return(null);
     }
 
+    @JsonIgnore @Deprecated
     public void setStartDate(Date startDate) {
-        synchronized (startDateLock) {
-            this.startDate = startDate;
+        synchronized (getTaskFulfillmentLock()) {
+            getTaskFulfillment().setStartDate(startDate);
         }
     }
 
-    // Helper methods for the this.parcelFinishedDate attribute
+    @JsonIgnore @Deprecated
     public boolean hasFinishedDate() {
-        if (this.finishedDate == null) {
-            return (false);
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasFinishedDate()){
+                return(true);
+            }
         }
-        return (true);
+        return(false);
     }
 
+    @JsonIgnore @Deprecated
     public Date getFinishedDate() {
-        return finishedDate;
+        if(hasFinishedDate()){
+            return(getTaskFulfillment().getFinishedDate());
+        }
+        return(null);
     }
 
+    @JsonIgnore @Deprecated
     public void setFinishedDate(Date finishedDate) {
-        synchronized (finishedDateLock) {
-            this.finishedDate = finishedDate;
+        synchronized (getTaskFulfillmentLock()) {
+            getTaskFulfillment().setFinishedDate(finishedDate);
         }
     }
 
-    // Helper methods for the this.parcelFinalisationDate attribute
+    @JsonIgnore @Deprecated
     public boolean hasFinalisationDate() {
-        if (this.finalisationDate == null) {
-            return (false);
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasFinalisationDate()){
+                return(true);
+            }
         }
-        return (true);
+        return(false);
     }
 
+    @JsonIgnore @Deprecated
     public Date getFinalisationDate() {
-        return finalisationDate;
+        if(hasFinalisationDate()){
+            return(getTaskFulfillment().getFinalisationDate());
+        }
+        return(null);
     }
 
+    @JsonIgnore @Deprecated
     public void setFinalisationDate(Date finalisationDate) {
-        synchronized (finalisationDateLock) {
-            this.finalisationDate = finalisationDate;
+        synchronized (getTaskFulfillmentLock()) {
+            getTaskFulfillment().setFinalisationDate(finalisationDate);
         }
     }
 
-    // Helper methods for the this.associatedWUPInstanceID attribute
+    //
+    // Associated WUP Identifier
+
+    @JsonIgnore @Deprecated
     public boolean hasAssociatedWUPIdentifier() {
-        if (this.associatedWUPIdentifier == null) {
-            return (false);
+        if(hasTaskFulfillment()){
+            if(getTaskFulfillment().hasFulfillerComponent()){
+                return(true);
+            }
         }
-        return (true);
+        return(false);
     }
 
+    @JsonIgnore @Deprecated
     public WUPIdentifier getAssociatedWUPIdentifier() {
-        return associatedWUPIdentifier;
+        if(hasAssociatedWUPIdentifier()){
+            TopologyNodeFDNToken nodeToken = getTaskFulfillment().getFulfillerComponent().getNodeFDN().getToken();
+            WUPIdentifier wupID = new WUPIdentifier(nodeToken);
+            return(wupID);
+        }
+        return(null);
     }
 
+    @JsonIgnore @Deprecated
     public void setAssociatedWUPIdentifier(WUPIdentifier associatedWUPIdentifier) {
-        synchronized (associatedWUPIdentifierLock) {
-            this.associatedWUPIdentifier = associatedWUPIdentifier;
-        }
+        throw(new UnsupportedOperationException("Please implement utilise getTaskFulfillment().setFulfillmentComponent() method"));
     }
 
-    public boolean hasFinalisationStatus() {
-        if (this.finalisationStatus == null) {
-            return (false);
-        } else {
-            return (true);
-        }
-    }
 
-    public ResilienceParcelFinalisationStatusEnum getFinalisationStatus() {
-        return finalisationStatus;
-    }
-
-    public void setFinalisationStatus(ResilienceParcelFinalisationStatusEnum finalisationStatus) {
-        synchronized (finalisationStatusLock) {
-            this.finalisationStatus = finalisationStatus;
-        }
-    }
-
+    @JsonIgnore @Deprecated
     public boolean hasProcessingStatus() {
-        if (this.processingStatus == null) {
-            return (false);
-        } else {
-            return (true);
-        }
+        boolean hasValue = this.processingStatus != null;
+        return(hasValue);
     }
 
+    @JsonIgnore @Deprecated
     public ResilienceParcelProcessingStatusEnum getProcessingStatus() {
         return processingStatus;
     }
 
+    @JsonIgnore @Deprecated
     public void setProcessingStatus(ResilienceParcelProcessingStatusEnum processingStatus) {
         synchronized (processingStatusLock) {
             this.processingStatus = processingStatus;
         }
     }
 
-    public boolean hasEpisodeIdentifier() {
-        if (this.episodeIdentifier == null) {
-            return (false);
-        } else {
-            return (true);
-        }
-    }
 
-    public PetasosEpisodeIdentifier getEpisodeIdentifier() {
-        return this.episodeIdentifier;
-    }
 
-    public void setEpisodeIdentifier(PetasosEpisodeIdentifier episodeIdentifier) {
-        synchronized (episodeIdentifierLock) {
-            this.episodeIdentifier = episodeIdentifier;
-        }
-    }
+
+    //
+    // Helper Methods
+    //
 
     public PetasosEpisodeIdentifier buildEpisodeID(ActivityID activityID, UoW theUoW) {
         if (theUoW == null) {
@@ -608,26 +585,4 @@ public class ResilienceParcel implements Serializable {
         return (parcelIdentifier);
     }
 
-    @Override
-    public String toString() {
-        return "ResilienceParcel{" +
-                "identifier=" + identifier +
-                ", typeID=" + typeID +
-                ", episodeIdentifier=" + episodeIdentifier +
-                ", actualUoW=" + actualUoW +
-                ", associatedWUPIdentifier=" + associatedWUPIdentifier +
-                ", downstreamEpisodeIdentifierSet=" + downstreamEpisodeIdentifierSet +
-                ", upstreamEpisodeIdentifier=" + upstreamEpisodeIdentifier +
-                ", finalisationStatus=" + finalisationStatus +
-                ", processingStatus=" + processingStatus +
-                ", registrationDate=" + registrationDate +
-                ", startDate=" + startDate +
-                ", finishedDate=" + finishedDate +
-                ", finalisationDate=" + finalisationDate +
-                ", cancellationDate=" + cancellationDate +
-                ", anInteractWUP=" + anInteractWUP +
-                ", associatedPortValue=" + associatedPortValue +
-                ", associatedPortType=" + associatedPortType +
-                '}';
-    }
 }

@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers.common;
 
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.Period;
 
@@ -123,7 +123,7 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         }
         WUPIdentifier wupIdentifier = parcel.getAssociatedWUPIdentifier();
         TopologyNodeFDN nodeFDN = new TopologyNodeFDN(wupIdentifier);
-        TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
+        TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
         if(topologyNodeRDN == null){
             return(AuditEventTypeEnum.DICOM_APPLICATION_ACTIVITY);
         }
@@ -229,9 +229,9 @@ public abstract class Pegacorn2FHIRAuditEventBase {
         }
         WUPIdentifier associatedWUPIdentifier = parcel.getAssociatedWUPIdentifier();
         TopologyNodeFDN wupFDN = new TopologyNodeFDN(associatedWUPIdentifier);
-        TopologyNodeRDN processingPlantRDN = wupFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
-        TopologyNodeRDN workshopRDN = wupFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
-        TopologyNodeRDN wupRDN = wupFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WUP);
+        TopologyNodeRDN processingPlantRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
+        TopologyNodeRDN workshopRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
+        TopologyNodeRDN wupRDN = wupFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WUP);
 
         String name = new String();
         if(processingPlantRDN != null){

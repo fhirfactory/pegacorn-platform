@@ -64,11 +64,11 @@ public class RouteElementNames {
         getLogger().debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFDNToken);
         TopologyNodeFDN wupFunctionFDN = new TopologyNodeFDN(this.nodeFDNToken);
         getLogger().trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
-        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
+        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(ComponentTypeTypeEnum.PROCESSING_PLANT);
         getLogger().trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
-        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
+        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
         getLogger().trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
-        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WUP);
+        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WUP);
         getLogger().trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
         String nodeVersion = wupFunctionRDN.getNodeVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");

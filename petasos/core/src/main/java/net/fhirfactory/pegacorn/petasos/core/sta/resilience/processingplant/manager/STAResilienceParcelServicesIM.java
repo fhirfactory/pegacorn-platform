@@ -24,11 +24,11 @@ package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.man
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache.ProcessingPlantParcelCacheDM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.LocalPetasosFulfillmentTaskDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
@@ -49,7 +49,7 @@ public class STAResilienceParcelServicesIM {
     private static final Logger LOG = LoggerFactory.getLogger(STAResilienceParcelServicesIM.class);
 
     @Inject
-    ProcessingPlantParcelCacheDM parcelCacheDM;
+    LocalPetasosFulfillmentTaskDM parcelCacheDM;
 
     @Inject
     STAServicesAuditBroker auditWriter;
@@ -90,20 +90,20 @@ public class STAResilienceParcelServicesIM {
         }
         // 1st, lets register the parcel
         LOG.trace(".registerSOAParcel(): check for existing ResilienceParcel instance for this WUP/UoW combination");
-        ResilienceParcel parcelInstance =  parcelCacheDM.getCurrentParcelForWUP(activityID.getPresentWUPIdentifier(), unitOfWork.getTypeID());
+        ResilienceParcel parcelInstance =  parcelCacheDM.getCurrentFulfillmetTaskForWUP(activityID.getPresentWUPIdentifier(), unitOfWork.getTypeID());
         if(parcelInstance != null){
             LOG.trace(".registerSOAParcel(): Well, there seems to be a Parcel already for this WUPInstanceID/UoWInstanceID. Odd, but let's use it!");
         } else {
             LOG.trace(".registerSOAParcel(): Attempted to retrieve existing ResilienceParcel, and there wasn't one, so let's create it!");
             parcelInstance = new ResilienceParcel(activityID, unitOfWork);
-            parcelCacheDM.addParcel(parcelInstance);
+            parcelCacheDM.addFulfillmentTask(parcelInstance);
             LOG.trace(".registerSOAParcel(): Set the PresentParcelInstanceID in the ActivityID (ActivityID), ParcelInstanceID --> {}", parcelInstance.getIdentifier());
             activityID.setPresentParcelIdentifier(parcelInstance.getIdentifier());
             Date registrationDate = Date.from(Instant.now());
             LOG.trace(".registerSOAParcel(): Set the Registration Date --> {}", registrationDate);
             parcelInstance.setRegistrationDate(registrationDate);
-            LOG.trace(".registerSOAParcel(): Set the Parcel Finalisation Status --> {} ", ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED);
-            parcelInstance.setFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED);
+            LOG.trace(".registerSOAParcel(): Set the Parcel Finalisation Status --> {} ", TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
+            parcelInstance.setFinalisationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
             LOG.trace(".registerSOAParcel(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             parcelInstance.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
             LOG.trace(".registerSOAParcel(): Doing an Audit Write");
@@ -141,12 +141,12 @@ public class STAResilienceParcelServicesIM {
             throw (new IllegalArgumentException("parcelID is null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingStart(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getFulfillmentTask(parcelID);
         Date startDate = Date.from(Instant.now());
         LOG.trace(".notifyParcelProcessingStart(): Set the Start Date --> {}", startDate);
         currentParcel.setStartDate(startDate);
-        LOG.trace(".notifyParcelProcessingStart(): Set the Parcel Finalisation Status --> {} ", ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED);
-        currentParcel.setFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED);
+        LOG.trace(".notifyParcelProcessingStart(): Set the Parcel Finalisation Status --> {} ", TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
+        currentParcel.setFinalisationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
         LOG.trace(".notifyParcelProcessingStart(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE);
         // TODO Check to see if we should do an Audit Entry when we start processing (as well as when it is registered)
@@ -158,7 +158,7 @@ public class STAResilienceParcelServicesIM {
 
     /**
      * This function notifies the "system" that a SOA transaction has finished (successfully). Note that, for SOA,
-     * "finish" and "finalised" mean the same thing and so we set the ResilienceParcelFinalisationStatusEnum
+     * "finish" and "finalised" mean the same thing and so we set the TaskFinalisationStatusEnum
      * to PARCEL_FINALISATION_STATUS_FINALISED.
      *
      * @param parcelID The relevant Parcel Identifier for the activity (for the originating WUP)
@@ -182,7 +182,7 @@ public class STAResilienceParcelServicesIM {
             throw (new IllegalArgumentException("unitOfWork or parcelID are null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingFinish(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getFulfillmentTask(parcelID);
         if(LOG.isTraceEnabled()){
             LOG.debug(".notifyParcelProcessingFinish(): Parcel Retrieved, contents:");
             LOG.debug(".notifyParcelProcessingFinish(): parcelInstance (ResilienceParcel).episodeIdentifier --> {}", currentParcel.getEpisodeIdentifier());
@@ -217,8 +217,8 @@ public class STAResilienceParcelServicesIM {
         currentParcel.setFinishedDate(finishDate);
         LOG.trace(".notifyParcelProcessingFinish(): Set the Finalisation Date --> {}", finishDate);
         currentParcel.setFinalisationDate(finishDate);
-        LOG.trace(".notifyParcelProcessingFinish(): Set the Parcel Finalisation Status --> {} ", ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
-        currentParcel.setFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        LOG.trace(".notifyParcelProcessingFinish(): Set the Parcel Finalisation Status --> {} ", TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
+        currentParcel.setFinalisationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
         LOG.trace(".notifyParcelProcessingFinish(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
         LOG.trace(".notifyParcelProcessingFinish(): Doing an Audit Write, note that it is synchronous by design");
@@ -255,7 +255,7 @@ public class STAResilienceParcelServicesIM {
             throw (new IllegalArgumentException(".notifyParcelProcessingFailure(): unitOfWork or parcelID are null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingFailure(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getFulfillmentTask(parcelID);
         LOG.trace(".notifyParcelProcessingFailure(): update the UoW (Egress Content)");
         currentParcel.getActualUoW().setEgressContent(unitOfWork.getEgressContent());
         LOG.trace(".notifyParcelProcessingFailure(): update the UoW Processing Outcome --> {}", unitOfWork.getProcessingOutcome());
@@ -263,8 +263,8 @@ public class STAResilienceParcelServicesIM {
         Date finishDate = Date.from(Instant.now());
         LOG.trace(".notifyParcelProcessingFailure(): Set the Finish Date --> {}", finishDate);
         currentParcel.setFinishedDate(finishDate);
-        LOG.trace(".notifyParcelProcessingFailure(): Set the Parcel Finalisation Status --> {} ", ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED);
-        currentParcel.setFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED);
+        LOG.trace(".notifyParcelProcessingFailure(): Set the Parcel Finalisation Status --> {} ", TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
+        currentParcel.setFinalisationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_NOT_BEING_FULFILLED);
         LOG.trace(".notifyParcelProcessingFailure(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         LOG.trace(".notifyParcelProcessingFailure(): Doing an Audit Write, note that it is asynchronous by desgin");
@@ -291,8 +291,8 @@ public class STAResilienceParcelServicesIM {
         Date finalisationDate = Date.from(Instant.now());
         LOG.trace(".notifyParcelProcessingFinalisation(): Set the Finalisation Date --> {}", finalisationDate);
         currentParcel.setFinalisationDate(finalisationDate);
-        LOG.trace(".notifyParcelProcessingFinalisation(): Set the Parcel Finalisation Status --> {} ", ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
-        currentParcel.setFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        LOG.trace(".notifyParcelProcessingFinalisation(): Set the Parcel Finalisation Status --> {} ", TaskFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        currentParcel.setFinalisationStatus(TaskFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
         LOG.trace(".notifyParcelProcessingFinalisation(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         LOG.trace(".notifyParcelProcessingFinalisation(): Doing an Audit Write, note that it is asynchronous by design");
@@ -309,7 +309,7 @@ public class STAResilienceParcelServicesIM {
             throw (new IllegalArgumentException(".notifyParcelProcessingFinalisation(): parcelID is null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingCancellation(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getFulfillmentTask(parcelID);
         LOG.trace(".notifyParcelProcessingCancellation(): checking to see if finish date has been set and, if not, setting it");
         if(!currentParcel.hasFinishedDate()) {
             Date finishDate = Date.from(Instant.now());
@@ -319,8 +319,8 @@ public class STAResilienceParcelServicesIM {
         Date finalisationDate = Date.from(Instant.now());
         LOG.trace(".notifyParcelProcessingCancellation(): Set the Finalisation Date --> {}", finalisationDate);
         currentParcel.setFinalisationDate(finalisationDate);
-        LOG.trace(".notifyParcelProcessingCancellation(): Set the Parcel Finalisation Status --> {} ", ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
-        currentParcel.setFinalisationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        LOG.trace(".notifyParcelProcessingCancellation(): Set the Parcel Finalisation Status --> {} ", TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
+        currentParcel.setFinalisationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
         LOG.trace(".notifyParcelProcessingCancellation(): Set the Parcel Processing Status --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         currentParcel.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
         LOG.trace(".notifyParcelProcessingCancellation(): Doing an Audit Write, note that it is asynchronous by design");

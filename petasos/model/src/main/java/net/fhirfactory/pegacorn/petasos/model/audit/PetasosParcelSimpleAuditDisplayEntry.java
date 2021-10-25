@@ -22,22 +22,28 @@
 
 package net.fhirfactory.pegacorn.petasos.model.audit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
+import org.hl7.fhir.r4.model.IdType;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 public class PetasosParcelSimpleAuditDisplayEntry {
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date auditTrailEntryDate;
     private UoW actualUoW;
-    private String identifier;
-    private ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus;
+    private TaskIdType identifier;
+    private TaskFinalisationStatusEnum parcelFinalsationStatus;
     private ResilienceParcelProcessingStatusEnum processingStatus;
     private HashSet<String> alternativeWUPIdentifierSet;
     private HashSet<String> alternativeParcelIdentifiersSet;
@@ -119,7 +125,7 @@ public class PetasosParcelSimpleAuditDisplayEntry {
             this.parcelFinalisedDate = theParcel.getParcelFinalisedDate();
         }
         if(theParcel.getIdentifier() != null){
-            this.identifier = theParcel.getIdentifier().getUnqualifiedToken();
+            setIdentifier(theParcel.getIdentifier());
         }
         if(theParcel.getParcelFinishedDate() != null){
             this.parcelFinishedDate = theParcel.getParcelFinishedDate();
@@ -166,19 +172,19 @@ public class PetasosParcelSimpleAuditDisplayEntry {
         this.actualUoW = actualUoW;
     }
 
-    public String getIdentifier() {
+    public TaskIdType getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(TaskIdType identifier) {
         this.identifier = identifier;
     }
 
-    public ResilienceParcelFinalisationStatusEnum getParcelFinalsationStatus() {
+    public TaskFinalisationStatusEnum getParcelFinalsationStatus() {
         return parcelFinalsationStatus;
     }
 
-    public void setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus) {
+    public void setParcelFinalsationStatus(TaskFinalisationStatusEnum parcelFinalsationStatus) {
         this.parcelFinalsationStatus = parcelFinalsationStatus;
     }
 

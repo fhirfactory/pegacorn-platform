@@ -21,6 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
+
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;

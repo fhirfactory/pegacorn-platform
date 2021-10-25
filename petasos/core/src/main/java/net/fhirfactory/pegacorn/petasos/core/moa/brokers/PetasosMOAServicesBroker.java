@@ -31,19 +31,19 @@ import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
-import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceParcelServicesIM;
+import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.LocalPetasosFulfilmentTaskBroker;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,14 +54,13 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 
 @ApplicationScoped
 public class PetasosMOAServicesBroker {
     private static final Logger LOG = LoggerFactory.getLogger(PetasosMOAServicesBroker.class);
 
     @Inject
-    ProcessingPlantResilienceParcelServicesIM parcelServicesIM;
+    LocalPetasosFulfilmentTaskBroker parcelServicesIM;
 
     @Inject
     ProcessingPlantResilienceActivityServicesController rasController;
@@ -97,7 +96,7 @@ public class PetasosMOAServicesBroker {
             PetasosEpisodeIdentifier wuaEpisodeToken = new PetasosEpisodeIdentifier(newWUAFDN.getToken());
             jobCard.getActivityID().setPresentEpisodeIdentifier(wuaEpisodeToken);
         }
-        ResilienceParcel newParcel = parcelServicesIM.registerParcel(jobCard.getActivityID(), initialUoW, false);
+        ResilienceParcel newParcel = parcelServicesIM.registerFulfillmentTask(jobCard.getActivityID(), initialUoW, false);
         jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());
         ParcelStatusElement statusElement = rasController.registerNewWorkUnitActivity(jobCard);
         return (statusElement);
@@ -113,7 +112,7 @@ public class PetasosMOAServicesBroker {
         if ((jobCard == null) || (initialUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
         }
-        ResilienceParcel newParcel = parcelServicesIM.registerParcel(jobCard.getActivityID(), initialUoW, true);
+        ResilienceParcel newParcel = parcelServicesIM.registerFulfillmentTask(jobCard.getActivityID(), initialUoW, true);
         jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());
         ParcelStatusElement statusElement = rasController.registerNewWorkUnitActivity(jobCard);
         return (statusElement);
@@ -123,7 +122,7 @@ public class PetasosMOAServicesBroker {
         if ((jobCard == null) || (initialUoW == null)) {
             throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
         }
-        ResilienceParcel newParcel = parcelServicesIM.registerParcel(jobCard.getActivityID(), initialUoW, portType, portValue, true);
+        ResilienceParcel newParcel = parcelServicesIM.registerFulfillmentTask(jobCard.getActivityID(), initialUoW, portType, portValue, true);
         jobCard.getActivityID().setPresentParcelIdentifier(newParcel.getIdentifier());
         ParcelStatusElement statusElement = rasController.registerNewWorkUnitActivity(jobCard);
         return (statusElement);
@@ -284,7 +283,7 @@ public class PetasosMOAServicesBroker {
         auditEntryIdentifier.appendRDN(new RDN("action", action));
         ResilienceParcelIdentifier parcelId = new ResilienceParcelIdentifier(auditEntryIdentifier.getToken());
         newAuditEntry.setIdentifier(parcelId);
-        newAuditEntry.setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        newAuditEntry.setParcelFinalsationStatus(TaskFinalisationStatusEnum.DOWNSTREAM_TASK_BEING_FULFILLED);
         newAuditEntry.setProcessingStatus(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
         newAuditEntry.setParcelFinalisedDate(Date.from(Instant.now()));
         newAuditEntry.setParcelFinishedDate(Date.from(Instant.now()));

@@ -31,48 +31,41 @@ import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 
-public class ResilienceParcelIdentifier extends FDNToken implements Serializable {
-	
-    public ResilienceParcelIdentifier(FDNToken originalToken) {
-        this.setContent(new String(originalToken.getContent()));
-    }
+public class ResilienceParcelIdentifier extends TaskIdType implements Serializable {
 
-    public ResilienceParcelIdentifier(){
-    	super();
+	//
+	// Constructors
+	//
+
+	public ResilienceParcelIdentifier(ResilienceParcelIdentifier ori){
+		super(ori);
 	}
 
-	public ResilienceParcelIdentifier(TopologyNodeFunctionFDNToken nodeFunctionToken){
-    	super();
-		TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(nodeFunctionToken);
-		FDN newFDN = new FDN();
-		for(TopologyNodeRDN currentRDN: nodeFunctionFDN.getHierarchicalNameSet()) {
-			newFDN.appendRDN(new RDN(currentRDN.getNodeName(), currentRDN.getNodeVersion()));
-		}
-		setContent(newFDN.getToken().getContent());
+	public ResilienceParcelIdentifier(){
+		super();
 	}
-    
+
+	public ResilienceParcelIdentifier(TaskIdType ori){
+		super(ori);
+	}
+
+	public ResilienceParcelIdentifier(FDNToken token){
+		super();
+		setId(token.getContent());
+	}
+
+	//
+	// To String
+	//
 
 	@Override
 	public String toString() {
-	        FDN tempFDN = new FDN(this);
-	        String simpleString = "ResilienceParcelIdentifier{";
-	        ArrayList<RDN> rdnSet = tempFDN.getRDNSet();
-	        int setSize = rdnSet.size();
-	        for (int counter = 0; counter < setSize; counter++) {
-	            RDN currentRDN = rdnSet.get(counter);
-	            String currentNameValue = currentRDN.getValue();
-	            if(currentNameValue.contains(".")){
-	                String outputString = currentNameValue.replace(".", "_");
-	                simpleString = simpleString + outputString;
-	            } else {
-	                simpleString = simpleString + currentNameValue;
-	            }
-	            if(counter < (setSize - 1)){
-	                simpleString = simpleString + ".";
-	            }
-	        }
-	        simpleString = simpleString + "}";
-	        return(simpleString);
+		return "ResilienceParcelIdentifier{" +
+				"id='" + getId() + '\'' +
+				", version='" + getVersion() + '\'' +
+				", creationInstant=" + getCreationInstant() +
+				'}';
 	}
 }
