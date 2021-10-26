@@ -20,10 +20,11 @@
  * SOFTWARE.
  */
 
-package net.fhirfactory.pegacorn.petasos.core.tasks.processingplant;
+package net.fhirfactory.pegacorn.petasos.core.tasks.caches;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalPetasosFulfillmentTaskDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
@@ -54,9 +55,6 @@ public class LocalPetasosFulfilmentTaskBroker {
 
     @Inject
     MOAServicesAuditBroker auditServicesBroker;
-
-    @Inject
-
 
     //
     // PetasosFulfillmentTask Registration

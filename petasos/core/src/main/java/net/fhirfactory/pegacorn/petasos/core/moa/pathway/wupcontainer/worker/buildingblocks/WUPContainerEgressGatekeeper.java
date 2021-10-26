@@ -23,7 +23,6 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -96,7 +95,7 @@ public class WUPContainerEgressGatekeeper {
         } else {
             getLogger().trace(".egressGatekeeper(): the isToBeDiscarded attribute is false, so we need to set the Semaphore (so we know we've processed this packet)");
             getLogger().trace(".egressGatekeeper(): And we return the ingres point of the associated Interchange Payload Transformer");
-            String targetEndpoint = nameSet.getEndPointInterchangePayloadTransformerIngres();
+            String targetEndpoint = nameSet.getEndpointTaskOutcomeCollection();
             targetList.add(targetEndpoint);
             getLogger().debug(".egressGatekeeper(): Returning route to the Interchange Payload Transformer instance --> {}", targetEndpoint);
             return (targetList);

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.tasks.processingplant;
+package net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;

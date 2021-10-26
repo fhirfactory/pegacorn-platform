@@ -19,11 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
+package net.fhirfactory.pegacorn.petasos.core.tasks.manager.outcomes;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
+import net.fhirfactory.pegacorn.petasos.core.tasks.manager.distribution.TaskDistributionWUPTypeRouter;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -31,9 +32,9 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
+public class TaskOutcomeCollectionAndProcessingTemplate extends BaseRouteBuilder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InterchangeExtractAndRouteTemplate.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskOutcomeCollectionAndProcessingTemplate.class);
     protected Logger getLogger(){
         return(LOG);
     }
@@ -41,9 +42,9 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
     private WorkUnitProcessorTopologyNode wupTopologyNode;
     private RouteElementNames nameSet;
 
-    public InterchangeExtractAndRouteTemplate(CamelContext context, WorkUnitProcessorTopologyNode nodeElement) {
+    public TaskOutcomeCollectionAndProcessingTemplate(CamelContext context, WorkUnitProcessorTopologyNode nodeElement) {
         super(context);
-        getLogger().debug(".InterchangeExtractAndRouteTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
+        getLogger().debug(".TaskOutcomeCollectionAndProcessingTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
         this.wupTopologyNode = nodeElement;
         nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
     }
@@ -51,25 +52,17 @@ public class InterchangeExtractAndRouteTemplate extends BaseRouteBuilder {
     @Override
     public void configure() {
         getLogger().debug(".configure(): Entry!, for wupNodeElement --> {}", this.wupTopologyNode);
-        getLogger().debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangePayloadTransformerIngres --> {}", nameSet.getEndPointInterchangePayloadTransformerIngres());
-        getLogger().debug("InterchangeExtractAndRouteTemplate :: EndPointInterchangeRouterIngres --> {}", nameSet.getEndPointInterchangeRouterIngres());
+        getLogger().debug("TaskOutcomeCollectionAndProcessingTemplate :: EndPointInterchangePayloadTransformerIngres --> {}", nameSet.getEndpointTaskOutcomeCollection());
+        getLogger().debug("TaskOutcomeCollectionAndProcessingTemplate :: EndPointInterchangeRouterIngres --> {}", nameSet.getEndPointInterchangeRouterIngres());
 
         NodeDetailInjector nodeDetailInjector = new NodeDetailInjector();
 
-        fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerIngres())
-                .routeId(nameSet.getRouteInterchangePayloadTransformer())
+        fromWithStandardExceptionHandling(nameSet.getEndpointTaskOutcomeCollection())
+                .routeId(nameSet.getRouteTaskOutcomeCollectionAndProcessing())
                 .process(nodeDetailInjector)
-                .split().method(InterchangeUoWPayload2NewUoWProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange)")
-                .to(nameSet.getEndPointInterchangePayloadTransformerEgress());
+                .split().method(TaskOutcome2NewTasksProcessor.class, "extractUoWPayloadAndCreateNewUoWSet(*, Exchange)")
+                .to(nameSet.getEndpointNewTaskCreationCompletion());
 
-        fromWithStandardExceptionHandling(nameSet.getEndPointInterchangePayloadTransformerEgress())
-                .routeId(nameSet.getRouteInterchangePayloadTransformerEgress2InterchangePayloadRouterIngres())
-                .to(nameSet.getEndPointInterchangeRouterIngres());
-
-        fromWithStandardExceptionHandling(nameSet.getEndPointInterchangeRouterIngres())
-                .routeId(nameSet.getRouteInterchangeRouter())
-                .process(nodeDetailInjector)
-                .bean(InterchangeTargetWUPTypeRouter.class, "forwardUoW2WUPs(*, Exchange)");
     }
 
     protected class NodeDetailInjector implements Processor {

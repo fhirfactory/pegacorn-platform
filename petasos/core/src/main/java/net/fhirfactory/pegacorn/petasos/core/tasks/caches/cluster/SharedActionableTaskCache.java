@@ -20,12 +20,13 @@
  * SOFTWARE.
  */
 
-package net.fhirfactory.pegacorn.petasos.core.tasks.cluster;
+package net.fhirfactory.pegacorn.petasos.core.tasks.caches.cluster;
 
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeFinalisationStatus;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeFinalisationStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionTokenSet;
@@ -60,6 +61,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class SharedActionableTaskCache {
     private static final Logger LOG = LoggerFactory.getLogger(SharedActionableTaskCache.class);
 
+    private ConcurrentHashMap<TaskIdType, PetasosActionableTask> taskCache;
     private ConcurrentHashMap<TaskIdType, PetasosEpisodeFinalisationStatus> downstreamRegistrationStatusSet;
     private ConcurrentHashMap<TaskIdType, WUPFunctionTokenSet> downstreamWUPRegistrationMap;
     private Object wupRegistrationSetLock;
@@ -141,7 +143,7 @@ public class SharedActionableTaskCache {
      * @param wuaEpisodeID The Episode ID that we would like to know if all the downstream WUPs have registered a successor WUA Episode ID for.
      * @return True if all downstream WUPs have registered a new WUA Episode ID (for a successor task), false if one or more haven't.
      */
-    public boolean checkForEpisodeFinalisation(FDNToken wuaEpisodeID){
+    public boolean checkForTaskFinalisation(FDNToken wuaEpisodeID){
         LOG.debug(".checkForEpisodeFinalisation(): Entry, wuaEpisodeID --> {} ", wuaEpisodeID);
         if(wuaEpisodeID==null){
             LOG.debug(".checkForEpisodeFinalisation(): wuaEpisodeID parameter is null, returning false");
@@ -165,5 +167,20 @@ public class SharedActionableTaskCache {
         }
         LOG.debug(".checkForEpisodeFinalisation(): It seems that ALL dowstream WUPs have registered successor WUA Episode IDs - returning -true-");
         return(true);
+    }
+
+    public PetasosActionableTask getActionableTask(TaskIdType taskId){
+        LOG.debug(".getActionableTask(): Entry, taskId->{}", taskId);
+        if(taskCache.isEmpty()){
+            LOG.debug(".getActionableTask(): Exit, taskId is empty");
+            return(null);
+        }
+        if(taskCache.containsKey(taskId)){
+            PetasosActionableTask task = taskCache.get(taskId);
+            LOG.debug(".getActionableTask(): Exit, task->{}", task);
+            return(task);
+        }
+        LOG.debug(".getActionableTask(): Exit, Task with TaskId({}) is not within the cahce", taskId);
+        return(null);
     }
 }

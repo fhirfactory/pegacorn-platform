@@ -150,13 +150,13 @@ public class RouteElementNames {
         return(endpointName);
     }
 
-    public String getEndPointInterchangePayloadTransformerIngres() {
+    public String getEndpointTaskOutcomeCollection() {
         getLogger().debug(".getEndPointInterchangePayloadTransformerIngres(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres";
         return(endpointName);
     }
 
-    public String getEndPointInterchangePayloadTransformerEgress() {
+    public String getEndpointNewTaskCreationCompletion() {
         getLogger().debug(".getEndPointInterchangePayloadTransformerEgress(): Entry");
         String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Egress";
         return(endpointName);
@@ -234,7 +234,7 @@ public class RouteElementNames {
         return(endpointName);
     }
 
-    public String getRouteInterchangePayloadTransformer(){
+    public String getRouteTaskOutcomeCollectionAndProcessing(){
         getLogger().debug(".getRouteInterchangePayloadTransformer(): Entry");
         String endpointName = "FROM-" + wupTypeName + ".IC.PT.I-To-" + wupTypeName +".IC.PT.E" ;
         return(endpointName);

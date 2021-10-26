@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.task.datatypes.traceability.datat
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.common.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.common.TaskInstantDetailSegmentBase;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 
 import java.io.Serializable;
@@ -49,6 +50,10 @@ public class TaskTraceabilityElementType extends TaskInstantDetailSegmentBase im
         this.fulfillerId = null;
         this.actionableTaskId = null;
         this.fulfillerTaskId = null;
+
+    }
+
+    public TaskTraceabilityElementType(TaskIdType previousActionableTask, TaskFulfillmentType fullfillment){
 
     }
 

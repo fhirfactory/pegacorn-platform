@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager;
 
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
-import net.fhirfactory.pegacorn.petasos.core.tasks.cluster.SharedActionableTaskCache;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.cluster.SharedActionableTaskCache;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.RegisterNewMOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.SynchroniseMOAWorkUnitActivityJobCardTask;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;

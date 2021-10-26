@@ -28,10 +28,10 @@ import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.manager.PathwayInterchangeManager;
+import net.fhirfactory.pegacorn.petasos.core.tasks.manager.TaskManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
-import net.fhirfactory.pegacorn.petasos.core.tasks.processingplant.LocalPetasosFulfilmentTaskBroker;
+import net.fhirfactory.pegacorn.petasos.core.tasks.caches.LocalPetasosFulfilmentTaskBroker;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
@@ -69,7 +69,7 @@ public class PetasosMOAServicesBroker {
     WorkUnitProcessorFrameworkManager wupFrameworkManager;
 
     @Inject
-    PathwayInterchangeManager wupInterchangeManager;
+    TaskManager wupInterchangeManager;
 
     @Inject
     DataParcelSubscriptionMapIM topicManager;

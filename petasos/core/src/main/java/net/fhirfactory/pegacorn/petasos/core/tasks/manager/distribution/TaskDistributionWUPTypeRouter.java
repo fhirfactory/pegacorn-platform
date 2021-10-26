@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
+package net.fhirfactory.pegacorn.petasos.core.tasks.manager.distribution;
 
 import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
@@ -51,9 +51,9 @@ import java.util.Set;
  */
 
 @Dependent
-public class InterchangeTargetWUPTypeRouter {
+public class TaskDistributionWUPTypeRouter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InterchangeTargetWUPTypeRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskDistributionWUPTypeRouter.class);
     protected Logger getLogger(){
         return(LOG);
     }
