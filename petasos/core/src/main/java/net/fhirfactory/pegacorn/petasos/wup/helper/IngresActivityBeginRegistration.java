@@ -62,7 +62,7 @@ public class IngresActivityBeginRegistration {
     TopologyIM topologyProxy;
 
     @Inject
-    PetasosMOAServicesBroker servicesBroker;
+    LocalTaskActivityController servicesBroker;
 
     @Inject
     PetasosPathwayExchangePropertyNames exchangePropertyNames;
@@ -97,7 +97,7 @@ public class IngresActivityBeginRegistration {
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
         LOG.trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, activityJobCard); // <-- Note the "WUPJobCard" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, statusElement); // <-- Note the "ParcelStatusElement" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_EXCHANGE_PROPERTY_NAME, statusElement); // <-- Note the "ParcelStatusElement" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
         LOG.debug(".registerActivityStart(): exit, my work is done!");
         return(theUoW);
     }

@@ -20,11 +20,9 @@
  * SOFTWARE.
  */
 
-package net.fhirfactory.pegacorn.petasos.core.tasks.manager;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management;
 
-import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.tasks.manager.distribution.TaskDistributionRouteTemplate;
-import net.fhirfactory.pegacorn.petasos.core.tasks.manager.outcomes.TaskOutcomeCollectionAndProcessingTemplate;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
 import org.apache.camel.CamelContext;
 import org.slf4j.Logger;
@@ -34,8 +32,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-public class TaskManager {
-    private static final Logger LOG = LoggerFactory.getLogger(TaskManager.class);
+public class LocalPetasosActionableTaskBroker {
+    private static final Logger LOG = LoggerFactory.getLogger(LocalPetasosActionableTaskBroker.class);
 
     @Inject
     CamelContext camelctx;
@@ -71,11 +69,7 @@ public class TaskManager {
             default: {
                 LOG.trace(".buildWUPInterchangeRoutes(): This WUP requires an Interchange service");
                 try {
-                    TaskOutcomeCollectionAndProcessingTemplate outcomeCollectionRoute = new TaskOutcomeCollectionAndProcessingTemplate(camelctx, nodeElement);
-                    TaskDistributionRouteTemplate distributionRoute = new TaskDistributionRouteTemplate(camelctx, nodeElement);
-                    LOG.trace(".buildWUPInterchangeRoutes(): Attempting to install new Route");
-                    camelctx.addRoutes(outcomeCollectionRoute);
-                    camelctx.addRoutes(distributionRoute);
+
                     LOG.trace(".buildWUPInterchangeRoutes(): Route installation successful");
                 } catch (Exception Ex) {
                     LOG.error(".buildWUPInterchangeRoutes(): Route install failed! Exception", Ex);

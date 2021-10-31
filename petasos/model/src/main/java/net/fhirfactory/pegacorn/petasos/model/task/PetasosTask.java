@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.fhirfactory.pegacorn.common.model.componentid.ComponentIdType;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.performer.datatypes.TaskPerformerTypeType;
@@ -58,6 +59,9 @@ public class PetasosTask implements Serializable {
     private TaskReasonType taskReason;
     private SerializableObject taskReasonLock;
 
+    private ComponentIdType taskNodeAffinity;
+    private SerializableObject taskNodeAffinityLock;
+
     private boolean registered;
 
     //
@@ -80,6 +84,8 @@ public class PetasosTask implements Serializable {
         this.taskTypeLock = new SerializableObject();
         this.taskReason = null;
         this.taskReasonLock = new SerializableObject();
+        this.taskNodeAffinity = null;
+        this.taskNodeAffinityLock = new SerializableObject();
     }
 
     //
@@ -246,6 +252,28 @@ public class PetasosTask implements Serializable {
 
     public void setTaskReasonLock(SerializableObject taskReasonLock) {
         this.taskReasonLock = taskReasonLock;
+    }
+
+    @JsonIgnore
+    public boolean hasTaskNodeAffinity(){
+        boolean hasValue = this.taskNodeAffinity != null;
+        return(hasValue);
+    }
+
+    public ComponentIdType getTaskNodeAffinity() {
+        return taskNodeAffinity;
+    }
+
+    public void setTaskNodeAffinity(ComponentIdType taskNodeAffinity) {
+        this.taskNodeAffinity = taskNodeAffinity;
+    }
+
+    public SerializableObject getTaskNodeAffinityLock() {
+        return taskNodeAffinityLock;
+    }
+
+    public void setTaskNodeAffinityLock(SerializableObject taskNodeAffinityLock) {
+        this.taskNodeAffinityLock = taskNodeAffinityLock;
     }
 
     //

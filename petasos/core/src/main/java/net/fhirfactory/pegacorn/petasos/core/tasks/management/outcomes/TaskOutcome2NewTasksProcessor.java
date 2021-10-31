@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package net.fhirfactory.pegacorn.petasos.core.tasks.manager.outcomes;
+package net.fhirfactory.pegacorn.petasos.core.tasks.management.outcomes;
 
 import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -80,9 +80,6 @@ public class TaskOutcome2NewTasksProcessor {
 
     public List<PetasosActionableTask> collectOutcomesAndCreateNewTasks(PetasosFulfillmentTask fulfillmentTask, Exchange camelExchange) {
         getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Entry, fulfillmentTask (WorkUnitTransportPacket)->{}", fulfillmentTask);
-        // Get my Petasos Context
-        getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
-        WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         TaskWorkItemType incomingUoW = fulfillmentTask.getTaskWorkItem();
         UoWPayloadSet egressContent = incomingUoW.getEgressContent();
         Set<UoWPayload> egressPayloadList = egressContent.getPayloadElements();
@@ -94,16 +91,16 @@ public class TaskOutcome2NewTasksProcessor {
                 counter++;
             }
         }
-        ArrayList<PetasosActionableTask> newEgressTransportPacketSet = new ArrayList<>();
+        ArrayList<PetasosActionableTask> newActionableTaskList = new ArrayList<>();
         for(UoWPayload currentPayload: egressPayloadList) {
-            TaskWorkItemType newUoW = new TaskWorkItemType(currentPayload);
-            getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newUoW->{}", newUoW);
-            WorkUnitTransportPacket transportPacket = new WorkUnitTransportPacket(fulfillmentTask.getPacketID(), Date.from(Instant.now()), newUoW);
-            newEgressTransportPacketSet.add(transportPacket);
+            TaskWorkItemType newWorkItem = new TaskWorkItemType(currentPayload);
+            getLogger().trace(".extractUoWPayloadAndCreateNewUoWSet(): newWorkItem->{}", newWorkItem);
+            PetasosActionableTask transportPacket = newActionableTask(fulfillmentTask.getActionableTaskId(), fulfillmentTask.getTaskFulfillment(), newWorkItem);
+            newActionableTaskList.add(transportPacket);
         }
-        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newEgressTransportPacketSet.size());
+        getLogger().debug(".extractUoWPayloadAndCreateNewUoWSet(): Exit, new WorkUnitTransportPackets created, number --> {} ", newActionableTaskList.size());
 
-        return (newEgressTransportPacketSet);
+        return (newActionableTaskList);
     }
 
     private PetasosActionableTask newActionableTask(TaskIdType previousActionableTaskId, TaskFulfillmentType previousTaskFulfillmentDetail, TaskWorkItemType work){
@@ -126,6 +123,7 @@ public class TaskOutcome2NewTasksProcessor {
             getLogger().debug(".newActionableTask(): Exit, cannot resolve previousActionableTaskId, returning null");
             return(null);
         }
-        actionableTaskFactory.newMessageBasedActionableTask(actionableTask, previousTaskFulfillmentDetail, work);
+        PetasosActionableTask petasosActionableTask = actionableTaskFactory.newMessageBasedActionableTask(actionableTask, previousTaskFulfillmentDetail, work);
+        return(petasosActionableTask);
     }
 }

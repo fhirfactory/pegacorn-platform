@@ -37,7 +37,7 @@ import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopolog
 import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
 import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
+import net.fhirfactory.pegacorn.petasos.core.tasks.management.LocalTaskActivityController;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
@@ -81,7 +81,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     private MessageBasedWUPEndpoint ingresEndpoint;
 
     @Inject
-    private PetasosMOAServicesBroker servicesBroker;
+    private LocalTaskActivityController servicesBroker;
 
     @Inject
     private TopologyIM topologyIM;
@@ -194,7 +194,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         return(dnsName);
     }
     
-    public PetasosMOAServicesBroker getServicesBroker(){
+    public LocalTaskActivityController getServicesBroker(){
         return(this.servicesBroker);
     }
     

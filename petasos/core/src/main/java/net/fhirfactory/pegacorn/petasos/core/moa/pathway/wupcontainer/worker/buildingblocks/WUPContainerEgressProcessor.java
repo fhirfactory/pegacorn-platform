@@ -54,7 +54,7 @@ public class WUPContainerEgressProcessor {
     RouteElementNames elementNames = null;
 
     @Inject
-    PetasosMOAServicesBroker petasosMOAServicesBroker;
+    LocalTaskActivityController localTaskActivityController;
 
     @Inject
     TopologyIM topologyProxy;
@@ -101,7 +101,7 @@ public class WUPContainerEgressProcessor {
         switch (parcelProcessingStatusEnum) {
             case PARCEL_STATUS_FINISHED:
             	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
-                petasosMOAServicesBroker.notifyFinishOfWorkUnitActivity(jobCard, uow);
+                localTaskActivityController.notifyFinishOfWorkUnitActivity(jobCard, uow);
                 break;
             case PARCEL_STATUS_ACTIVE_ELSEWHERE:
             	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE_ELSEWHERE);
@@ -120,7 +120,7 @@ public class WUPContainerEgressProcessor {
             case PARCEL_STATUS_FAILED:
             	getLogger().trace(".standaloneDeploymentModeECP(): ParcelStatus (ResilienceParcelProcessingStatusEnum) --> {}", ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FAILED);
             default:
-                petasosMOAServicesBroker.notifyFailureOfWorkUnitActivity(jobCard, uow);
+                localTaskActivityController.notifyFailureOfWorkUnitActivity(jobCard, uow);
         }
         return (ingresPacket);
     }

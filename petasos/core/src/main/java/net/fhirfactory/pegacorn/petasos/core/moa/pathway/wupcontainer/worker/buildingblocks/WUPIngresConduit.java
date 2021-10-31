@@ -62,7 +62,7 @@ public class WUPIngresConduit {
         getLogger().debug(".forwardIntoWUP(): Entry, ingresParcel->{}", ingresPacket);
         UoW theUoW = ingresPacket.getPayload();
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentJobCard());
-        camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentParcelStatus());
+        camelExchange.setProperty(PetasosPropertyConstants.WUP_FULFILLMENT_TASK_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentParcelStatus());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, theUoW);
         //
         // Because auditing is not running yet

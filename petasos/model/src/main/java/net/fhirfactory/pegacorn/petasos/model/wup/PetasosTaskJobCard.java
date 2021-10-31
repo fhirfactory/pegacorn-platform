@@ -48,15 +48,22 @@ public class PetasosTaskJobCard implements Serializable {
     private TaskIdType actionableTaskIdentifier;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant localUpdateInstant;
+    private SerializableObject localUpdateInstantLock;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSXXX", timezone = PetasosPropertyConstants.DEFAULT_TIMEZONE)
     private Instant coordinatorUpdateInstant;
+    private SerializableObject coordinatorUpdateInstantLock;
     private ComponentIdType processingPlant;
     private ComponentIdType workUnitProcessor;
     private PetasosJobActivityStatusEnum currentStatus;
+    private SerializableObject currentStatusLock;
     private PetasosJobActivityStatusEnum requestedStatus;
+    private SerializableObject requestedStatusLock;
     private PetasosJobActivityStatusEnum grantedStatus;
+    private SerializableObject grantedStatusLock;
     private FulfillmentExecutionStatusEnum localFulfillmentStatus;
+    private SerializableObject localFulfillmentStatusLock;
     private FulfillmentExecutionStatusEnum globalFulfillmentStatus;
+    private SerializableObject globalFulfillmentStatusLock;
     private ConcurrencyModeEnum clusterMode;
     private ResilienceModeEnum systemMode;
     private boolean isToBeDiscarded;
@@ -82,6 +89,14 @@ public class PetasosTaskJobCard implements Serializable {
         this.globalFulfillmentStatus = null;
         this.processingPlant = null;
         this.workUnitProcessor = null;
+
+        this.localUpdateInstantLock = new SerializableObject();
+        this.coordinatorUpdateInstantLock = new SerializableObject();
+        this.currentStatusLock = new SerializableObject();
+        this.requestedStatusLock = new SerializableObject();
+        this.grantedStatusLock = new SerializableObject();
+        this.localFulfillmentStatusLock = new SerializableObject();
+        this.globalFulfillmentStatusLock = new SerializableObject();
     }
 
     public PetasosTaskJobCard(
@@ -109,6 +124,14 @@ public class PetasosTaskJobCard implements Serializable {
         this.globalFulfillmentStatus = null;
         this.processingPlant = null;
         this.workUnitProcessor = null;
+
+        this.localUpdateInstantLock = new SerializableObject();
+        this.coordinatorUpdateInstantLock = new SerializableObject();
+        this.currentStatusLock = new SerializableObject();
+        this.requestedStatusLock = new SerializableObject();
+        this.grantedStatusLock = new SerializableObject();
+        this.localFulfillmentStatusLock = new SerializableObject();
+        this.globalFulfillmentStatusLock = new SerializableObject();
 
         //
         // Assign provided values
@@ -149,6 +172,14 @@ public class PetasosTaskJobCard implements Serializable {
         this.workUnitProcessor = null;
         this.localFulfillmentStatus = null;
         this.globalFulfillmentStatus = null;
+
+        this.localUpdateInstantLock = new SerializableObject();
+        this.coordinatorUpdateInstantLock = new SerializableObject();
+        this.currentStatusLock = new SerializableObject();
+        this.requestedStatusLock = new SerializableObject();
+        this.grantedStatusLock = new SerializableObject();
+        this.localFulfillmentStatusLock = new SerializableObject();
+        this.globalFulfillmentStatusLock = new SerializableObject();
         //
         // Assign provided values
         if(ori.hasActionableTaskIdentifier()){
@@ -235,11 +266,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public Instant getLocalUpdateInstant() {
-        return localUpdateInstant;
+        Instant instant = null;
+        synchronized (this.localUpdateInstantLock) {
+            instant = this.localUpdateInstant;
+        }
+        return (instant);
     }
 
     public void setLocalUpdateInstant(Instant localUpdateInstant) {
-        this.localUpdateInstant = localUpdateInstant;
+        synchronized (this.localUpdateInstantLock) {
+            this.localUpdateInstant = localUpdateInstant;
+        }
     }
 
     @JsonIgnore
@@ -249,11 +286,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public Instant getCoordinatorUpdateInstant() {
-        return coordinatorUpdateInstant;
+        Instant instant = null;
+        synchronized(this.coordinatorUpdateInstantLock){
+            instant = this.coordinatorUpdateInstant;
+        }
+        return(instant);
     }
 
     public void setCoordinatorUpdateInstant(Instant coordinatorUpdateInstant) {
-        this.coordinatorUpdateInstant = coordinatorUpdateInstant;
+        synchronized (this.coordinatorUpdateInstantLock) {
+            this.coordinatorUpdateInstant = coordinatorUpdateInstant;
+        }
     }
 
     @JsonIgnore
@@ -263,11 +306,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public PetasosJobActivityStatusEnum getCurrentStatus() {
-        return currentStatus;
+        PetasosJobActivityStatusEnum status = null;
+        synchronized (this.currentStatusLock){
+            status = this.currentStatus;
+        }
+        return (status);
     }
 
     public void setCurrentStatus(PetasosJobActivityStatusEnum currentStatus) {
-        this.currentStatus = currentStatus;
+        synchronized(this.currentStatusLock) {
+            this.currentStatus = currentStatus;
+        }
     }
 
     @JsonIgnore
@@ -277,11 +326,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public PetasosJobActivityStatusEnum getRequestedStatus() {
-        return requestedStatus;
+        PetasosJobActivityStatusEnum status = null;
+        synchronized (this.requestedStatusLock){
+            status = this.requestedStatus;
+        }
+        return (status);
     }
 
     public void setRequestedStatus(PetasosJobActivityStatusEnum requestedStatus) {
-        this.requestedStatus = requestedStatus;
+        synchronized (this.requestedStatusLock) {
+            this.requestedStatus = requestedStatus;
+        }
     }
 
     @JsonIgnore
@@ -291,11 +346,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public PetasosJobActivityStatusEnum getGrantedStatus() {
-        return grantedStatus;
+        PetasosJobActivityStatusEnum status = null;
+        synchronized(this.grantedStatusLock){
+            status = this.grantedStatus;
+        }
+        return (status);
     }
 
     public void setGrantedStatus(PetasosJobActivityStatusEnum grantedStatus) {
-        this.grantedStatus = grantedStatus;
+        synchronized (this.grantedStatusLock) {
+            this.grantedStatus = grantedStatus;
+        }
     }
 
     @JsonIgnore
@@ -355,11 +416,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public FulfillmentExecutionStatusEnum getLocalFulfillmentStatus() {
-        return localFulfillmentStatus;
+        FulfillmentExecutionStatusEnum status = null;
+        synchronized (this.localFulfillmentStatusLock){
+            status = this.localFulfillmentStatus;
+        }
+        return (status);
     }
 
     public void setLocalFulfillmentStatus(FulfillmentExecutionStatusEnum localFulfillmentStatus) {
-        this.localFulfillmentStatus = localFulfillmentStatus;
+        synchronized (this.localFulfillmentStatusLock) {
+            this.localFulfillmentStatus = localFulfillmentStatus;
+        }
     }
 
     @JsonIgnore
@@ -369,11 +436,17 @@ public class PetasosTaskJobCard implements Serializable {
     }
 
     public FulfillmentExecutionStatusEnum getGlobalFulfillmentStatus() {
-        return globalFulfillmentStatus;
+        FulfillmentExecutionStatusEnum status = null;
+        synchronized (this.globalFulfillmentStatusLock){
+            status = this.globalFulfillmentStatus;
+        }
+        return (status);
     }
 
     public void setGlobalFulfillmentStatus(FulfillmentExecutionStatusEnum localFulfillmentStatus) {
-        this.globalFulfillmentStatus = localFulfillmentStatus;
+        synchronized (this.globalFulfillmentStatusLock) {
+            this.globalFulfillmentStatus = localFulfillmentStatus;
+        }
     }
 
     @JsonIgnore
@@ -402,6 +475,62 @@ public class PetasosTaskJobCard implements Serializable {
 
     public void setWorkUnitProcessor(ComponentIdType workUnitProcessor) {
         this.workUnitProcessor = workUnitProcessor;
+    }
+
+    public SerializableObject getLocalUpdateInstantLock() {
+        return localUpdateInstantLock;
+    }
+
+    public void setLocalUpdateInstantLock(SerializableObject localUpdateInstantLock) {
+        this.localUpdateInstantLock = localUpdateInstantLock;
+    }
+
+    public SerializableObject getCoordinatorUpdateInstantLock() {
+        return coordinatorUpdateInstantLock;
+    }
+
+    public void setCoordinatorUpdateInstantLock(SerializableObject coordinatorUpdateInstantLock) {
+        this.coordinatorUpdateInstantLock = coordinatorUpdateInstantLock;
+    }
+
+    public SerializableObject getCurrentStatusLock() {
+        return currentStatusLock;
+    }
+
+    public void setCurrentStatusLock(SerializableObject currentStatusLock) {
+        this.currentStatusLock = currentStatusLock;
+    }
+
+    public SerializableObject getRequestedStatusLock() {
+        return requestedStatusLock;
+    }
+
+    public void setRequestedStatusLock(SerializableObject requestedStatusLock) {
+        this.requestedStatusLock = requestedStatusLock;
+    }
+
+    public SerializableObject getGrantedStatusLock() {
+        return grantedStatusLock;
+    }
+
+    public void setGrantedStatusLock(SerializableObject grantedStatusLock) {
+        this.grantedStatusLock = grantedStatusLock;
+    }
+
+    public SerializableObject getLocalFulfillmentStatusLock() {
+        return localFulfillmentStatusLock;
+    }
+
+    public void setLocalFulfillmentStatusLock(SerializableObject localFulfillmentStatusLock) {
+        this.localFulfillmentStatusLock = localFulfillmentStatusLock;
+    }
+
+    public SerializableObject getGlobalFulfillmentStatusLock() {
+        return globalFulfillmentStatusLock;
+    }
+
+    public void setGlobalFulfillmentStatusLock(SerializableObject globalFulfillmentStatusLock) {
+        this.globalFulfillmentStatusLock = globalFulfillmentStatusLock;
     }
 
     //

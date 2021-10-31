@@ -155,19 +155,19 @@ public class RouteElementNames {
 
     public String getEndpointTaskOutcomeCollection() {
         getLogger().debug(".getEndPointInterchangePayloadTransformerIngres(): Entry");
-        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Ingres";
+        String endpointName = PetasosPropertyConstants.TASK_OUTCOME_COLLECTION_QUEUE;
         return(endpointName);
     }
 
     public String getEndpointNewTaskCreationCompletion() {
         getLogger().debug(".getEndPointInterchangePayloadTransformerEgress(): Entry");
-        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.PayloadTransformer.Egress";
+        String endpointName = PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE;
         return(endpointName);
     }
 
-    public String getEndPointInterchangeRouterIngres() {
+    public String getEndPointTaskDistributionQueueIngres() {
         getLogger().debug(".getEndPointInterchangeRouterIngres(): Entry");
-        String endpointName = INTRA_FUNCTION_DIRECT_TYPE + wupTypeName + ".Interchange.Router.Ingres";
+        String endpointName = PetasosPropertyConstants.TASK_DISTRIBUTION_QUEUE;
         return(endpointName);
     }
 

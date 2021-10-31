@@ -65,7 +65,7 @@ public class WUPContainerIngresProcessor {
     private RouteElementNames elementNames;
 
     @Inject
-    PetasosMOAServicesBroker petasosMOAServicesBroker;
+    LocalTaskActivityController localTaskActivityController;
 
     @Inject
     TopologyIM topologyProxy;
@@ -120,10 +120,10 @@ public class WUPContainerIngresProcessor {
                 case WUP_ACTIVITY_STATUS_WAITING:
                     getLogger().trace(".ingresContentProcessor(): jobCard.getCurrentStatus --> {}", PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING );
                     jobCard.setRequestedStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                    petasosMOAServicesBroker.synchroniseJobCard(jobCard);
+                    localTaskActivityController.synchroniseJobCard(jobCard);
                     if (jobCard.getGrantedStatus() == PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING) {
                         jobCard.setCurrentStatus(PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING);
-                        petasosMOAServicesBroker.notifyStartOfWorkUnitActivity(jobCard);
+                        localTaskActivityController.notifyStartOfWorkUnitActivity(jobCard);
                         getLogger().trace(".ingresContentProcessor(): We've been granted execution privileges!");
                         waitState = false;
                         break;
@@ -178,7 +178,7 @@ public class WUPContainerIngresProcessor {
         getLogger().trace(".standardIngresContentProcessor(): Creating new JobCard");
         WUPJobCard activityJobCard = new WUPJobCard(newActivityID, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_WAITING, PetasosJobActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, ConcurrencyModeEnum.CONCURRENCY_MODE_STANDALONE, ResilienceModeEnum.RESILIENCE_MODE_STANDALONE, Date.from(Instant.now()));
         getLogger().trace(".standardIngresContentProcessor(): Registering the Work Unit Activity using the ActivityID --> {} and UoW --> {}", newActivityID, theUoW);
-        ParcelStatusElement statusElement = petasosMOAServicesBroker.registerStandardWorkUnitActivity(activityJobCard, theUoW);
+        ParcelStatusElement statusElement = localTaskActivityController.registerTaskJobCard(activityJobCard, theUoW);
         getLogger().trace(".standardIngresContentProcessor(): Let's check the status of everything");
         switch (statusElement.getParcelStatus()) {
             case PARCEL_STATUS_REGISTERED:

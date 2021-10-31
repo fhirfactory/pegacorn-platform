@@ -29,7 +29,9 @@ import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatyp
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.factories.TaskIdTypeFactory;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.performer.datatypes.TaskPerformerTypeType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.reason.datatypes.TaskReasonType;
+import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.traceability.datatypes.TaskTraceabilityType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.work.datatypes.TaskWorkItemType;
 import org.apache.commons.lang3.SerializationUtils;
@@ -39,6 +41,9 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class PetasosFulfillmentTaskFactory {
@@ -66,24 +71,52 @@ public class PetasosFulfillmentTaskFactory {
     public PetasosFulfillmentTask newFulfillmentTask(PetasosActionableTask actionableTask, WorkUnitProcessorTopologyNode wupNode) {
         getLogger().debug(".newFulfillmentTask(): Enter, actionableTask->{}, wupNode->{}", actionableTask, wupNode );
 
-        // Get the core Items from the actionableTask (PetasosActionableTask)
-        TaskWorkItemType taskWorkItem = SerializationUtils.clone(actionableTask.getTaskWorkItem());
-        TaskTraceabilityType taskTraceability = SerializationUtils.clone(actionableTask.getTaskTraceability());
-        TaskIdType actionableTaskId = SerializationUtils.clone(actionableTask.getTaskId());
-        TaskReasonType taskReason = actionableTask.getTaskReason();
-
-        // Construct the PetasosFullfillmentTask using the ActionableTask details
-
+        //
+        // Create Empty PetasosFulfillmentTask
         PetasosFulfillmentTask fulfillmentTask = new PetasosFulfillmentTask();
-        fulfillmentTask.setTaskId(taskIdFactory.newTaskId());
 
+        //
+        // Create a TaskId (is local, so simple UUID is ok) and add to our Task
+        TaskIdType fulfillmentTaskId = new TaskIdType();
+        fulfillmentTaskId.setId(UUID.randomUUID().toString());
+        fulfillmentTaskId.setVersion(actionableTask.getTaskId().getVersion());
+        fulfillmentTaskId.setCreationInstant(Instant.now());
+        fulfillmentTask.setTaskId(fulfillmentTaskId);
+        //
+        // Get the Task Type, clone it and add it to our Task
+        TaskTypeType taskType = SerializationUtils.clone(actionableTask.getTaskType());
+        fulfillmentTask.setTaskType(taskType);
+        //
+        // Get the TaskWorkItem from the actionableTask, clone it and add it to our Task.
+        TaskWorkItemType taskWorkItem = SerializationUtils.clone(actionableTask.getTaskWorkItem());
         fulfillmentTask.setTaskWorkItem(taskWorkItem);
+        //
+        // Get the TaskTraceability Detail from the actionableTask, clone it and add it to our Task
+        TaskTraceabilityType taskTraceability = SerializationUtils.clone(actionableTask.getTaskTraceability());
         fulfillmentTask.setTaskTraceability(taskTraceability);
+        //
+        // Get the ActionableTask's Id, clone it and add it to our Task
+        TaskIdType actionableTaskId = SerializationUtils.clone(actionableTask.getTaskId());
         fulfillmentTask.setActionableTaskId(actionableTaskId);
+        //
+        // Get the ActionableTask's Task Reason (we don't need to clone it, it's an enum) and add it to our Task
+        TaskReasonType taskReason = actionableTask.getTaskReason();
         fulfillmentTask.setTaskReason(taskReason);
-
+        //
+        // Get the Task Performer Types from the Actionable Task, clone them and add them to our task
+        List<TaskPerformerTypeType> taskPerformers = new ArrayList<>();
+        if(actionableTask.hasTaskPerformerTypes()){
+            for(TaskPerformerTypeType currentPerformerType: actionableTask.getTaskPerformerTypes()){
+                TaskPerformerTypeType clonedPerformerType = SerializationUtils.clone(currentPerformerType);
+                taskPerformers.add(clonedPerformerType);
+            }
+        }
+        fulfillmentTask.setTaskPerformerTypes(taskPerformers);
+        //
+        // Assign the node affinity of the fulfillment task (from the actionable task)
+        fulfillmentTask.setTaskNodeAffinity(actionableTask.getTaskNodeAffinity());
+        //
         // Now to add Fulfillment details
-
         TaskFulfillmentType fulfillment = new TaskFulfillmentType();
         fulfillment.setFulfillerComponent(wupNode);
         fulfillment.setStatus(FulfillmentExecutionStatusEnum.FULFILLMENT_EXECUTION_STATUS_UNREGISTERED);
@@ -91,9 +124,10 @@ public class PetasosFulfillmentTaskFactory {
         FulfillmentTrackingIdType trackingId = new FulfillmentTrackingIdType(fulfillmentTask.getTaskId());
         fulfillment.setTrackingID(trackingId);
         fulfillment.setLastCheckedInstant(Instant.now());
-
         fulfillmentTask.setTaskFulfillment(fulfillment);
-
+        //
+        // Done! :)
+        getLogger().debug(".newFulfillmentTask(): Exit, fulfillmentTask->{}", fulfillmentTask);
         return(fulfillmentTask);
     }
 
