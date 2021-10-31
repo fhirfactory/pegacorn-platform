@@ -22,8 +22,8 @@
 
 package net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;

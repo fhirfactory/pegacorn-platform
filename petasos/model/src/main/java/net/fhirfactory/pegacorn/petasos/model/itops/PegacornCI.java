@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.itops;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 
 /**
  *

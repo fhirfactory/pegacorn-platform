@@ -23,7 +23,8 @@ package net.fhirfactory.pegacorn.petasos.audit.transformers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
+
+import net.fhirfactory.pegacorn.core.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventEntityFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.factories.AuditEventFactory;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.*;

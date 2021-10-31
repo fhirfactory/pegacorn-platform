@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
@@ -202,7 +202,7 @@ public class LocalPetasosFulfillmentTaskDM {
             PetasosFulfillmentTask currentParcel = taskListIterator.next();
             if (currentParcel.hasTaskFulfillment()) {
                 if (currentParcel.getTaskFulfillment().hasFulfillerComponent()){
-                    if(currentParcel.getTaskFulfillment().getFulfillerComponent().getNodeFDN().getToken().equals(wupInstanceID)){
+                    if(currentParcel.getTaskFulfillment().getFulfillerComponent().getComponentFDN().getToken().equals(wupInstanceID)){
                         return (currentParcel);
                     }
                 }

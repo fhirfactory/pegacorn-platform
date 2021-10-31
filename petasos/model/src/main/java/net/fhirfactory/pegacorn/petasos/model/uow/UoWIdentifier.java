@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.uow;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.RDN;
 
 import java.io.Serializable;
 

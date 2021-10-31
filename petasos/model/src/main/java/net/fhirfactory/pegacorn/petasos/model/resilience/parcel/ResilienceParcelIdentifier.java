@@ -23,14 +23,8 @@
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 
 public class ResilienceParcelIdentifier extends TaskIdType implements Serializable {

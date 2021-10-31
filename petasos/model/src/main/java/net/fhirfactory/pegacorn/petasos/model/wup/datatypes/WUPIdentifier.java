@@ -22,9 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.model.wup.datatypes;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;

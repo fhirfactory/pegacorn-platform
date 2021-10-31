@@ -22,10 +22,9 @@
 package net.fhirfactory.pegacorn.petasos.core.tasks.manager.distribution;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
-import net.fhirfactory.pegacorn.petasos.core.tasks.manager.outcomes.TaskOutcome2NewTasksProcessor;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -46,7 +45,7 @@ public class TaskDistributionRouteTemplate extends BaseRouteBuilder {
         super(context);
         getLogger().debug(".TaskOutcomeCollectionAndProcessingTemplate(): Entry, context --> ###, nodeElement --> {}", nodeElement);
         this.wupTopologyNode = nodeElement;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getComponentFDN().getToken());
     }
 
     @Override

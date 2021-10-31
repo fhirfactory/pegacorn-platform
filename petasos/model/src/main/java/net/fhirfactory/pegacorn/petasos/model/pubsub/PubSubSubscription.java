@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 
 import java.io.Serializable;
 import java.util.Objects;

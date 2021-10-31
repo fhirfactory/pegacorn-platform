@@ -21,15 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.manager.distribution;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
@@ -190,7 +190,7 @@ public class TaskDistributionWUPTypeRouter {
         getLogger().trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
         WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
         getLogger().trace(".forwardUoW2WUPs(): The TopologyNode for the target subscriber->{}", currentNodeElement);
-        TopologyNodeFDNToken currentNodeToken = currentNodeElement.getNodeFDN().getToken();
+        TopologyNodeFDNToken currentNodeToken = currentNodeElement.getComponentFDN().getToken();
         getLogger().trace(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", currentNodeElement);
         RouteElementNames routeName = new RouteElementNames(currentNodeToken);
         // Clone and Inject Message into Target Route

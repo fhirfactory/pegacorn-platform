@@ -22,11 +22,11 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.brokers;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.RDN;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.manager.TaskManager;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
@@ -53,7 +53,7 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 
 @ApplicationScoped
 public class PetasosMOAServicesBroker {

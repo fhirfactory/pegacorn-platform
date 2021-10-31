@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalPetasosFulfillmentTaskDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;

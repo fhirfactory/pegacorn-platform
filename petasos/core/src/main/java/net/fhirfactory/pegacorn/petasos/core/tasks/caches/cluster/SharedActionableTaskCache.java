@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.caches.cluster;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeFinalisationStatus;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeFinalisationStatusEnum;

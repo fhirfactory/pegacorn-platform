@@ -21,21 +21,21 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import java.io.Serializable;
-import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentIdType;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentIdType;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.Instant;
 
 
 public class PetasosTaskJobCard implements Serializable {

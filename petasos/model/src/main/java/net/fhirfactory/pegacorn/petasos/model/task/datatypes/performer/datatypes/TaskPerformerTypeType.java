@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.task.datatypes.performer.datatypes;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
 
 import java.io.Serializable;
 

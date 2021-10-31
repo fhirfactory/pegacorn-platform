@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
@@ -50,7 +50,7 @@ public class ExternalIngresWUPContainerRoute extends BasePetasosContainerRoute {
         super(camelCTX, auditTrailBroker);
         getLogger().debug(".ExternalIngresWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupNode );
         this.wupTopologyNode = wupNode;
-        nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+        nameSet = new RouteElementNames(wupTopologyNode.getComponentFDN().getToken());
     }
 
     @Override

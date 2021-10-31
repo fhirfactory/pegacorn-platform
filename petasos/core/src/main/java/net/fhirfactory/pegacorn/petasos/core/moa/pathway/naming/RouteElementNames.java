@@ -22,7 +22,10 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming;
 
-import net.fhirfactory.pegacorn.common.model.componentid.*;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

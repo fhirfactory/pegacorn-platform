@@ -21,12 +21,12 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.transformers.common;
 
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventSubTypeEnum;
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.auditevent.valuesets.AuditEventTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;

@@ -22,20 +22,20 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.SolutionTopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterface;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCInterfaceDefinition;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCServerTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.ProcessingPlantTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.SolutionTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
@@ -118,7 +118,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().trace(".initialise(): Setting up the wupTopologyElement (NodeElement) instance, which is the Topology Server's representation of this WUP ");
         this.associatedTopologyNode = buildWUPNodeElement();
         getLogger().trace(".initialise(): Setting the WUP nameSet, which is the set of Route EndPoints that the WUP Framework will use to link various enablers");
-        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getNodeFDN().getToken());
+        this.nameSet = new RouteElementNames(getAssociatedTopologyNode().getComponentFDN().getToken());
         getLogger().trace(".initialise(): Setting the WUP EgressEndpoint");
         this.egressEndpoint = specifyEgressEndpoint();
         getLogger().trace(".initialise(): Setting the WUP IngresEndpoint");
@@ -211,7 +211,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     public String getWupInstanceName() {
-        return getAssociatedTopologyNode().getNodeRDN().getTag();
+        return getAssociatedTopologyNode().getComponentRDN().getTag();
     }
 
     public WUPArchetypeEnum getWupArchetype() {
@@ -227,7 +227,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
     }
 
     public String getVersion() {
-        return associatedTopologyNode.getNodeRDN().getNodeVersion();
+        return associatedTopologyNode.getComponentRDN().getNodeVersion();
     }
 
     public FHIRElementTopicFactory getFHIRTopicIDBuilder(){
@@ -299,7 +299,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 specifyWUPInstanceVersion(),
                 getWorkshop().getWorkshopNode(),
                 ComponentTypeTypeEnum.WUP);
-        getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
+        getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getComponentFDN(), wupNode);
         wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
         return(wupNode);

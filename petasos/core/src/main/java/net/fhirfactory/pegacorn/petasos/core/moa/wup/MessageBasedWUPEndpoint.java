@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.base.IPCTopologyEndpoint;
 
 public class MessageBasedWUPEndpoint {
     private IPCTopologyEndpoint endpointTopologyNode;

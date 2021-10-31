@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.audit.brokers;
 
-import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosAuditWriterInterface;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
@@ -51,7 +51,7 @@ public class STAServicesAuditBroker {
         }
     }
 
-    public TransactionStatusElement logAPIActivity(WUPJobCard jobCard, UoW uow, TransactionTypeEnum transactionType){
+    public TransactionStatusElement logAPIActivity(WUPJobCard jobCard, UoW uow, PegacornTransactionTypeEnum transactionType){
         LOG.debug(".logAPIActivity(): Entry, jobCard->{}, uow->{}, transactionType->{}", jobCard, uow, transactionType);
         TransactionStatusElement statusElement = new TransactionStatusElement();
         return(statusElement);

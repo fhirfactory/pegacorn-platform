@@ -22,15 +22,12 @@
 package net.fhirfactory.pegacorn.petasos.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeType;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.finalisation.datatypes.TaskFinalisationStatusType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.TaskFulfillmentType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
-
-import java.util.List;
 
 public class PetasosActionableTask extends PetasosTask{
 

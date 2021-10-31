@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.factories;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.reason.valuesets.TaskReasonTypeEnum;

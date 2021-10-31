@@ -22,9 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
@@ -77,7 +77,7 @@ public class IngresActivityBeginRegistration {
         TopologyNodeFunctionFDNToken wupFunctionToken = wup.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);        
         LOG.trace(".registerActivityStart(): Building the ActivityID for this activity");
-        WUPIdentifier wupID = new WUPIdentifier(wup.getNodeFDN().getToken());
+        WUPIdentifier wupID = new WUPIdentifier(wup.getComponentFDN().getToken());
         ActivityID newActivityID = new ActivityID();
         newActivityID.setPresentWUPFunctionToken(wupFunctionToken);
         newActivityID.setPresentWUPIdentifier(wupID);

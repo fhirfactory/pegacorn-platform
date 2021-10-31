@@ -22,10 +22,9 @@
 package net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
+import net.fhirfactory.pegacorn.core.model.component.SoftwareComponent;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.common.TaskInstantDetailSegmentBase;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -37,12 +36,12 @@ import java.util.Date;
  * @author Mark A. Hunter
  */
 public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements Serializable {
-    private TopologyNode fulfillerComponent;
+    private SoftwareComponent fulfillerComponent;
     private FulfillmentTrackingIdType trackingID;
     private FulfillmentExecutionStatusEnum status;
     private boolean resilientActivity;
 
-    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, TopologyNode fulfillerCommponent, Instant registrationInstant) {
+    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerCommponent, Instant registrationInstant) {
         super();
         this.fulfillerComponent = fulfillerComponent;
         this.trackingID = SerializationUtils.clone(trackingID);
@@ -51,7 +50,7 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
         this.resilientActivity = false;
     }
 
-    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, TopologyNode fulfillerCommponent) {
+    public TaskFulfillmentType(FulfillmentTrackingIdType trackingID, SoftwareComponent fulfillerCommponent) {
         super();
         this.fulfillerComponent = fulfillerComponent;
         this.trackingID = SerializationUtils.clone(trackingID);
@@ -95,11 +94,11 @@ public class TaskFulfillmentType extends TaskInstantDetailSegmentBase implements
         return(hasValue);
     }
 
-    public TopologyNode getFulfillerComponent() {
+    public SoftwareComponent getFulfillerComponent() {
         return fulfillerComponent;
     }
 
-    public void setFulfillerComponent(TopologyNode fulfillerComponent) {
+    public void setFulfillerComponent(SoftwareComponent fulfillerComponent) {
         this.fulfillerComponent = fulfillerComponent;
     }
 

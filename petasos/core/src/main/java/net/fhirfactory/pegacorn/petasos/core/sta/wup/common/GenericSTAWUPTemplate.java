@@ -1,14 +1,14 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.wup.common;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.common.model.componentid.ComponentTypeTypeEnum;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.ComponentTypeTypeEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkshopTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkshopTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPIdentifier;
@@ -75,7 +75,7 @@ public abstract class GenericSTAWUPTemplate {
      */
     private WorkUnitProcessorTopologyNode buildSTAClientNode() {
         getLogger().debug(".buildSTAClientNode(): Entry");
-        TopologyNodeFDN staClientTypeFDN = new TopologyNodeFDN(getWorkshop().getNodeFDN());
+        TopologyNodeFDN staClientTypeFDN = new TopologyNodeFDN(getWorkshop().getComponentFDN());
         getLogger().trace(".buildSTAClientNode(): Now construct the Work Unit Processing Node");
         WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), ComponentTypeTypeEnum.WUP);
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Concurrency Mode");
@@ -83,7 +83,7 @@ public abstract class GenericSTAWUPTemplate {
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Resillience Mode");
         wup.setResilienceMode(getWorkshop().getResilienceMode());
         getLogger().trace(".buildSTAClientNode(): Now registering the Node");
-        getTopologyIM().addTopologyNode(getWorkshop().getNodeFDN(), wup);
+        getTopologyIM().addTopologyNode(getWorkshop().getComponentFDN(), wup);
         getLogger().debug(".buildSTAClientNode(): Exit, buildSTAClientNode (NodeElementIdentifier) --> {}", wup);
         return (wup);
     }
@@ -97,7 +97,7 @@ public abstract class GenericSTAWUPTemplate {
     }
 
     public String getWUPName() {
-        return (getWUP().getNodeRDN().getNodeName());
+        return (getWUP().getComponentRDN().getNodeName());
     }
 
     public WUPJobCard getWUPJobCard() {
@@ -105,7 +105,7 @@ public abstract class GenericSTAWUPTemplate {
     }
 
     public String getWUPVersion() {
-        return (getWUP().getNodeRDN().getNodeVersion());
+        return (getWUP().getComponentRDN().getNodeVersion());
     }
 
     public TopologyIM getTopologyIM() {
@@ -113,7 +113,7 @@ public abstract class GenericSTAWUPTemplate {
     }
 
     public WUPIdentifier getWUPIdentifier(){
-        WUPIdentifier wupIdentifier = new WUPIdentifier(getWUP().getNodeFDN().getToken());
+        WUPIdentifier wupIdentifier = new WUPIdentifier(getWUP().getComponentFDN().getToken());
         return(wupIdentifier);
     }
 }

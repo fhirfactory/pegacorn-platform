@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.manager;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.tasks.manager.distribution.TaskDistributionRouteTemplate;
 import net.fhirfactory.pegacorn.petasos.core.tasks.manager.outcomes.TaskOutcomeCollectionAndProcessingTemplate;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.WUPArchetypeEnum;

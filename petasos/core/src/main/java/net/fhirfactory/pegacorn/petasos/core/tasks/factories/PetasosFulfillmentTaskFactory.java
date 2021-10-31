@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.tasks.factories;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosActionableTask;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.datatypes.FulfillmentTrackingIdType;

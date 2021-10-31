@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.datasets.cache;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

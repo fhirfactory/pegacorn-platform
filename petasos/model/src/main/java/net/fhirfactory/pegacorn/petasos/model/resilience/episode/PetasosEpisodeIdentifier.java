@@ -23,8 +23,8 @@
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 
 import java.io.Serializable;

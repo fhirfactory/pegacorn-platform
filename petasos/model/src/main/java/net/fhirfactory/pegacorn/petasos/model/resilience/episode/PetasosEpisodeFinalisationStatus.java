@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.datatypes.WUPFunctionToken;
 
 /**

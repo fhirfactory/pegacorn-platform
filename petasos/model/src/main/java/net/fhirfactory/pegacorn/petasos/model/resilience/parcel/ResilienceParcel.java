@@ -22,15 +22,14 @@
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.common.model.componentid.*;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.DefaultWorkshopSetEnum;
+import net.fhirfactory.pegacorn.core.model.componentid.*;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.DefaultWorkshopSetEnum;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.task.PetasosFulfillmentTask;
-import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.TaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.identity.datatypes.TaskIdType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.TaskTypeType;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.tasktype.valuesets.TaskTypeTypeEnum;
@@ -43,8 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Mark A. Hunter
@@ -134,7 +131,7 @@ public class ResilienceParcel extends PetasosFulfillmentTask {
     public boolean isAnInteractWUP() {
         if(hasTaskFulfillment()){
             if(getTaskFulfillment().hasFulfillerComponent()){
-                TopologyNodeFDN nodeFDN = getTaskFulfillment().getFulfillerComponent().getNodeFDN();
+                TopologyNodeFDN nodeFDN = getTaskFulfillment().getFulfillerComponent().getComponentFDN();
                 TopologyNodeRDN topologyNodeRDN = nodeFDN.extractRDNForNodeType(ComponentTypeTypeEnum.WORKSHOP);
                 if(topologyNodeRDN != null){
                     if(topologyNodeRDN.getNodeName().equalsIgnoreCase(DefaultWorkshopSetEnum.INTERACT_WORKSHOP.getWorkshop())){
@@ -474,7 +471,7 @@ public class ResilienceParcel extends PetasosFulfillmentTask {
     @JsonIgnore @Deprecated
     public WUPIdentifier getAssociatedWUPIdentifier() {
         if(hasAssociatedWUPIdentifier()){
-            TopologyNodeFDNToken nodeToken = getTaskFulfillment().getFulfillerComponent().getNodeFDN().getToken();
+            TopologyNodeFDNToken nodeToken = getTaskFulfillment().getFulfillerComponent().getComponentFDN().getToken();
             WUPIdentifier wupID = new WUPIdentifier(nodeToken);
             return(wupID);
         }

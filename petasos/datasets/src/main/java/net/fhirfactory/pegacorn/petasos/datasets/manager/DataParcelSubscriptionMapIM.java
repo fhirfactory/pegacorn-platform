@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.DataParcelSubscriptionMapDM;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.PubSubParticipant;
 import org.slf4j.Logger;

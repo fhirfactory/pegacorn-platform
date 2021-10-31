@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.model.itops;
 
 import java.time.Instant;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 
 /**
  *

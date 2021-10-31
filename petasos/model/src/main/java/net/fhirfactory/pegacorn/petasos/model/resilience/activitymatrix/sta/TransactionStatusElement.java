@@ -21,8 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta;
 
-import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionStatusEnum;
-import net.fhirfactory.pegacorn.components.transaction.valuesets.TransactionTypeEnum;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionStatusEnum;
+import net.fhirfactory.pegacorn.core.model.transaction.valuesets.PegacornTransactionTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 
@@ -32,8 +32,8 @@ import java.util.Date;
 public class TransactionStatusElement {
     private WUPJobCard jobCard;
     private UoW unitOfWork;
-    private TransactionStatusEnum transactionStatus;
-    private TransactionTypeEnum transactionType;
+    private PegacornTransactionStatusEnum transactionStatus;
+    private PegacornTransactionTypeEnum transactionType;
     private String transactionStatusCommentary;
     private Date transactionStartTime;
     private Date transactionFinishedTime;
@@ -68,19 +68,19 @@ public class TransactionStatusElement {
         this.unitOfWork = unitOfWork;
     }
 
-    public TransactionStatusEnum getTransactionStatus() {
+    public PegacornTransactionStatusEnum getTransactionStatus() {
         return transactionStatus;
     }
 
-    public void setTransactionStatus(TransactionStatusEnum transactionStatus) {
+    public void setTransactionStatus(PegacornTransactionStatusEnum transactionStatus) {
         this.transactionStatus = transactionStatus;
     }
 
-    public TransactionTypeEnum getTransactionType() {
+    public PegacornTransactionTypeEnum getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(TransactionTypeEnum transactionType) {
+    public void setTransactionType(PegacornTransactionTypeEnum transactionType) {
         this.transactionType = transactionType;
     }
 

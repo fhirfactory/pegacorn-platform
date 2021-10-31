@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.manager;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalEgressWUPContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes.ExternalIngresWUPContainerRoute;
@@ -155,7 +155,7 @@ public class WorkUnitProcessorFrameworkManager {
     private PubSubParticipant constructPubSubSubscriber(WorkUnitProcessorTopologyNode wupNode){
         PubSubParticipant subscriber = new PubSubParticipant();
         IntraSubsystemPubSubParticipant localSubscriber = new IntraSubsystemPubSubParticipant();
-        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getNodeFDN().getToken());
+        IntraSubsystemPubSubParticipantIdentifier identifier = new IntraSubsystemPubSubParticipantIdentifier(wupNode.getComponentFDN().getToken());
         localSubscriber.setIdentifier(identifier);
         subscriber.setIntraSubsystemParticipant(localSubscriber);
         return(subscriber);

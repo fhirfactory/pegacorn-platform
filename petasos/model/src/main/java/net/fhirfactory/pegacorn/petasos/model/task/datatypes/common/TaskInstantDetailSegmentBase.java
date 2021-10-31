@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.model.task.datatypes.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.time.Instant;

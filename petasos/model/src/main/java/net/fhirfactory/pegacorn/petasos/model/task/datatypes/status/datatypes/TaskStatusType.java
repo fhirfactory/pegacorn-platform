@@ -23,7 +23,7 @@
 package net.fhirfactory.pegacorn.petasos.model.task.datatypes.status.datatypes;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
+import net.fhirfactory.pegacorn.core.constants.petasos.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.task.datatypes.fulfillment.valuesets.FulfillmentExecutionStatusEnum;
 
 import java.io.Serializable;

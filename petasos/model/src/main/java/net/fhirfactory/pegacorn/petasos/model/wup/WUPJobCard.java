@@ -24,8 +24,8 @@ package net.fhirfactory.pegacorn.petasos.model.wup;
 import java.io.Serializable;
 import java.util.Date;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ConcurrencyModeEnum;
-import net.fhirfactory.pegacorn.deployment.topology.model.mode.ResilienceModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ConcurrencyModeEnum;
+import net.fhirfactory.pegacorn.core.model.topology.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.valuesets.PetasosJobActivityStatusEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;

@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.edge.petasos.PetasosEndpoint;
+import net.fhirfactory.pegacorn.core.model.topology.endpoints.edge.petasos.PetasosEndpoint;
 
 import java.io.Serializable;
 import java.time.Instant;

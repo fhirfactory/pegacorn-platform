@@ -22,7 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.core.tasks.caches;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.core.model.generalid.FDN;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.tasks.caches.processingplant.LocalPetasosFulfillmentTaskDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
@@ -87,12 +87,12 @@ public class LocalPetasosFulfilmentTaskBroker {
             LOG.trace(".registerParcel(): Attempted to retrieve existing ResilienceParcel, and there wasn't one, so let's create it!");
             fulfillmentTask = new ResilienceParcel(activityID, unitOfWork);
             if(portType != null){
-                fulfillmentTask.setAssociatedPortType(portType);
-                fulfillmentTask.setAssociatedPortValue(portValue);
+//                fulfillmentTask.getTaskFulfillment().getFulfillerComponent().(portType);
+//                fulfillmentTask.setAssociatedPortValue(portValue);
             }
             parcelCacheDM.addFulfillmentTask(fulfillmentTask);
-            LOG.trace(".registerParcel(): Set the PresentParcelInstanceID in the ActivityID (ActivityID), ParcelInstanceID --> {}", fulfillmentTask.getIdentifier());
-            activityID.setPresentParcelIdentifier(fulfillmentTask.getIdentifier());
+            LOG.trace(".registerParcel(): Set the PresentParcelInstanceID in the ActivityID (ActivityID), ParcelInstanceID --> {}", fulfillmentTask.getTaskId());
+            activityID.setPresentParcelIdentifier(fulfillmentTask.getTaskId());
             Date registrationDate = Date.from(Instant.now());
             LOG.trace(".registerParcel(): Set the Registration Date --> {}", registrationDate);
             fulfillmentTask.setRegistrationDate(registrationDate);

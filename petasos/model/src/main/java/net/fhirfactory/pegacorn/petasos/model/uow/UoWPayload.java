@@ -22,13 +22,11 @@
 package net.fhirfactory.pegacorn.petasos.model.uow;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelQualityStatement;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelManifest;
+import net.fhirfactory.pegacorn.core.model.dataparcel.DataParcelQualityStatement;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.fhirfactory.pegacorn.components.dataparcel.DataParcelToken;
 
 import java.io.Serializable;
 import java.util.Objects;

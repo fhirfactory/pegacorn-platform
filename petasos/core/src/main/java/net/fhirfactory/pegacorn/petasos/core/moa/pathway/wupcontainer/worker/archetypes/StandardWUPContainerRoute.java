@@ -22,20 +22,15 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.archetypes;
 
-import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.core.model.topology.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.common.BasePetasosContainerRoute;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.buildingblocks.*;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.*;
-import org.apache.camel.model.OnExceptionDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.net.ConnectException;
 
 /**
  * @author Mark A. Hunter
@@ -59,14 +54,14 @@ public class StandardWUPContainerRoute extends BasePetasosContainerRoute {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken());
+		this.nameSet = new RouteElementNames(wupTopologyNode.getComponentFDN().getToken());
 	}
 
 	public StandardWUPContainerRoute(CamelContext camelCTX, WorkUnitProcessorTopologyNode wupTopologyNode, MOAServicesAuditBroker auditTrailBroker, boolean requiresDirect) {
 		super(camelCTX, auditTrailBroker);
 		getLogger().debug(".StandardWUPContainerRoute(): Entry, context --> ###, wupNode --> {}", wupTopologyNode);
 		this.wupTopologyNode = wupTopologyNode;
-		this.nameSet = new RouteElementNames(wupTopologyNode.getNodeFDN().getToken(), requiresDirect);
+		this.nameSet = new RouteElementNames(wupTopologyNode.getComponentFDN().getToken(), requiresDirect);
 	}
 
 	//
