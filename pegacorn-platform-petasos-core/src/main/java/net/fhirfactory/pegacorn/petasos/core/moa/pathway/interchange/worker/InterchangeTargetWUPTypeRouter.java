@@ -123,7 +123,7 @@ public class InterchangeTargetWUPTypeRouter {
                 if(hasRemoteServiceName(currentSubscriber)) {
                     String subscriberName = currentSubscriber.getInterSubsystemParticipant().getEndpointServiceName();
                     if (subscriberName.contentEquals(uowTopicID.getIntendedTargetSystem())) {
-                        forwardPacket(currentSubscriber, ingresPacket);
+                        forwardPacket(currentSubscriber, ingresPacket, camelExchange);
                         alreadySentTo = subscriberName;
                     }
                 }
@@ -148,7 +148,7 @@ public class InterchangeTargetWUPTypeRouter {
                     }
                     if (!dontSendAgain) {
                         getLogger().trace(".forwardUoW2WUPs(): does not have Inter-Subsystem element");
-                        forwardPacket(currentSubscriber, ingresPacket);
+                        forwardPacket(currentSubscriber, ingresPacket, camelExchange);
                     }
                 }
             }
@@ -184,7 +184,7 @@ public class InterchangeTargetWUPTypeRouter {
         return(true);
     }
 
-    private void forwardPacket(PubSubParticipant subscriber, WorkUnitTransportPacket packet){
+    private void forwardPacket(PubSubParticipant subscriber, WorkUnitTransportPacket packet, Exchange exchange){
         getLogger().debug(".forwardUoW2WUPs(): Subscriber --> {}", subscriber);
         IntraSubsystemPubSubParticipantIdentifier localSubscriberIdentifier = subscriber.getIntraSubsystemParticipant().getIdentifier();
         getLogger().trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
@@ -211,7 +211,8 @@ public class InterchangeTargetWUPTypeRouter {
                 getLogger().trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getEndpointServiceName());
             }
         }
-        template.sendBody(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket);
+        Object propertyValue = exchange.getProperty("CamelAttachmentObjects");
+        template.sendBodyAndProperty(routeName.getEndPointWUPContainerIngresProcessorIngres(), ExchangePattern.InOnly, clonedPacket, "CamelAttachmentObjects", propertyValue);
         // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
         // Now add the downstream WUPFunction to the Parcel Finalisation Registry
         WUPFunctionToken functionToken = new WUPFunctionToken(currentNodeElement.getNodeFunctionFDN().getFunctionToken());
